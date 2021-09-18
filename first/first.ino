@@ -110,6 +110,7 @@ inline Voltage_t calculateVoltage(const double avgerage_signal)
 ***/
   const Voltage_t V_out = (avgerage_signal / MAX_SIGNAL) * VOLTAGE_FOR_MAX_SIGNAL; // See ref [1]
   const Voltage_t V_in = V_out / (R_2 / (R_1 + R_2)); // See ref [1]
+
   return V_in;
 }
 
