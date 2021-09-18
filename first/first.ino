@@ -31,13 +31,9 @@
   * [3] https://en.wikipedia.org/wiki/Voltage_divider
 ***/
 
-// Includes
-
 #include "first.h"
 
-static LiquidCrystal_I2C *lcd_handle = nullptr;
-
-// Implementations
+static LiquidCrystal_I2C *main_lcd_handle = nullptr;
 
 inline Voltage_t calculateVoltage(const double avgerage_signal)
 {
@@ -100,8 +96,8 @@ inline void abortWithErrorCode(const ErrorCode_t err_code)
   case NO_ERROR:
     return;
   default:
-    free(lcd_handle);
-    lcd_handle = nullptr;
+    free(main_lcd_handle);
+    main_lcd_handle = nullptr;
     abort();
   }
 }
@@ -137,10 +133,10 @@ void setup()
 void loop()
 {
   const Voltage_t input_voltage = measureVoltage(); // [V]
-  lcd_handle->clear();
-  lcd_handle->setCursor(0, 0);
+  main_lcd_handle->clear();
+  main_lcd_handle->setCursor(0, 0);
   printMeasuredVoltage(input_voltage);
-  lcd_handle->setCursor(0, 1);
+  main_lcd_handle->setCursor(0, 1);
 }
 
 Voltage_t measureVoltage()
@@ -177,8 +173,8 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
         Serial.print(adr, HEX);
         Serial.println(".");
 #endif
-        lcd_handle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
-        if (lcd_handle)
+        main_lcd_handle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
+        if (main_lcd_handle)
         {
 #ifndef NO_DEBUGGIG
           Serial.print("log: I2C connected: address = 0x");
@@ -206,11 +202,11 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
       }
     }
 
-    if (lcd_handle)
+    if (main_lcd_handle)
     {
       err_code = NO_ERROR;
-      lcd_handle->begin();
-      lcd_handle->backlight();
+      main_lcd_handle->begin();
+      main_lcd_handle->backlight();
     }
     else
     {
@@ -238,37 +234,37 @@ void printMeasuredVoltage(const Voltage_t measured_voltage)
   switch (((measured_voltage > 4.99) * 2) + ((measured_voltage < 0.01) * 1))
   {
   case 0: // when (measured_voltage <= 0.01 && measured_voltage <= 4.99)
-    lcd_handle->print("V_in = ");
-    lcd_handle->print(measured_voltage);
-    lcd_handle->print("V");
+    main_lcd_handle->print("V_in = ");
+    main_lcd_handle->print(measured_voltage);
+    main_lcd_handle->print("V");
     break;
   case 1: // when (measured_voltage < 0.01)
 #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too small.");
 #endif
-    lcd_handle->print("V_in < 0.01V");
+    main_lcd_handle->print("V_in < 0.01V");
     break;
   case 2: // when (measured_voltage > 4.99)
 #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too large.");
 #endif
-    lcd_handle->print("V_in > 4.99V");
+    main_lcd_handle->print("V_in > 4.99V");
     break;
   }
 }
 
 void greeting()
 {
-  lcd_handle->clear();
-  lcd_handle->setCursor(0, 0);
-  lcd_handle->print("SYSTEM ONLINE");
+  main_lcd_handle->clear();
+  main_lcd_handle->setCursor(0, 0);
+  main_lcd_handle->print("SYSTEM ONLINE");
   for (int cnt_dot = 0; cnt_dot < 3; cnt_dot++)
   {
     delay(500);
-    lcd_handle->print(".");
+    main_lcd_handle->print(".");
   }
   delay(500);
-  lcd_handle->setCursor(0, 1);
-  lcd_handle->print("# VOLTAGE SENSOR");
+  main_lcd_handle->setCursor(0, 1);
+  main_lcd_handle->print("# VOLTAGE SENSOR");
   delay(1000);
 }
