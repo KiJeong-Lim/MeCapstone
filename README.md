@@ -1,5 +1,7 @@
 # My Capstone Project
 
+# Inner projects
+
 ## first
 
 - Measuring the voltage of a given battery and printing it.
