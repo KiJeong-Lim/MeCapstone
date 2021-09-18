@@ -41,9 +41,23 @@
   * ```
 ***/
 
+// Includes
+
 #include "first.h"
 
+// Module Functions
+
+static ErrorCode_t initializeLCD(int lcd_width, int lcd_height);
+static Voltage_t measureVoltage();
+static void printMeasuredVoltage(Voltage_t measured_voltage);
+static void greeting();
+
+// Module Variables
+
 static LiquidCrystal_I2C *main_lcd_handle = nullptr;
+static ErrorCode_t err_code = NO_ERROR;
+
+// Implementations
 
 inline Voltage_t calculateVoltage(const double avgerage_signal)
 {
@@ -99,7 +113,7 @@ inline Voltage_t calculateVoltage(const double avgerage_signal)
   return V_in;
 }
 
-inline void abortWithErrorCode(const ErrorCode_t err_code)
+inline void checkOkay()
 {
   switch (err_code)
   {
@@ -122,57 +136,61 @@ inline void warmingupAnalogPin(const int pin_num)
 
 void setup()
 {
-  ErrorCode_t err_code = NO_ERROR;
   #ifndef NO_DEBUGGING
   Serial.begin(9600);
   Serial.println("log: Runtime started.");
   #endif // ifndef NO_DEBUGGING
+  
   Wire.begin();
   err_code = initializeLCD(16, 2);
-  if (err_code == NO_ERROR)
-  {
-    greeting();
-    warmingupAnalogPin(A0);
-  }
-  else
-  {
-    abortWithErrorCode(err_code);
-  }
+  checkOkay();
+
+  greeting();
+  warmingupAnalogPin(A0);
 }
 
 void loop()
 {
   const Voltage_t input_voltage = measureVoltage(); // [V]
+  
   main_lcd_handle->clear();
+
+  // print input voltage
   main_lcd_handle->setCursor(0, 0);
   printMeasuredVoltage(input_voltage);
-  main_lcd_handle->setCursor(0, 1);
 }
 
-Voltage_t measureVoltage()
+static Voltage_t measureVoltage()
 {
   const int long long beg_time = millis(); // the time when this function was called
   int long long sum_of_vals = 0; // sum of values obtained from the analog pin `A0`
   int long cnt_of_vals = 0; // number of how many times we call the function `analogRead`
+  
+  // keep calling the function `analogRead` for 100 milli seconds
   for (int long long cur_time = beg_time; cur_time - beg_time < 100; cur_time = millis())
-  { // keep calling the function `analogRead` for 100 milli seconds
+  {
     sum_of_vals += analogRead(A0);
     cnt_of_vals++;
   }
-  return calculateVoltage(((double)sum_of_vals) / ((double)cnt_of_vals)); // derive the input voltage from the average value
+  
+  // calculate the input voltage from the average value
+  return calculateVoltage(((double)sum_of_vals) / ((double)cnt_of_vals));
 }
 
-ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
+static ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
 {
-  ErrorCode_t err_code = INIT_FAIL;
+  ErrorCode_t my_err_code = INIT_FAIL; // result of this function
+
   if (row_dim > 0 && col_dim > 0)
   {
     for (byte adr = 0x01; adr < 0xFF; adr++) // See ref [2]
     {
       byte response = 4;
+
       Wire.beginTransmission(adr);
       response = Wire.endTransmission(adr);
-      if (response == 0)
+
+      if (response == 0) // when `adr` is the address of a device
       {
         #ifndef NO_DEBUGGIG
         Serial.print("log: address found: address = 0x");
@@ -183,8 +201,11 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
         Serial.print(adr, HEX);
         Serial.println(".");
         #endif // ifndef NO_DEBUGGING
+
+        // make an LCD handle
         main_lcd_handle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
-        if (main_lcd_handle)
+
+        if (main_lcd_handle) // when the LCD handle is good
         {
           #ifndef NO_DEBUGGIG
           Serial.print("log: I2C connected: address = 0x");
@@ -195,10 +216,11 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
           Serial.print(adr, HEX);
           Serial.println(".");
           #endif // ifndef NO_DEBUGGING
-          break;
+
+          break; // break the loop `for (byte adr = 0x01; adr < 0xFF; adr++)`
         }
       }
-      else if (response == 0)
+      else if (response == 0) // when an error occurs in the address `adr`
       {
         #ifndef NO_DEBUGGING // ifndef NO_DEBUGGING
         Serial.print("Warning: unknown error at 0x");
@@ -211,9 +233,9 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
         #endif // ifndef NO_DEBUGGING
       }
     }
-    if (main_lcd_handle)
+    if (main_lcd_handle) // if we have a good LCD handle
     {
-      err_code = NO_ERROR;
+      my_err_code = NO_ERROR;
       main_lcd_handle->begin();
       main_lcd_handle->backlight();
     }
@@ -230,39 +252,48 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
     Serial.println("ERROR: initializing LCD failed.");
     #endif // ifndef NO_DEBUGGING
   }
-  return err_code;
+  return my_err_code;
 }
 
-void printMeasuredVoltage(const Voltage_t measured_voltage)
+static void printMeasuredVoltage(const Voltage_t measured_voltage)
 {
   #ifndef NO_DEBUGGIG
   Serial.print("log: measured_voltage = ");
   Serial.print(measured_voltage);
   Serial.println("[V].");
   #endif // ifndef NO_DEBUGGING
+
   switch (((measured_voltage > 4.99) * 2) + ((measured_voltage < 0.01) * 1))
   {
   case 0: // when (measured_voltage <= 0.01 && measured_voltage <= 4.99)
+
     main_lcd_handle->print("V_in = ");
     main_lcd_handle->print(measured_voltage);
     main_lcd_handle->print("V");
     break;
+
   case 1: // when (measured_voltage < 0.01)
+
     #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too small.");
     #endif // ifndef NO_DEBUGGING
+
     main_lcd_handle->print("V_in < 0.01V");
     break;
+
   case 2: // when (measured_voltage > 4.99)
+
     #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too large.");
     #endif // ifndef NO_DEBUGGING
+
     main_lcd_handle->print("V_in > 4.99V");
     break;
+
   }
 }
 
-void greeting()
+static void greeting()
 {
   main_lcd_handle->clear();
   main_lcd_handle->setCursor(0, 0);
@@ -273,6 +304,7 @@ void greeting()
     main_lcd_handle->print(".");
   }
   delay(500);
+  
   main_lcd_handle->setCursor(0, 1);
   main_lcd_handle->print("# VOLTAGE SENSOR");
   delay(1000);

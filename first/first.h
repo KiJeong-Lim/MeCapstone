@@ -65,11 +65,4 @@ enum ErrorCode_t {
 
 typedef double Voltage_t;
 
-// Declarations
-
-ErrorCode_t initializeLCD(int lcd_width, int lcd_height);
-Voltage_t measureVoltage();
-void printMeasuredVoltage(Voltage_t measured_voltage);
-void greeting();
-
 #endif // ifndef FIRST_H
