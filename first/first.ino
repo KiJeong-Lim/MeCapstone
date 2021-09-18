@@ -97,7 +97,7 @@ inline Voltage_t calculateVoltage(const double avgerage_signal)
   * [Voltage Sensor]   |   +---< A0      *
   *                    |          |      *
   *                    |          |      *
-  *                    |         V_in    *
+  *                    |         V_out   *
   *                    |          |      *
   *                    |         \|/     *
   *                    +-------< GND     *
