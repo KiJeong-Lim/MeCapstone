@@ -154,10 +154,10 @@ void setup()
 void loop()
 {
   const Voltage_t input_voltage = measureVoltage(); // [V]
-  
+
   main_lcd_handle->clear();
 
-  // print input voltage
+  // print `input_voltage`
   main_lcd_handle->setCursor(0, 0);
   printMeasuredVoltage(input_voltage);
 }
