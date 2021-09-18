@@ -29,6 +29,16 @@
   * [1] https://www.youtube.com/watch?v=psNAeHoZv0A
   * [2] https://codingrun.com/119
   * [3] https://en.wikipedia.org/wiki/Voltage_divider
+  <Setting>
+  * [.vscode/arduino.json]
+  * ```
+  * {
+  *   "sketch": "first/first.ino",
+  *   "board": "arduino:avr:uno",
+  *   "port": "COM3",
+  *   "output": "first/build"
+  * }
+  * ```
 ***/
 
 #include "first.h"
@@ -113,10 +123,10 @@ inline void warmingupAnalogPin(const int pin_num)
 void setup()
 {
   ErrorCode_t err_code = NO_ERROR;
-#ifndef NO_DEBUGGING
+  #ifndef NO_DEBUGGING
   Serial.begin(9600);
   Serial.println("log: Runtime started.");
-#endif
+  #endif // ifndef NO_DEBUGGING
   Wire.begin();
   err_code = initializeLCD(16, 2);
   if (err_code == NO_ERROR)
@@ -164,7 +174,7 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
       response = Wire.endTransmission(adr);
       if (response == 0)
       {
-#ifndef NO_DEBUGGIG
+        #ifndef NO_DEBUGGIG
         Serial.print("log: address found: address = 0x");
         if (adr < 16)
         {
@@ -172,11 +182,11 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
         }
         Serial.print(adr, HEX);
         Serial.println(".");
-#endif
+        #endif // ifndef NO_DEBUGGING
         main_lcd_handle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
         if (main_lcd_handle)
         {
-#ifndef NO_DEBUGGIG
+          #ifndef NO_DEBUGGIG
           Serial.print("log: I2C connected: address = 0x");
           if (adr < 16)
           {
@@ -184,13 +194,13 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
           }
           Serial.print(adr, HEX);
           Serial.println(".");
-#endif
+          #endif // ifndef NO_DEBUGGING
           break;
         }
       }
       else if (response == 0)
       {
-#ifndef NO_DEBUGGING
+        #ifndef NO_DEBUGGING // ifndef NO_DEBUGGING
         Serial.print("Warning: unknown error at 0x");
         if (adr < 16)
         {
@@ -198,10 +208,9 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
         }
         Serial.print(adr, HEX);
         Serial.println(".");
-#endif
+        #endif // ifndef NO_DEBUGGING
       }
     }
-
     if (main_lcd_handle)
     {
       err_code = NO_ERROR;
@@ -210,27 +219,27 @@ ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
     }
     else
     {
-#ifndef NO_DEBUGGIG
+      #ifndef NO_DEBUGGIG
       Serial.println("ERROR: initializing LCD failed.");
-#endif
+      #endif // ifndef NO_DEBUGGING
     }
   }
   else
   {
-#ifndef NO_DEBUGGIG
+    #ifndef NO_DEBUGGIG
     Serial.println("ERROR: initializing LCD failed.");
-#endif
+    #endif // ifndef NO_DEBUGGING
   }
   return err_code;
 }
 
 void printMeasuredVoltage(const Voltage_t measured_voltage)
 {
-#ifndef NO_DEBUGGIG
+  #ifndef NO_DEBUGGIG
   Serial.print("log: measured_voltage = ");
   Serial.print(measured_voltage);
   Serial.println("[V].");
-#endif
+  #endif // ifndef NO_DEBUGGING
   switch (((measured_voltage > 4.99) * 2) + ((measured_voltage < 0.01) * 1))
   {
   case 0: // when (measured_voltage <= 0.01 && measured_voltage <= 4.99)
@@ -239,15 +248,15 @@ void printMeasuredVoltage(const Voltage_t measured_voltage)
     main_lcd_handle->print("V");
     break;
   case 1: // when (measured_voltage < 0.01)
-#ifndef NO_DEBUGGIG
+    #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too small.");
-#endif
+    #endif // ifndef NO_DEBUGGING
     main_lcd_handle->print("V_in < 0.01V");
     break;
   case 2: // when (measured_voltage > 4.99)
-#ifndef NO_DEBUGGIG
+    #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too large.");
-#endif
+    #endif // ifndef NO_DEBUGGING
     main_lcd_handle->print("V_in > 4.99V");
     break;
   }

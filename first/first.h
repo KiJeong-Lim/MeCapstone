@@ -29,6 +29,16 @@
   * [1] https://www.youtube.com/watch?v=psNAeHoZv0A
   * [2] https://codingrun.com/119
   * [3] https://en.wikipedia.org/wiki/Voltage_divider
+  <Setting>
+  * [.vscode/arduino.json]
+  * ```
+  * {
+  *   "sketch": "first/first.ino",
+  *   "board": "arduino:avr:uno",
+  *   "port": "COM3",
+  *   "output": "first/build"
+  * }
+  * ```
 ***/
 
 #ifndef FIRST_H
@@ -62,4 +72,4 @@ Voltage_t measureVoltage();
 void printMeasuredVoltage(Voltage_t measured_voltage);
 void greeting();
 
-#endif
+#endif // ifndef FIRST_H
