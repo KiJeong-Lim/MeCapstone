@@ -85,23 +85,23 @@ inline Voltage_t calculateVoltage(const double avgerage_signal)
   * R_1 = the resistance between `VCC` of [Voltage Sensor] and `S` of [Voltage Sensor].
   * R_2 = the resistance between `S` of [Voltage Sensor] and `-` of [Voltage Sensor].
   <Core Wiring and Voltage Divison>
-  *                        +---< GND     *
-  *                        |     /|\     *
+  *                        +---< (+)     *
   *                        |      |      *
-  *                        |     V_out   *
   *                        |      |      *
-  *              - >-------+      |      *
-  *              S >-----------< A0      *
-  *            GND >-------+   [Arduino] *
-  *            VCC >---+   |             *
-  * [Voltage Sensor]   |   +---< (-)     *
-  *                    |         /|\     *
+  *                        |     V_in    *
+  *                        |      |      *
+  *            VCC >-------+     \|/     *
+  *            GND >-----------< (-)     *
+  *              S >-------+   [Battery] *
+  *              - >---+   |             *
+  * [Voltage Sensor]   |   +---< A0      *
+  *                    |          |      *
   *                    |          |      *
   *                    |         V_in    *
   *                    |          |      *
-  *                    |          |      *
-  *                    +-------< (+)     *
-  *                            [Battery] *
+  *                    |         \|/     *
+  *                    +-------< GND     *
+  *                            [Arduino] *
   <The conclusion>
   * R_1 = 30000.0 [Ohm]
   * R_2 = 7500.0  [Ohm]
@@ -119,6 +119,7 @@ inline void checkOkay()
   {
   case NO_ERROR:
     return;
+
   default:
     free(main_lcd_handle);
     main_lcd_handle = nullptr;
@@ -165,7 +166,7 @@ static Voltage_t measureVoltage()
   const int long long beg_time = millis(); // the time when this function was called
   int long long sum_of_vals = 0; // sum of values obtained from the analog pin `A0`
   int long cnt_of_vals = 0; // number of how many times we call the function `analogRead`
-  
+
   // keep calling the function `analogRead` for 100 milli seconds
   for (int long long cur_time = beg_time; cur_time - beg_time < 100; cur_time = millis())
   {
