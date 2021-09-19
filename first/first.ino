@@ -108,6 +108,7 @@ inline Voltage_t calculateVoltage(const double avgerage_signal)
   * -------------------
   * V_out = V_in * 0.2
 ***/
+
   const Voltage_t V_out = (avgerage_signal / MAX_SIGNAL) * VOLTAGE_FOR_MAX_SIGNAL; // See ref [1]
   const Voltage_t V_in = V_out / (R_2 / (R_1 + R_2)); // See ref [1]
 
@@ -268,14 +269,12 @@ static void printMeasuredVoltage(const Voltage_t measured_voltage)
   switch (((measured_voltage > 4.99) * 2) + ((measured_voltage < 0.01) * 1))
   {
   case 0: // when (measured_voltage <= 0.01 && measured_voltage <= 4.99)
-
     main_lcd_handle->print("V_in = ");
     main_lcd_handle->print(measured_voltage);
     main_lcd_handle->print("V");
     break;
 
   case 1: // when (measured_voltage < 0.01)
-
     #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too small.");
     #endif // ifndef NO_DEBUGGING
@@ -284,20 +283,19 @@ static void printMeasuredVoltage(const Voltage_t measured_voltage)
     break;
 
   case 2: // when (measured_voltage > 4.99)
-
     #ifndef NO_DEBUGGIG
     Serial.println("Warning: the input voltage is too large.");
     #endif // ifndef NO_DEBUGGING
 
     main_lcd_handle->print("V_in > 4.99V");
     break;
-
   }
 }
 
 static void greeting()
 {
   main_lcd_handle->clear();
+
   main_lcd_handle->setCursor(0, 0);
   main_lcd_handle->print("SYSTEM ONLINE");
   for (int cnt_dot = 0; cnt_dot < 3; cnt_dot++)
