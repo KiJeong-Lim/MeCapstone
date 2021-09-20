@@ -1,4 +1,4 @@
-# The charging system for a battery cell
+# My charging system for a battery cell
 
 ```c
 /**
