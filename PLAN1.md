@@ -60,7 +60,7 @@
   * [MOFSET] IRF4905PBF P-channel Power MOFSET
   * [NPN] SS8050DTA Bipolar NPN Transistor
   * [Power Inductor] 150[μH] Power Inductor 2[A] Idc 106[mΩ] Rdc
-  * [R (#1)] 1[kΩ]
+  * [R (#1)] 8[kΩ]
   * [R (#2)] 1[kΩ]
   * [Source] ???
   * [Voltage Sensor] Arduino DC 0-25V voltage sensor module
