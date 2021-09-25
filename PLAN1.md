@@ -57,10 +57,10 @@
   * [Cell] NCR18650B Li-ion MH12210
   * [Diode] 1N5819 Schottky Diode
   * [LCD (I2C)] Arduino LCD 16x2 display module with 4-pins I2C LCD controller
-  * [MOFSET] IRF4905PBF P-channel Power MOFSET
+  * [MOSFET] IRF4905PBF P-channel Power MOFSET
   * [NPN] SS8050DTA Bipolar NPN Transistor
   * [Power Inductor] 150[μH] Power Inductor 2[A] Idc 106[mΩ] Rdc
-  * [R (#1)] 8[kΩ]
+  * [R (#1)] 10[kΩ]
   * [R (#2)] 1[kΩ]
   * [Source] RSP-150-13.5
   * [Voltage Sensor] Arduino DC 0-25V voltage sensor module
