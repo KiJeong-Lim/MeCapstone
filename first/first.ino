@@ -268,7 +268,7 @@ static void printMeasuredVoltage(const Voltage_t measured_voltage)
 
   switch (((measured_voltage > 4.99) * 2) + ((measured_voltage < 0.01) * 1))
   {
-  case 0: // when (measured_voltage <= 0.01 && measured_voltage <= 4.99)
+  case 0: // when (measured_voltage >= 0.01 && measured_voltage <= 4.99)
     main_lcd_handle->print("V_in = ");
     main_lcd_handle->print(measured_voltage);
     main_lcd_handle->print("V");
