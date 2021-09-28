@@ -106,7 +106,7 @@ void loop()
 
   showValues(measured_voltage, measured_current);
 
-  delay(480);
+  delay(300);
 }
 
 double measureAnalogSignal(uint8_t pin_num, Time_t duration)
@@ -213,14 +213,14 @@ boolean initializePins()
 
 Voltage_t measureVoltage()
 {
-  const double avg_val = measureAnalogSignal(VoltagePin, 10);
+  const double avg_val = measureAnalogSignal(VoltagePin, 100);
 
   return (calculateVoltage(avg_val));
 }
 
 mA_t measureCurrent()
 {
-  const double avg_val = measureAnalogSignal(CurrentPin, 10);
+  const double avg_val = measureAnalogSignal(CurrentPin, 100);
 
   return (calculateCurrent(avg_val));
 }
