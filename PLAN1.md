@@ -55,7 +55,7 @@
   * [Arduino] Arduino Uno (R3)
   * [Capacitor] 2200[μF] 25[V]
   * [Cell] NCR18650B Li-ion MH12210
-  * [Diode] C1815
+  * [Diode] 1N4001
   * [Inductor] 100[mH]
   * [LCD (I2C)] Arduino LCD 16x2 display module with 4-pins I2C LCD controller
   * [MOSFET] IRFP260N

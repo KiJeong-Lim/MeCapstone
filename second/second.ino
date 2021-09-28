@@ -2,7 +2,6 @@
 
 LiquidCrystal_I2C *main_lcd_handle = nullptr;
 ACS712 *current_sensor_handle = nullptr;
-Count_t frequencies[INPUT_MAX_SIGNAL_VALUE];
 
 boolean initializeLCD(int lcd_width, int lcd_height);
 boolean initializePins();
