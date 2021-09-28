@@ -239,7 +239,7 @@ static ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
     if (main_lcd_handle) // if we have a good LCD handle
     {
       my_err_code = NO_ERROR;
-      main_lcd_handle->begin();
+      main_lcd_handle->init();
       main_lcd_handle->backlight();
     }
     else
