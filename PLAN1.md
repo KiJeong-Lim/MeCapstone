@@ -53,15 +53,15 @@
   * +------------------------------------------+
   <Used Parts>
   * [Arduino] Arduino Uno (R3)
-  * [Capacitor] Panasonic 100[μF] 16[V] Electrolytic Capacitor
+  * [Capacitor] 2200[μF] 25[V]
   * [Cell] NCR18650B Li-ion MH12210
-  * [Diode] 1N5819 Schottky Diode
+  * [Diode] C1815
+  * [Inductor] 100[mH]
   * [LCD (I2C)] Arduino LCD 16x2 display module with 4-pins I2C LCD controller
-  * [MOSFET] IRF4905PBF P-channel Power MOFSET
-  * [NPN] SS8050DTA Bipolar NPN Transistor
-  * [Power Inductor] 150[μH] Power Inductor 2[A] Idc 106[mΩ] Rdc
+  * [MOSFET] IRFP260N
+  * [NPN] C1815
   * [R (#1)] 10[kΩ]
-  * [R (#2)] 1[kΩ]
+  * [R (#2)] 10[kΩ]
   * [Source] RSP-150-13.5
   * [Voltage Sensor] Arduino DC 0-25V voltage sensor module
   <References>
