@@ -69,14 +69,14 @@
   * [NPN] C1815
   * [R (#1)] 10[kΩ]
   * [R (#2)] 10[kΩ]
-  * [R (#3)] 5[Ω]]
+  * [R (#3)] 5[Ω]
   * [Sensor] MAX471 25[V] 3[A] (HAM6703)
   * [Source] ???
   <Dependencies>
   * [LiquidCrystal_I2C] https://codeload.github.com/johnrickman/LiquidCrystal_I2C/zip/refs/tags/1.1.3
   * [ACS712] https://codeload.github.com/rkoptev/ACS712-arduino/zip/refs/tags/1.0.2
   <References>
-  [1] https://m.blog.naver.com/ysahn2k/222074476103
+  * [1] https://m.blog.naver.com/ysahn2k/222074476103
 ***/
 
 #include "third.h"
