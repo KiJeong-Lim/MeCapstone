@@ -77,6 +77,7 @@
   * [ACS712] https://codeload.github.com/rkoptev/ACS712-arduino/zip/refs/tags/1.0.2
   <References>
   * [1] https://m.blog.naver.com/ysahn2k/222074476103
+  * [2] https://codingrun.com/119
 ***/
 
 // Includes
@@ -89,8 +90,8 @@ State_t system_state = WORKING_STATE;
 LiquidCrystal_I2C *main_lcd_handle = nullptr;
 struct HAM6703_t { Voltage_t MAX_INPUT_VOLTAGE; Ohm_t voltage_ampere_ratio; }
 const HAM6703 =
-  { .MAX_INPUT_VOLTAGE = 25.0 // [V]
-  , .voltage_ampere_ratio = 1 // [V / A]
+  { .MAX_INPUT_VOLTAGE    = 25.0  // [V]
+  , .voltage_ampere_ratio = 1.0   // [V/A]
   }
 ;
 
@@ -146,7 +147,7 @@ static inline
 Voltage_t calculateVoltage(double const avg_value)
 {
   Voltage_t const V_out = (avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL;
-  Voltage_t const V_in = V_out * (HAM6703.MAX_INPUT_VOLTAGE / VOLTAGE_FOR_MAX_SIGNAL);
+  Voltage_t const V_in  = V_out * (HAM6703.MAX_INPUT_VOLTAGE / VOLTAGE_FOR_MAX_SIGNAL);
 
   return V_in;
 }
@@ -184,7 +185,7 @@ void setup()
 void loop()
 {
   Voltage_t const measured_voltage = measureVoltage(); // [V]
-  mA_t const measured_current = measureCurrent(); // [mA]
+  mA_t      const measured_current = measureCurrent(); // [mA]
 
   #ifndef NO_DEBUGGIG
   Serial.print("log: measured_voltage = ");
@@ -327,6 +328,7 @@ boolean initializePins()
   pinMode(VoltagePin, INPUT);
   pinMode(CurrentPin, INPUT);
   pinMode(PwmPin, OUTPUT);
+  setPWM(0.0);
 
   return true;
 }
