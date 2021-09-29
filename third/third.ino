@@ -1,6 +1,12 @@
 #include "third.h"
 
-/**
+/** THE THIRD STEP ON OUR CAPSTONE PROJECT
+  <Abstract>
+  * A battery-cell charging system by the CC-CV method 
+  <Members>
+  * Hwanhee Jeon [School of Mechanical Engineering, Chonnam National University]
+  * Hakjung Im [School of Mechanical Engineering, Chonnam National University]
+  * Kijeong Lim [School of Mechanical Engineering, Chonnam National University]
   <Wiring Diagram>
   *                     #===========#
   *                     # LCD (I2C) #
@@ -44,20 +50,15 @@
   *                     #==========#   |   |   |        +---< + Diode - >--------+
   *                                    |   |   |        |   #===========#        |
   *            #======#   #========#   |   |   |        |                        |
-  *        +---< Fuse >---< R (#3) >---+   |   |        |                        |
-  *        |   #======#   #========#       |   |        |                        |
-  *        |                               |   |        |                        |
-  *        |   #==============#            |   |        |                        |
-  *        +---< (-) Cell (+) >------------+   |        |                        |
-  *            #==============#                |        |                        |
-  *                                 +----------+        |                        |
-  *                                 |                   |                        |
-  *                                 |   #===========#   |                        |
-  *                                 +---< Capacitor >---+                        |
-  *                                 |   #===========#                            |
-  *                                 |                             #==========#   |
-  *                                 +-----------------------------< Inductor >---+
-  *                                                               #==========#
+  *        +---< Fuse >---< R (#3) >---+   |   |        +----------+             |
+  *        |   #======#   #========#       |   |                   |             |
+  *        |                               |   |   #===========#   |             |
+  *        |   #==============#            |   +---< Capacitor >---+             |
+  *        +---< (-) Cell (+) >------------+   |   #===========#                 |
+  *            #==============#                |                                 |
+  *                                            |   #==========#                  |
+  *                                            +---< Inductor >------------------+
+  *                                                #==========#
   <Used Parts>
   * [Arduino] Arduino Uno (R3)
   * [Capacitor] 2200[μF] 25[V]
@@ -72,6 +73,7 @@
   * [R (#2)] 10[kΩ]
   * [R (#3)] 5[Ω]]
   * [Sensor] MAX471 25[V] 3[A] (HAM6703)
+  * [Source] ???
   <References>
   [1] https://m.blog.naver.com/ysahn2k/222074476103
 ***/
