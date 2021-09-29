@@ -6,11 +6,11 @@ ACS712 *current_sensor_handle = nullptr;
 boolean initializeLCD(int lcd_width, int lcd_height);
 boolean initializePins();
 double measureAnalogSignal(uint8_t pin_num, Time_t duration);
-Voltage_t measureVoltage();
+V_t measureVoltage();
 mA_t measureCurrent();
-void showValues(const Voltage_t measured_voltage, const mA_t measured_current);
+void showMeasuredValues(const V_t measured_voltage, const mA_t measured_current);
 
-inline Voltage_t calculateVoltage(const double avg_value)
+inline V_t calculateVoltage(const double avg_value)
 {
 /** Note: The principle of voltage divider
   <Voltage Divisor>
@@ -63,8 +63,8 @@ inline Voltage_t calculateVoltage(const double avg_value)
   const Ohm_t R_1 = 30000.0;
   const Ohm_t R_2 = 7500.0;
 
-  const Voltage_t V_out = (avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL; // See ref [1]
-  const Voltage_t V_in = V_out / (R_2 / (R_1 + R_2)); // See ref [1]
+  const V_t V_out = (avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL; // See ref [1]
+  const V_t V_in = V_out / (R_2 / (R_1 + R_2)); // See ref [1]
 
   return V_in;
 }
@@ -91,7 +91,7 @@ void setup()
 
 void loop()
 {
-  const Voltage_t measured_voltage = measureVoltage(); // [V]
+  const V_t measured_voltage = measureVoltage(); // [V]
   const mA_t measured_current = measureCurrent(); // [mA]
 
   #ifndef NO_DEBUGGIG
@@ -103,7 +103,7 @@ void loop()
   Serial.println("[mA].");
   #endif // ifndef NO_DEBUGGING
 
-  showValues(measured_voltage, measured_current);
+  showMeasuredValues(measured_voltage, measured_current);
 
   delay(300);
 }
@@ -210,7 +210,7 @@ boolean initializePins()
   return true;
 }
 
-Voltage_t measureVoltage()
+V_t measureVoltage()
 {
   const double avg_val = measureAnalogSignal(VoltagePin, 100);
 
@@ -224,7 +224,7 @@ mA_t measureCurrent()
   return (calculateCurrent(avg_val));
 }
 
-void showValues(const Voltage_t measured_voltage, const mA_t measured_current)
+void showMeasuredValues(const V_t measured_voltage, const mA_t measured_current)
 {
   main_lcd_handle->clear();
 

@@ -9,7 +9,7 @@
 // Types
 
 typedef double mA_t;
-typedef double Voltage_t;
+typedef double V_t;
 typedef double Ohm_t;
 typedef unsigned int long Time_t;
 

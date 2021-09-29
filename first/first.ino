@@ -48,8 +48,8 @@
 // Module Functions
 
 static ErrorCode_t initializeLCD(int lcd_width, int lcd_height);
-static Voltage_t measureVoltage();
-static void printMeasuredVoltage(Voltage_t measured_voltage);
+static V_t measureVoltage();
+static void printMeasuredVoltage(V_t measured_voltage);
 static void greeting();
 
 // Module Variables
@@ -59,7 +59,7 @@ static ErrorCode_t err_code = NO_ERROR;
 
 // Implementations
 
-inline Voltage_t calculateVoltage(const double avgerage_signal)
+inline V_t calculateVoltage(const double avgerage_signal)
 {
 /** Note: The principle of voltage divider
   <Voltage Divisor>
@@ -109,8 +109,8 @@ inline Voltage_t calculateVoltage(const double avgerage_signal)
   * V_out = V_in * 0.2
 ***/
 
-  const Voltage_t V_out = (avgerage_signal / MAX_SIGNAL) * VOLTAGE_FOR_MAX_SIGNAL; // See ref [1]
-  const Voltage_t V_in = V_out / (R_2 / (R_1 + R_2)); // See ref [1]
+  const V_t V_out = (avgerage_signal / MAX_SIGNAL) * VOLTAGE_FOR_MAX_SIGNAL; // See ref [1]
+  const V_t V_in = V_out / (R_2 / (R_1 + R_2)); // See ref [1]
 
   return V_in;
 }
@@ -154,7 +154,7 @@ void setup()
 
 void loop()
 {
-  const Voltage_t measured_voltage = measureVoltage(); // [V]
+  const V_t measured_voltage = measureVoltage(); // [V]
 
   main_lcd_handle->clear();
 
@@ -163,7 +163,7 @@ void loop()
   printMeasuredVoltage(measured_voltage);
 }
 
-static Voltage_t measureVoltage()
+static V_t measureVoltage()
 {
   const int long long beg_time = millis(); // the time when this function was called
   int long long sum_of_vals = 0; // sum of values obtained from the analog pin `A0`
@@ -258,7 +258,7 @@ static ErrorCode_t initializeLCD(const int row_dim, const int col_dim)
   return my_err_code;
 }
 
-static void printMeasuredVoltage(const Voltage_t measured_voltage)
+static void printMeasuredVoltage(const V_t measured_voltage)
 {
   #ifndef NO_DEBUGGIG
   Serial.print("log: measured_voltage = ");

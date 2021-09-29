@@ -63,6 +63,6 @@ enum ErrorCode_t {
   INIT_FAIL = 1,
 };
 
-typedef double Voltage_t;
+typedef double V_t;
 
 #endif // ifndef FIRST_H
