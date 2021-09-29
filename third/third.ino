@@ -83,10 +83,26 @@
 
 void setup()
 {
-
+  // my_controller.setPWM(wanted_voltage = 4.2[V], due_time = 10[ms]);
+  // cur = my_sensor.getCurrent();
+  // my_controller.lockCurrent(wanted_current = 0[mA], tolerance = 100[mA], due_time = 1000[ms], duration = 5000[ms]);
+  // ocv = my_sensor.getVoltage();
+  // soc = getSocByOcv(ocv);
+  // res = (4.2 - ocv) / cur
+  // my_controller.setPWM(wanted_voltage = ocv + res * CC_cur, due_time = 60000[ms]);
+  // mode = CC;
 }
 
 void loop()
 {
-  
+  // if (mode == CC)
+  //   my_controller.lockCurrent(wanted_current = CC_cur, tolerance = 100[mA], due_time = 1000[ms], duration = 1000[ms]);
+  //   vol = my_sensor.getVoltage();
+  //   if (vol >= 4.2)
+  //     mode = CV;
+  // else
+  //   my_controller.lockVoltage(wanted_voltage = 4.2[V], tolerance = 0.1[V], due_time = 1000[ms], duration = 1000[ms]);
+  //   cur = my_sensor.getVoltage();
+  //   if (cur < 100[mA])
+  //     print("FULL CHARGED");
 }
