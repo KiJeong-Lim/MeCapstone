@@ -87,10 +87,11 @@ void setup()
   // my_controller.setPWM(wanted_voltage = 4.2[V], due_time = 10[ms]);
   // cur = my_sensor.getCurrent();
   // my_controller.lockCurrent(wanted_current = 0[mA], tolerance = 100[mA], due_time = 1000[ms], duration = 5000[ms]);
-  // ocv = my_sensor.getVoltage();
-  // soc = getSocByOcv(ocv);
+  // battery_model.ocv = my_sensor.getVoltage();
+  // battery_model.computeSOC();
+  // soc = battery_model.getSOC();
   // my_printer.printf("soc = %lf\n", soc);
-  // res = (4.2[V] - ocv) / cur
+  // battery_model.resistance = (4.2[V] - ocv) / cur
   // mode = CC;
   // my_controller.setPWM(wanted_voltage = ocv + res * CC_cur, due_time = 60000[ms]);
 }
