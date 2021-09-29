@@ -1,8 +1,6 @@
-#include "third.h"
-
 /** THE THIRD STEP ON OUR CAPSTONE PROJECT
   <Abstract>
-  * A battery-cell charging system by the CC-CV method 
+  * A battery-cell charging system using the CC-CV method 
   <Members>
   * Hwanhee Jeon [School of Mechanical Engineering, Chonnam National University]
   * Hakjung Im [School of Mechanical Engineering, Chonnam National University]
@@ -74,9 +72,14 @@
   * [R (#3)] 5[Ω]]
   * [Sensor] MAX471 25[V] 3[A] (HAM6703)
   * [Source] ???
+  <Dependencies>
+  * [LiquidCrystal_I2C] https://codeload.github.com/johnrickman/LiquidCrystal_I2C/zip/refs/tags/1.1.3
+  * [ACS712] https://codeload.github.com/rkoptev/ACS712-arduino/zip/refs/tags/1.0.2
   <References>
   [1] https://m.blog.naver.com/ysahn2k/222074476103
 ***/
+
+#include "third.h"
 
 State_t system_state = WORKING_STATE;
 LiquidCrystal_I2C *main_lcd_handle = nullptr;
