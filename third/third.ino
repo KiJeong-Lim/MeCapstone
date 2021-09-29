@@ -105,6 +105,8 @@ mA_t measureCurrent();
 void setPWM(double duty_ratio);
 void showValues(Voltage_t measured_voltage, mA_t measured_current);
 double calculateDutyRatio(Voltage_t measured_voltage, mA_t measured_current);
+void greeting();
+void goodbye();
 
 // Implementations
 
@@ -132,9 +134,7 @@ void setState(State_t new_state)
   switch (system_state)
   {
   case FINISH_STATE:
-    main_lcd_handle->clear();
-    main_lcd_handle->setCursor(0, 0);
-    main_lcd_handle->print("FULL CHARGED");
+    goodbye();
   case BAD_STATE:
     delay(10000);
     abort();
@@ -222,7 +222,7 @@ void setPWM(double const duty_ratio)
 {
   if (duty_ratio >= 0 && duty_ratio <= 1)
   {
-    int const duty_val = 255.0 * duty_ratio;
+    int const duty_val = round(255.0 * duty_ratio);
 
     analogWrite(PwmPin, duty_val);
   }
@@ -241,6 +241,122 @@ double measureAnalogSignal(uint8_t const pin_num, Time_t const duration)
   }
 
   return (double)sum_of_vals / (double)cnt_of_vals;
+}
+
+boolean initializePins()
+{
+  pinMode(VoltagePin, INPUT);
+  pinMode(CurrentPin, INPUT);
+  pinMode(PwmPin, OUTPUT);
+  setPWM(0.0);
+
+  return true;
+}
+
+Voltage_t measureVoltage()
+{
+  double const avg_val = measureAnalogSignal(VoltagePin, 100);
+
+  return (calculateVoltage(avg_val));
+}
+
+mA_t measureCurrent()
+{
+  double const avg_val = measureAnalogSignal(CurrentPin, 100);
+
+  return (calculateCurrent(avg_val));
+}
+
+void showValues(Voltage_t const measured_voltage, mA_t const measured_current)
+{
+  int const measured_current_int = round(measured_current);
+
+  main_lcd_handle->clear();
+
+  // print voltage
+  main_lcd_handle->setCursor(0, 0);
+  switch (((measured_voltage > 24.99) * 2) + ((measured_voltage < 0.01) * 1))
+  {
+  case 0: // when (measured_voltage >= 0.01 && measured_voltage <= 24.99)
+    main_lcd_handle->print("V_in = ");
+    main_lcd_handle->print(measured_voltage);
+    main_lcd_handle->print("V");
+    break;
+
+  case 1: // when (measured_voltage < 0.01)
+    #ifndef NO_DEBUGGIG
+    Serial.println("Warning: the input voltage is too small.");
+    #endif // ifndef NO_DEBUGGING
+
+    main_lcd_handle->print("V_in < 0.01V");
+    break;
+
+  case 2: // when (measured_voltage > 24.99)
+    #ifndef NO_DEBUGGIG
+    Serial.println("Warning: the input voltage is too large.");
+    #endif // ifndef NO_DEBUGGING
+
+    main_lcd_handle->print("V_in > 24.99V");
+    break;
+  }
+
+  // print current
+  main_lcd_handle->setCursor(0, 1);
+  switch (((measured_current_int > 2950) * 2) + ((measured_current_int < 50) * 1))
+  {
+  case 0: // when (measured_current >= 2950 && measured_current < 50)
+    main_lcd_handle->print("I_in = ");
+    main_lcd_handle->print(measured_current_int);
+    main_lcd_handle->print("mA");
+    break;
+
+  case 1: // when (measured_current < 50)
+    #ifndef NO_DEBUGGIG
+    Serial.println("Warning: the input current is too small.");
+    #endif // ifndef NO_DEBUGGING
+
+    main_lcd_handle->print("I_in < 50mA");
+    break;
+
+  case 2: // when (measured_current > 2950)
+    #ifndef NO_DEBUGGIG
+    Serial.println("Warning: the input current is too large.");
+    #endif // ifndef NO_DEBUGGING
+
+    main_lcd_handle->print("I_in > 2950mA");
+    break;
+  }
+}
+
+void greeting()
+{
+  main_lcd_handle->clear();
+
+  main_lcd_handle->setCursor(0, 0);
+  main_lcd_handle->print("SYSTEM ONLINE");
+  for (int cnt_dot = 0; cnt_dot < 3; cnt_dot++)
+  {
+    delay(500);
+    main_lcd_handle->print(".");
+  }
+  delay(500);
+}
+
+void goodbye()
+{
+  main_lcd_handle->clear();
+
+  for (int i = 0; i < 3; i++)
+  {
+    main_lcd_handle->noBacklight();
+    delay(100);
+
+    main_lcd_handle->backlight();
+    delay(100);
+  }
+
+  main_lcd_handle->setCursor(0, 0);
+  main_lcd_handle->print("FULL CHARGED");
 }
 
 boolean initializeLCD(int const row_dim, int const col_dim)
@@ -321,99 +437,4 @@ boolean initializeLCD(int const row_dim, int const col_dim)
   }
 
   return successed;
-}
-
-boolean initializePins()
-{
-  pinMode(VoltagePin, INPUT);
-  pinMode(CurrentPin, INPUT);
-  pinMode(PwmPin, OUTPUT);
-  setPWM(0.0);
-
-  return true;
-}
-
-Voltage_t measureVoltage()
-{
-  double const avg_val = measureAnalogSignal(VoltagePin, 100);
-
-  return (calculateVoltage(avg_val));
-}
-
-mA_t measureCurrent()
-{
-  double const avg_val = measureAnalogSignal(CurrentPin, 100);
-
-  return (calculateCurrent(avg_val));
-}
-
-void showValues(Voltage_t const measured_voltage, mA_t const measured_current)
-{
-  main_lcd_handle->clear();
-
-  main_lcd_handle->setCursor(0, 0);
-  switch (((measured_voltage > 24.99) * 2) + ((measured_voltage < 0.01) * 1))
-  {
-  case 0: // when (measured_voltage >= 0.01 && measured_voltage <= 24.99)
-    main_lcd_handle->print("V_in = ");
-    main_lcd_handle->print(measured_voltage);
-    main_lcd_handle->print("V");
-    break;
-
-  case 1: // when (measured_voltage < 0.01)
-    #ifndef NO_DEBUGGIG
-    Serial.println("Warning: the input voltage is too small.");
-    #endif // ifndef NO_DEBUGGING
-
-    main_lcd_handle->print("V_in < 0.01V");
-    break;
-
-  case 2: // when (measured_voltage > 24.99)
-    #ifndef NO_DEBUGGIG
-    Serial.println("Warning: the input voltage is too large.");
-    #endif // ifndef NO_DEBUGGING
-
-    main_lcd_handle->print("V_in > 24.99V");
-    break;
-  }
-
-  main_lcd_handle->setCursor(0, 1);
-  switch (((measured_current > 2950.0) * 2) + ((measured_current < 50.0) * 1))
-  {
-  case 0: // when (measured_current >= 2950 && measured_current < 50)
-    main_lcd_handle->print("I_in = ");
-    main_lcd_handle->print(measured_current);
-    main_lcd_handle->print("mA");
-    break;
-
-  case 1: // when (measured_current < 50)
-    #ifndef NO_DEBUGGIG
-    Serial.println("Warning: the input current is too small.");
-    #endif // ifndef NO_DEBUGGING
-
-    main_lcd_handle->print("I_in < 50mA");
-    break;
-
-  case 2: // when (measured_current > 2950)
-    #ifndef NO_DEBUGGIG
-    Serial.println("Warning: the input current is too large.");
-    #endif // ifndef NO_DEBUGGING
-
-    main_lcd_handle->print("I_in > 2950mA");
-    break;
-  }
-}
-
-void greeting()
-{
-  main_lcd_handle->clear();
-
-  main_lcd_handle->setCursor(0, 0);
-  main_lcd_handle->print("SYSTEM ONLINE");
-  for (int cnt_dot = 0; cnt_dot < 3; cnt_dot++)
-  {
-    delay(500);
-    main_lcd_handle->print(".");
-  }
-  delay(500);
 }
