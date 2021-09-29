@@ -79,10 +79,22 @@
   * [1] https://m.blog.naver.com/ysahn2k/222074476103
 ***/
 
+// Includes
+
 #include "third.h"
+
+// Global Variables
 
 State_t system_state = WORKING_STATE;
 LiquidCrystal_I2C *main_lcd_handle = nullptr;
+struct HAM6703_t { Voltage_t MAX_INPUT_VOLTAGE; Ohm_t voltage_ampere_ratio; }
+const HAM6703 =
+  { .MAX_INPUT_VOLTAGE = 25.0 // [V]
+  , .voltage_ampere_ratio = 1 // [V / A]
+  }
+;
+
+// Declarations
 
 boolean initializeLCD(int lcd_width, int lcd_height);
 boolean initializePins();
@@ -90,10 +102,13 @@ double measureAnalogSignal(uint8_t pin_num, Time_t duration);
 Voltage_t measureVoltage();
 mA_t measureCurrent();
 void setPWM(double duty_ratio);
-void showValues(const Voltage_t measured_voltage, const mA_t measured_current);
-double calculateDutyRatio(const Voltage_t measured_voltage, const mA_t measured_current);
+void showValues(Voltage_t measured_voltage, mA_t measured_current);
+double calculateDutyRatio(Voltage_t measured_voltage, mA_t measured_current);
 
-inline void setState(State_t new_state)
+// Implementations
+
+static inline
+void setState(State_t new_state)
 {
   system_state = new_state;
 
@@ -127,20 +142,19 @@ inline void setState(State_t new_state)
   }
 }
 
-inline Voltage_t calculateVoltage(const double avg_value)
+static inline
+Voltage_t calculateVoltage(double const avg_value)
 {
-  const Voltage_t MAX_INPUT_VOLTAGE = 25.0; // [V]
-  const Voltage_t V_out = (avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL;
-  const Voltage_t V_in = V_out * (MAX_INPUT_VOLTAGE / VOLTAGE_FOR_MAX_SIGNAL);
+  Voltage_t const V_out = (avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL;
+  Voltage_t const V_in = V_out * (HAM6703.MAX_INPUT_VOLTAGE / VOLTAGE_FOR_MAX_SIGNAL);
 
   return V_in;
 }
 
-inline mA_t calculateCurrent(const double avg_value)
+static inline
+mA_t calculateCurrent(double const avg_value)
 {
-  const Ohm_t voltage_ampere_ratio_of_SENSOR = 1.0; // [V/A]
-
-  return 1000 * ((avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL / voltage_ampere_ratio_of_SENSOR);
+  return 1000 * ((avg_value / INPUT_MAX_SIGNAL_VALUE) * VOLTAGE_FOR_MAX_SIGNAL / HAM6703.voltage_ampere_ratio);
 }
 
 void setup()
@@ -169,8 +183,8 @@ void setup()
 
 void loop()
 {
-  const Voltage_t measured_voltage = measureVoltage(); // [V]
-  const mA_t measured_current = measureCurrent(); // [mA]
+  Voltage_t const measured_voltage = measureVoltage(); // [V]
+  mA_t const measured_current = measureCurrent(); // [mA]
 
   #ifndef NO_DEBUGGIG
   Serial.print("log: measured_voltage = ");
@@ -183,7 +197,7 @@ void loop()
 
   showValues(measured_voltage, measured_current);
 
-  const double duty_ratio = calculateDutyRatio(measured_voltage, measured_current); // 0.0 ~ 1.0
+  double const duty_ratio = calculateDutyRatio(measured_voltage, measured_current); // 0.0 ~ 1.0
 
   #ifndef NO_DEBUGGIG
   Serial.print("log: duty_ratio = ");
@@ -196,26 +210,26 @@ void loop()
   delay(300);
 }
 
-double calculateDutyRatio(const Voltage_t measured_voltage, const mA_t measured_current)
+double calculateDutyRatio(Voltage_t const measured_voltage, mA_t const measured_current)
 {
 
   // TO DO: implement this function!
 
 }
 
-void setPWM(double duty_ratio)
+void setPWM(double const duty_ratio)
 {
   if (duty_ratio >= 0 && duty_ratio <= 1)
   {
-    const int duty_val = 255.0 * duty_ratio;
+    int const duty_val = 255.0 * duty_ratio;
 
     analogWrite(PwmPin, duty_val);
   }
 }
 
-double measureAnalogSignal(uint8_t pin_num, Time_t duration)
+double measureAnalogSignal(uint8_t const pin_num, Time_t const duration)
 {
-  const int long long beg_time = millis();
+  int long long const beg_time = millis();
   int long long sum_of_vals = 0;
   int long cnt_of_vals = 0;
 
@@ -228,7 +242,7 @@ double measureAnalogSignal(uint8_t pin_num, Time_t duration)
   return (double)sum_of_vals / (double)cnt_of_vals;
 }
 
-boolean initializeLCD(const int row_dim, const int col_dim)
+boolean initializeLCD(int const row_dim, int const col_dim)
 {
   boolean successed = false; // result of this function
 
@@ -319,19 +333,19 @@ boolean initializePins()
 
 Voltage_t measureVoltage()
 {
-  const double avg_val = measureAnalogSignal(VoltagePin, 100);
+  double const avg_val = measureAnalogSignal(VoltagePin, 100);
 
   return (calculateVoltage(avg_val));
 }
 
 mA_t measureCurrent()
 {
-  const double avg_val = measureAnalogSignal(CurrentPin, 100);
+  double const avg_val = measureAnalogSignal(CurrentPin, 100);
 
   return (calculateCurrent(avg_val));
 }
 
-void showValues(const Voltage_t measured_voltage, const mA_t measured_current)
+void showValues(Voltage_t const measured_voltage, mA_t const measured_current)
 {
   main_lcd_handle->clear();
 
