@@ -1,6 +1,6 @@
 /** THE THIRD STEP ON OUR CAPSTONE PROJECT
   <Abstract>
-  * A battery-cell charging system using the CC-CV method 
+  * A battery cell charging system using the CC-CV method 
   <Members>
   * Hwanhee Jeon [School of Mechanical Engineering, Chonnam National University]
   * Hakjung Im [School of Mechanical Engineering, Chonnam National University]
@@ -178,17 +178,7 @@ void loop()
 
 V_t findVoltage(mA_t wanted_current)
 {
-  V_t const wanted_voltage = wanted_current * (measured.voltage / measured.current);
-
-  if (wanted_voltage >= CUTOFF_VOLTAGE)
-  {
-    return OCV_AT_SOC_100;
-  }
-  if (wanted_voltage <= OCV_AT_SOC_0)
-  {
-    return OCV_AT_SOC_0;
-  }
-  return wanted_voltage;
+  // TO DO
 }
 
 void analyzeCell()
