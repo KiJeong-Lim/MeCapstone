@@ -67,7 +67,7 @@
   * [POWER] ???
   * [R (#1)] 10[kΩ]
   * [R (#2)] 10[kΩ]
-  * [R (#3)] 5[Ω]
+  * [R (#3)] 1[Ω]
   * [Sensor] MAX471 25[V] 3[A] (HAM6703)
   <Dependencies>
   * [LiquidCrystal_I2C] https://codeload.github.com/johnrickman/LiquidCrystal_I2C/zip/refs/tags/1.1.3
