@@ -27,6 +27,7 @@ enum State_t { BAD_STATE = 0, CC_STATE, CV_STATE, FINISH_STATE };
 #define CUTOFF_AMPERE               2000.0
 #define CUTOFF_VOLTAGE              5.0
 #define VOLTAGE_OUTPUT_AT_255       6.0
+#define DECREASING_VOLTAGE_SCALE    0.05
 
 // Declarations
 

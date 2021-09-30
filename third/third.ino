@@ -220,7 +220,7 @@ void analyzeCell()
       break;
     }
 
-    setPWM(measured.voltage - 0.1);
+    setPWM(measured.voltage - DECREASING_VOLTAGE_SCALE);
   }
 }
 
