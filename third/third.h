@@ -30,7 +30,6 @@ enum State_t { BAD_STATE = 0, CC_STATE, CV_STATE, FINISH_STATE };
 
 // Declarations
 
-
 /* Core */
 V_t findVoltage(mA_t wanted_current);
 void analyzeCell();

@@ -129,6 +129,8 @@ void setup()
 
 void loop()
 {
+  showMeasuredValues();
+
   if (measured.current >= CUTOFF_AMPERE)
   {
     setPWM(OCV_AT_SOC_0);
@@ -165,8 +167,6 @@ void loop()
     setState(BAD_STATE);
   }
 
-  showMeasuredValues();
-
   my_timer.current_time = millis();
 
   V_t wanted_voltage = findVoltage(BATTERY_CAPACITY * CHARGING_COEFFICIENT);
@@ -185,12 +185,12 @@ void loop()
   setPWM(wanted_voltage);
   delay(400);
 
+  readSensorFor100ms();
+
   if (measured.current < 65.0)
   {
     setState(FINISH_STATE);
   }
-
-  readSensorFor100ms();
 }
 
 // Core
