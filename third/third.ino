@@ -129,13 +129,6 @@ void setup()
 
 void loop()
 {
-  readSensorFor100ms();
-
-  if (measured.current < 65.0)
-  {
-    setState(FINISH_STATE);
-  }
-
   if (measured.current >= CUTOFF_AMPERE)
   {
     setPWM(OCV_AT_SOC_0);
@@ -191,13 +184,26 @@ void loop()
 
   setPWM(wanted_voltage);
   delay(400);
+
+  if (measured.current < 65.0)
+  {
+    setState(FINISH_STATE);
+  }
+
+  readSensorFor100ms();
 }
 
 // Core
 
 V_t findVoltage(mA_t wanted_current)
 {
+  #ifndef NO_OCV_LOOKUP_TABLE
+
+  extern V_t lookupOcvTable(Time_t run_time);
+
   return lookupOcvTable(my_timer.current_time - my_timer.initial_time);
+
+  #endif // ifndef NO_OCV_LOOKUP_TABLE
 }
 
 void analyzeCell()

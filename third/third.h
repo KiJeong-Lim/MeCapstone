@@ -30,8 +30,6 @@ enum State_t { BAD_STATE = 0, CC_STATE, CV_STATE, FINISH_STATE };
 
 // Declarations
 
-/* "table.cpp" */
-V_t lookupOcvTable(Time_t run_time);
 
 /* Core */
 V_t findVoltage(mA_t wanted_current);
