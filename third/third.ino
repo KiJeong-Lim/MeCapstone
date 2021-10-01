@@ -1,6 +1,6 @@
 /** THE THIRD STEP ON OUR CAPSTONE PROJECT
   <Abstract>
-  * A battery-cell charging system using the CC-CV method 
+  * A battery cell charging system using the CC-CV method 
   <Members>
   * Hwanhee Jeon [School of Mechanical Engineering, Chonnam National University]
   * Hakjung Im [School of Mechanical Engineering, Chonnam National University]
@@ -215,7 +215,7 @@ void analyzeCell()
     readSensorFor100ms();
     showMeasuredValues();
 
-    if (measured.current - wanted_current < 65.0)
+    if (measured.current - wanted_current > 0.0)
     {
       break;
     }
@@ -439,7 +439,7 @@ void initializePins()
   pinMode(VoltagePin, INPUT);
   pinMode(CurrentPin, INPUT);
   pinMode(PwmPin, OUTPUT);
-  setPWM(OCV_AT_SOC_100);
+  setPWM(OCV_AT_SOC_0);
 }
 
 void initializeLCD(int const row_dim, int const col_dim)

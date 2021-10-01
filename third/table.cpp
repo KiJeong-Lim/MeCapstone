@@ -33,13 +33,16 @@ Time_t OCV_table[25] =
 
 V_t lookupOcvTable(Time_t const running_millseconds)
 {
+  V_t result_Voltage = 0.0;
+
+#if 0
+
   Time_t const running_minutes = running_millseconds / 6000;
 
   int left_idx = 0;
   int right_idx = sizeof(OCV_table) / sizeof(OCV_table[0]) - 1;
   int mid_idx = (left_idx + right_idx) / 2;
   int dir = 0;
-  V_t result_Voltage = 0.0;
 
   while (left_idx <= right_idx)
   {
@@ -72,6 +75,8 @@ V_t lookupOcvTable(Time_t const running_millseconds)
   {
     result_Voltage = OCV_AT_SOC_0 + mid_idx * DECREASING_VOLTAGE_SCALE;
   }
+
+#endif
 
   return result_Voltage;
 }
