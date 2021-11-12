@@ -57,6 +57,11 @@ public:
     : Pin{ .pinId = pin_no }
   {
   }
+  Val_t readSignalOnce() const
+  {
+    Val_t val = analogRead(pinId);
+    return val;
+  }
   Val_t readSignal(ms_t const duration) const
   {
     int long long sum_of_vals = 0;

@@ -134,6 +134,13 @@ void BufferWithFormat::putString(char const *const str)
 {
   for (char const *p_ch = str; *p_ch != '\0'; p_ch++)
   {
-    put(*p_ch);
+    if (cnt < LCD_SECTION_LEN)
+    {
+      buf[cnt++] = *p_ch;
+    }
+    else
+    {
+      break;
+    }
   }
 }

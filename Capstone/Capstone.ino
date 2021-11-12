@@ -40,10 +40,10 @@ class BMS {
   ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
   ReaderAnalogPin Iin_pin = { .pin_no = A4 };
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
-  bool wire_on = false;
-  bool lcdOkay = false;
-  bool measuredValuesAreFresh = false;
-  bool charging_finished = false;
+  byte wire_on = false;
+  byte lcdOkay = false;
+  byte measuredValuesAreFresh = false;
+  byte charging_finished = false;
   LiquidCrystal_I2C *lcd_handle = nullptr;
   A_t Iin = 0.0;
   V_t arduino5V = refOf.arduinoRegularV;
@@ -55,7 +55,9 @@ private:
   void measure();
   void control();
   bool checkSafety();
+  void goodbye();
   void execEmergencyMode();
+  void showValues();
   void initWire();
   bool openLCD(int lcd_width, int lcd_height);
   void greeting();
@@ -108,73 +110,24 @@ void BMS::step()
 
   beg_time = millis();
   measure();
-#ifndef NO_DEBUGGING
-  Serial.print(">>> A5V = ");
-  Serial.print(arduino5V);
-  Serial.print("[V], ");
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    Serial.print("C");
-    Serial.print(i);
-    Serial.print("V = ");
-    Serial.print(cellV[i]);
-    Serial.print("[V], ");
-  }
-  Serial.print("I = ");
-  Serial.print(Iin);
-  Serial.println("[A]. ");
-#endif
-#ifndef NO_LCD_USE
-  if (lcdOkay)
-  {
-    LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
-
-    for (int i = 0; i < LENGTH_OF(cellV); i++)
-    {
-      lcd.print("C");
-      lcd.print(i);
-      lcd.print("=");
-      lcd.print(cellV[i]);
-      lcd.println(" ");
-    }
-    lcd.print("I");
-    lcd.print("=");
-    lcd.print(Iin);
-    lcd.println(" ");
-  }
-#endif
+  showValues();
   control();
-  measuredValuesAreFresh = false;
   system_is_okay = checkSafety();
 
   if (system_is_okay && charging_finished)
   {
-#ifndef NO_DEBUGGING
-    Serial.print("[log] CHARGING COMPLETED");
-#endif
-#ifndef NO_LCD_USE
-    if (lcdOkay)
-    {
-      lcd_handle->clear();
-      lcd_handle->setCursor(0, 0);
-      lcd_handle->print("FULLY CHARGED");
-      lcd_handle->setCursor(0, 1);
-      lcd_handle->print("REMOVE BATTERY");
-    }
-#endif
-    powerIn_pin.turnOff();
-    delay(10000);
+    goodbye();
   }
   else
   {
     for (cur_time = millis(); cur_time - beg_time < given_time; cur_time = millis())
     {
-      system_is_okay = checkSafety();
       if (!system_is_okay)
       {
         execEmergencyMode();
       }
-      delay(50);
+      delay(100);
+      system_is_okay = checkSafety();
     }
   }
 }
@@ -205,6 +158,11 @@ void BMS::control()
 {
   V_t const targetV = 3.8, targetV_overloaded = 4.1;
 
+  while (measuredValuesAreFresh)
+  {
+    measure();
+  }
+
   charging_finished = true;
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
@@ -220,6 +178,8 @@ void BMS::control()
       cells[i].balanceCircuit_pin.turnOn();
     }
   }
+
+  measuredValuesAreFresh = false;
 }
 
 bool BMS::checkSafety()
@@ -227,65 +187,134 @@ bool BMS::checkSafety()
   V_t const allowedV_high = 4.2, allowedV_low = 2.7;
   A_t const allowedA_high = 2.0, allowedA_low = -0.1;
   bool isBad = false;
-  
-  measure();
+
+  while (measuredValuesAreFresh)
+  {
+    measure();
+  }
+
   if (Iin >= allowedA_high)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] Iin too high!");
+    Serial.println("[Warning] 'Iin' too high.");
 #endif
   }
-  if (Iin <= allowedA_low)
+  else if (Iin <= allowedA_low)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] Iin too low!");
+    Serial.println("[Warning] 'Iin' too low.");
 #endif
   }
+
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     if (cellV[i] >= allowedV_high)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] cellV[");
+      Serial.print("[Warning] 'cellV[");
       Serial.print(i);
-      Serial.print("]");
-      Serial.println(" too high!");
+      Serial.print("]'");
+      Serial.println(" too high.");
 #endif
     }
-  }
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    if (cellV[i] <= allowedV_low)
+    else if (cellV[i] <= allowedV_low)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] cellV[");
+      Serial.print("[Warning] 'cellV[");
       Serial.print(i);
-      Serial.print("]");
-      Serial.println(" too low!");
+      Serial.print("]'");
+      Serial.println(" too low.");
 #endif
     }
   }
+
   measuredValuesAreFresh = false;
+
   return isBad;
+}
+
+void BMS::goodbye()
+{
+#ifndef NO_DEBUGGING
+  Serial.println("[log] CHARGING COMPLETED.");
+#endif
+#ifndef NO_LCD_USE
+  if (lcdOkay)
+  {
+    lcd_handle->clear();
+    lcd_handle->setCursor(0, 0);
+    lcd_handle->print("FULLY CHARGED");
+    lcd_handle->setCursor(0, 1);
+    lcd_handle->print("REMOVE BATTERY");
+    for (int i = 0; i < LENGTH_OF(cells); i++)
+    {
+      cells[i].balanceCircuit_pin.turnOn();
+    }
+    delay(10000);
+  }
+#endif
+  powerIn_pin.turnOff();
+  abort();
 }
 
 void BMS::execEmergencyMode()
 {
-  powerIn_pin.turnOff();
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
   }
   delay(500);
-  powerIn_pin.turnOn();
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOff();
   }
+}
+
+void BMS::showValues()
+{
+#ifndef NO_DEBUGGING
+  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  {
+    Serial.print(">>> ");
+    Serial.print("C");
+    Serial.print(i);
+    Serial.print("V = ");
+    Serial.print(cellV[i]);
+    Serial.println("[V].");
+  }
+#endif
+#ifndef NO_LCD_USE
+  if (lcdOkay)
+  {
+    LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
+
+    for (int i = 0; i < LENGTH_OF(cellV); i++)
+    {
+      lcd.print("C");
+      lcd.print(i);
+      lcd.print("=");
+      lcd.print(cellV[i]);
+      lcd.println(" ");
+    }
+    lcd.print("I");
+    lcd.print("=");
+    lcd.print(Iin);
+    lcd.println(" ");
+  }
+#endif
+#ifndef NO_DEBUGGING
+  Serial.print(">>> ");
+  Serial.print("A5V = ");
+  Serial.print(arduino5V);
+  Serial.print("[V], ");
+  Serial.print("Iin = ");
+  Serial.print(Iin);
+  Serial.println("[A].");
+#endif
 }
 
 void BMS::initWire()
