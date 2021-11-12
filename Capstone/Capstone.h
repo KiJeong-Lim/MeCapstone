@@ -187,8 +187,6 @@ private:
 #endif
 
 // global variable decls
-#ifndef NOT_MAIN_INO_FILE
 extern ReferenceCollection const refOf;
-#endif
 
 #endif

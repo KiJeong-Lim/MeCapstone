@@ -332,7 +332,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 #ifndef NO_LCD_USE
     if (row_dim > 0 && col_dim > 0)
     {
-      for (byte adr = 0x01; adr < 0xFF; adr++)
+      for (byte adr = 0x01; adr <= 0xFF; adr++)
       {
         byte response = 4;
         Wire.beginTransmission(adr);
@@ -366,12 +366,12 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
     }
 #endif
   }
-#ifndef NO_DEBUGGING
   else
   {
-    Serial.println("[Warning] please execute 'this->initWire()' before calling 'BMS::openLCD'.");
-  }
+#ifndef NO_DEBUGGING
+    Serial.println("[Warning] Please execute 'this->initWire()' before calling 'BMS::openLCD'.");
 #endif
+  }
 
   return isGood;
 }
