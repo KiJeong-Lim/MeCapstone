@@ -14,7 +14,7 @@ ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
   .arduinoRegularV = 5.00,
   .zenerdiodeVfromRtoA = 2.48,
-  .conversion_ratio_for_ampere_sensor = 1 / SENSITIVITY_OF_20A_AMPERE_SENSOR,
+  .conversion_ratio_for_ampere_sensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR,
 };
 
 CELL cells[] = {

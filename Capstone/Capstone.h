@@ -23,7 +23,7 @@
 #define LCD_HEIGHT                          2
 #define LCD_SECTION_EA                      2
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
-#define SENSITIVITY_OF_20A_AMPERE_SENSOR    100.0
+#define SENSITIVITY_OF_20A_CURRENT_SENSOR   100.0
 #define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
 
 // type synonym defns
@@ -57,8 +57,8 @@ struct Pin {
   int const pinId;
 };
 class ReaderAnalogPin : public Pin {
-public:
   ReaderAnalogPin() = delete;
+public:
   ReaderAnalogPin(int const pin_no)
     : Pin{ .pinId = pin_no }
   {
