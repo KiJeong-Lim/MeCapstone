@@ -146,7 +146,7 @@ void BMS::control()
 {
   V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltage?
 
-  while (measuredValuesAreFresh)
+  if (measuredValuesAreFresh)
   {
     delay(10);
     measure(false);
@@ -181,14 +181,15 @@ bool BMS::checkSafety(bool const reportToSerial)
   A_t const allowedA_max = 2.0, allowedA_min = -0.1; // <- Ok?
   bool isBad = false;
 
-  while (measuredValuesAreFresh)
+  if (measuredValuesAreFresh)
   {
     delay(10);
     measure(false);
   }
 
+  // check current
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  if (Iin > allowedV_max)
+  if (Iin > allowedA_max)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
@@ -198,7 +199,7 @@ bool BMS::checkSafety(bool const reportToSerial)
     }
 #endif
   }
-  if (Iin < allowedV_min)
+  if (Iin < allowedA_min)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
@@ -209,9 +210,11 @@ bool BMS::checkSafety(bool const reportToSerial)
 #endif
   }
 #endif
+
+  // check voltage
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    if (cellV[i] > allowedA_max)
+    if (cellV[i] > allowedV_max)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
@@ -224,7 +227,7 @@ bool BMS::checkSafety(bool const reportToSerial)
       }
 #endif
     }
-    if (cellV[i] < allowedA_min)
+    if (cellV[i] < allowedV_min)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
