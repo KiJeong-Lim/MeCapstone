@@ -107,6 +107,7 @@ void BMS::init(ms_t given_time)
     Serial.println("[Warning] No lcd connected.");
 #endif
   }
+  measure(true);
   given_time -= hourglass.getDuration();
   delay(given_time >= 0 ? given_time : 0);
 }
@@ -125,7 +126,22 @@ void BMS::step(ms_t given_time)
 
     if (system_is_okay and jobs_done)
     {
+#ifndef NO_DEBUGGING
+      Serial.println("[log] CHARGING COMPLETED.");
+#endif
+      for (int i = 0; i < LENGTH_OF(cells); i++)
+      {
+        cells[i].balanceCircuit_pin.turnOn();
+      }
       goodbye(10);
+#ifndef NO_LCD_USE
+      if (lcdOkay)
+      {
+        lcd_handle->clear();
+        lcd_handle->setCursor(0, 1);
+        lcd_handle->print("JOBS FINISHED");
+      }
+#endif
     }
     else
     {
@@ -144,7 +160,7 @@ void BMS::step(ms_t given_time)
 
 void BMS::control()
 {
-  V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltage?
+  V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltages?
 
   if (measuredValuesAreFresh)
   {
@@ -261,21 +277,11 @@ void BMS::execEmergencyMode()
 
 void BMS::goodbye(int const countDown)
 {
-#ifndef NO_DEBUGGING
-  Serial.println("[log] CHARGING COMPLETED.");
-#endif
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOn();
-  }
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
-    lcd_handle->clear();
-    lcd_handle->setCursor(0, 1);
-    lcd_handle->print("JOBS FINISHED");
     lcd_handle->setCursor(1, 0);
-    lcd_handle->print("SECS LEFT");
+    lcd_handle->print(" SECS LEFT");
   }
 #endif
   for (int i = countDown; i > 0; i--)
