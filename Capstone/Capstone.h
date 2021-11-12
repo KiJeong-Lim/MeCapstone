@@ -6,6 +6,9 @@
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
 ** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
 ** ===============================================================================
+** Notes
+** [1] Do not change the definition of 'ms_t' to some type of unsigned integers.
+**     Because it is used to present time-differences which might be negative.
 */
 
 #ifndef CAPSTONE
@@ -38,13 +41,13 @@
 // #define NOT_CONSIDER_SUPPLY_CURRENT
 
 // type synonym defns
-typedef int long long ms_t;
-typedef double A_t;
-typedef double V_t;
-typedef double Ohm_t;
-typedef double Val_t;
-typedef uint8_t pinId_t;
-typedef int long long bigInt_t;
+typedef int long long ms_t; // type for milliseconds
+typedef double A_t; // type for ampere;
+typedef double V_t; // type for voltage;
+typedef double Ohm_t; // type for ohm;
+typedef double Val_t; // type for arduino analog signal
+typedef uint8_t pinId_t; // type for arduino pin
+typedef int long long bigInt_t; // type for big integer
 
 // class defns
 #ifndef NOT_MAIN_INO_FILE
@@ -52,7 +55,7 @@ struct ReferenceCollection {
   Val_t analogSignalMax;
   V_t arduinoRegularV;
   V_t zenerdiodeVfromRtoA;
-  Ohm_t conversion_ratio_for_ampere_sensor;
+  Ohm_t conversionRatioForCurrentSensor;
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
@@ -260,6 +263,32 @@ public:
     flush();
   }
 #endif
+};
+#endif
+#ifndef NOT_MAIN_INO_FILE
+class Timer {
+  ms_t beg_time = 0;
+public:
+  Timer()
+  {
+    beg_time = millis();
+  }
+  ~Timer()
+  {
+  }
+private:
+  ms_t getTimeDiff(ms_t const currentTime) const
+  {
+    return currentTime - beg_time;
+  }
+public:
+  ms_t getDuration()
+  {
+    ms_t const currentTime = millis();
+    ms_t const result = getTimeDiff(currentTime);
+    beg_time = currentTime;
+    return result;
+  }
 };
 #endif
 

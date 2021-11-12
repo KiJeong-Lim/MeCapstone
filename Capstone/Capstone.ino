@@ -12,7 +12,7 @@
 #include "Capstone.h"
 
 #ifndef NO_DEBUGGING
-static void printHexOnSerial(byte const integer_between_0_and_255)
+static void printByteOnSerial(byte const integer_between_0_and_255)
 {
   Serial.print("0x");
   if (integer_between_0_and_255 < 16)
@@ -27,7 +27,7 @@ ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
   .arduinoRegularV = 5.00,
   .zenerdiodeVfromRtoA = 2.48,
-  .conversion_ratio_for_ampere_sensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR,
+  .conversionRatioForCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR,
 };
 
 CELL cells[] = {
@@ -55,8 +55,8 @@ class BMS {
 #endif
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
-  void init(); // FIX ME
-  void step(); // FIX ME
+  void init(ms_t expected_elapsed_time); // TRUST ME
+  void step(ms_t expected_elapsed_time); // FIX ME
 private:
   void measure(); // TRUST ME
   void control(); // FIX ME
@@ -71,20 +71,18 @@ private:
 
 void setup()
 {
-  myBMS.init();
+  myBMS.init(500);
 }
 
 void loop()
 {
-  myBMS.step();
+  myBMS.step(3000);
 }
 
-void BMS::init()
+void BMS::init(ms_t given_time)
 {
-  ms_t const given_time = 500;
-  ms_t beg_time, cur_time;
+  Timer hourglass;
 
-  beg_time = millis();
 #ifndef NO_DEBUGGING
   Serial.begin(SERIAL_PORT);
 #endif
@@ -110,17 +108,15 @@ void BMS::init()
     Serial.println("[Warning] No lcd connected.");
 #endif
   }
-  cur_time = millis();
-  delay(beg_time < cur_time - given_time ? given_time - (cur_time - beg_time) : 0);
+  given_time -= hourglass.getDuration();
+  delay(given_time >= 0 ? given_time : 0);
 }
 
-void BMS::step()
+void BMS::step(ms_t given_time)
 {
-  ms_t const given_time = 3000;
   bool system_is_okay = true;
-  ms_t beg_time, cur_time;
+  Timer hourglass;
 
-  beg_time = millis();
   measure();
   showValues();
   control();
@@ -132,7 +128,7 @@ void BMS::step()
   }
   else
   {
-    for (cur_time = millis(); cur_time - beg_time < given_time; cur_time = millis())
+    for (given_time -= hourglass.getDuration(); given_time > 0; given_time -= hourglass.getDuration())
     {
       if (not system_is_okay)
       {
@@ -146,24 +142,24 @@ void BMS::step()
 
 void BMS::measure()
 {
-  ms_t const measuring_time = 10;
+  ms_t const measuring_time_for_one_sensor = 10;
   V_t sensorV = 0.0;
   V_t accumV = 0.0;
 
 #ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
-  sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+  sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
-#endif
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
-  Iin = refOf.conversion_ratio_for_ampere_sensor * (sensorV - arduino5V * 0.5);
 #endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
-    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
     cellV[i] = sensorV - accumV;
     accumV += cellV[i];
   }
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
+  sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+  Iin = refOf.conversionRatioForCurrentSensor * (sensorV - arduino5V * 0.5);
+#endif
 
   measuredValuesAreFresh = true;
 }
@@ -377,7 +373,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
         {
 #ifndef NO_DEBUGGING
           Serial.print("[log] I2C address found: address = ");
-          printHexOnSerial(adr);
+          printByteOnSerial(adr);
           Serial.println(".");
 #endif
           lcd_handle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
@@ -385,7 +381,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
           {
 #ifndef NO_DEBUGGING
             Serial.print("[log] I2C connected: address = ");
-            printHexOnSerial(adr);
+            printByteOnSerial(adr);
             Serial.println(".");
 #endif
             break;
