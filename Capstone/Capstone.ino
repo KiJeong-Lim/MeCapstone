@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#define BMS_VERSION "1.0.0"
+#define BMS_VERSION 1.00
 #include "Capstone.h"
 
 #ifndef NO_DEBUGGING
@@ -72,16 +72,12 @@ void setup()
 {
 #ifndef NO_DEBUGGING
   Serial.begin(SERIAL_PORT);
-  Serial.println("[log] Runtime started.");
 #endif
   myBMS.init(500);
 }
 
 void loop()
 {
-#ifndef NO_DEBUGGING
-  Serial.println("[log] Turn changed.");
-#endif
   myBMS.step(3000);
 }
 
@@ -89,6 +85,9 @@ void BMS::init(ms_t given_time)
 {
   Timer hourglass;
 
+#ifndef NO_DEBUGGING
+  Serial.println("[log] Runtime started.");
+#endif
   initWire();
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -116,6 +115,9 @@ void BMS::step(ms_t given_time)
 {
   Timer hourglass;
 
+#ifndef NO_DEBUGGING
+  Serial.println("[log] Turn changed.");
+#endif
   measure(true);
   control();
   {
@@ -257,6 +259,10 @@ void BMS::goodbye(int const countDown)
 #ifndef NO_DEBUGGING
   Serial.println("[log] CHARGING COMPLETED.");
 #endif
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    cells[i].balanceCircuit_pin.turnOn();
+  }
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
@@ -267,10 +273,6 @@ void BMS::goodbye(int const countDown)
     lcd_handle->print("SECS LEFT");
   }
 #endif
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOn();
-  }
   for (int i = countDown; i > 0; i--)
   {
 #ifndef NO_LCD_USE
@@ -438,14 +440,12 @@ void BMS::hello()
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
-    lcd_handle->noBacklight();
-    lcd_handle->clear();
-    lcd_handle->backlight();
-    lcd_handle->setCursor(0, 0);
-    lcd_handle->print("SYSTEM ONLINE");
-    lcd_handle->setCursor(0, 1);
-    lcd_handle->print("VERSION = ");
-    lcd_handle->print(BMS_VERSION);
+    LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
+    
+    lcd.println("> SYSTEM");
+    lcd.println(" ONLINE ");
+    lcd.println("VERSION=");
+    lcd.println(BMS_VERSION);
   }
 #endif
 }
