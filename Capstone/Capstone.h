@@ -40,6 +40,7 @@
 // #define NO_LCD_USE
 // #define NOT_CONSIDER_SUPPLY_VOLTAGE
 // #define NOT_CONSIDER_SUPPLY_CURRENT
+// #define NOT_CONTROL_BALANCE_CIRCUIT
 
 // type synonym defns
 typedef int long long ms_t; // type for milliseconds

@@ -58,7 +58,9 @@ public:
   void init(ms_t expected_elapsed_time); // TRUST ME
   void step(ms_t expected_elapsed_time); // FIX ME
 private:
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
   void control(); // FIX ME
+#endif
   bool checkSafety(bool reportToSerial); // FIX ME
   void execEmergencyMode(); // FIX ME
   void goodbye(int timeLeftToQuit); // TRUST ME
@@ -120,7 +122,9 @@ void BMS::step(ms_t given_time)
 #endif
   measure(true);
   delay(10);
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
   control();
+#endif
   {
     bool system_is_okay = checkSafety(true);
 
@@ -158,6 +162,7 @@ void BMS::step(ms_t given_time)
   }
 }
 
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
 void BMS::control()
 {
   V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltages?
@@ -190,6 +195,7 @@ void BMS::control()
 
   measuredValuesAreFresh = false;
 }
+#endif
 
 bool BMS::checkSafety(bool const reportToSerial)
 {
@@ -264,15 +270,19 @@ bool BMS::checkSafety(bool const reportToSerial)
 
 void BMS::execEmergencyMode()
 {
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
   }
+#endif
   delay(500);
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOff();
   }
+#endif
 }
 
 void BMS::goodbye(int const countDown)
