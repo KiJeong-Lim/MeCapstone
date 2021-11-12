@@ -106,7 +106,7 @@ void BMS::init(ms_t given_time)
   else
   {
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] No lcd connected.");
+    Serial.println("[Warning] LCD not connected.");
 #endif
   }
   given_time -= hourglass.getDuration();
