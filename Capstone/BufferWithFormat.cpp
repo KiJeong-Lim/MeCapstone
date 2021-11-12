@@ -9,11 +9,12 @@
 */
 
 #include "Capstone.h"
+#ifndef NO_LCD_USE
 #ifndef round
 #define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #endif
 
-inline int long long pow10(int const n)
+static int long long pow10(int const n)
 {
   int long long res = 1;
   for (int i = 0; i < n; i++)
@@ -144,3 +145,4 @@ void BufferWithFormat::putString(char const *const str)
     }
   }
 }
+#endif

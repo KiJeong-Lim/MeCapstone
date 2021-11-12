@@ -44,16 +44,20 @@ typedef double Val_t;
 typedef uint8_t pinId_t;
 
 // class defns
+#ifndef NOT_MAIN_INO_FILE
 struct ReferenceCollection {
   Val_t analogSignalMax;
   V_t arduinoRegularV;
   V_t zenerdiodeVfromRtoA;
   Ohm_t conversion_ratio_for_ampere_sensor;
 };
+#endif
 #ifndef NOT_MAIN_INO_FILE
 struct Pin {
   pinId_t const pinId;
 };
+#endif
+#ifndef NOT_MAIN_INO_FILE
 class ReaderAnalogPin : public Pin {
 public:
   ReaderAnalogPin() = delete;
@@ -79,6 +83,8 @@ public:
     return ((double)sum_of_vals) / ((double)cnt_of_vals);
   }
 };
+#endif
+#ifndef NOT_MAIN_INO_FILE
 class WriterDigitalPin : public Pin {
   bool is_high;
 public:
@@ -126,11 +132,14 @@ public:
     return is_high;
   }
 };
+#endif
+#ifndef NOT_MAIN_INO_FILE
 struct CELL {
   ReaderAnalogPin const voltageSensor_pin;
   WriterDigitalPin const balanceCircuit_pin;
 };
 #endif
+#ifndef NO_LCD_USE
 class BufferWithFormat {
   int cnt = 0;
   char buf[LCD_SECTION_LEN + 1] = {};
@@ -143,8 +152,10 @@ public:
   void putString(char const *string_being_printed);
   void putDouble(double value_being_printed, int number_of_digits_after_dot);
 };
+#endif
 #ifndef NOT_MAIN_INO_FILE
 class LcdPrettyPrinter {
+#ifndef NO_LCD_USE
   LiquidCrystal_I2C *const lcd_handle;
   int section_no;
   BufferWithFormat fbuf;
@@ -187,10 +198,13 @@ public:
   void println(char const *string);
 private:
   void flush();
+#endif
 };
 #endif
 
 // global variable decls
+#ifndef NOT_MAIN_INO_FILE
 extern ReferenceCollection const refOf;
+#endif
 
 #endif

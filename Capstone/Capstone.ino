@@ -11,17 +11,17 @@
 #define BMS_VERSION "1.0.0"
 #include "Capstone.h"
 
-inline void printHexOnSerial(byte const integer_between_0_and_255)
-{
 #ifndef NO_DEBUGGING
+static void printHexOnSerial(byte const integer_between_0_and_255)
+{
   Serial.print("0x");
   if (integer_between_0_and_255 < 16)
   {
     Serial.print("0");
   }
   Serial.print(integer_between_0_and_255, HEX);
-#endif
 }
+#endif
 
 ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
@@ -395,6 +395,7 @@ void BMS::greeting()
 #endif
 }
 
+#ifndef NO_LCD_USE
 void LcdPrettyPrinter::print(int const value)
 {
   fbuf.putInt(value);
@@ -444,3 +445,4 @@ void LcdPrettyPrinter::flush()
   section_no++;
   fbuf.ready();
 }
+#endif
