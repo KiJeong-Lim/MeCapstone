@@ -58,12 +58,11 @@ public:
   void init(ms_t expected_elapsed_time); // TRUST ME
   void step(ms_t expected_elapsed_time); // FIX ME
 private:
-  void measure(); // TRUST ME
   void control(); // FIX ME
-  bool checkSafety(); // TRUST ME
+  bool checkSafety(bool reportToSerial); // TRUST ME
   void goodbye(); // FIX ME
   void execEmergencyMode(); // FIX ME
-  void showValues(); // FIX ME
+  void measure(bool showValues); // TRUST ME
   void initWire(); // FIX ME
   bool openLCD(int lcd_width, int lcd_height); // TRUST ME
   void hello(); // TRUST ME
@@ -117,10 +116,12 @@ void BMS::step(ms_t given_time)
   bool system_is_okay = true;
   Timer hourglass;
 
-  measure();
-  showValues();
+#ifndef NO_DEBUGGING
+  Serial.println("[log] Turn changed.");
+#endif
+  measure(true);
   control();
-  system_is_okay = checkSafety();
+  system_is_okay = checkSafety(true);
 
   if (system_is_okay and jobs_done)
   {
@@ -135,33 +136,9 @@ void BMS::step(ms_t given_time)
         execEmergencyMode();
       }
       delay(100);
-      system_is_okay = checkSafety();
+      system_is_okay = checkSafety(false);
     }
   }
-}
-
-void BMS::measure()
-{
-  ms_t const measuring_time_for_one_sensor = 10;
-  V_t sensorV = 0.0;
-  V_t accumV = 0.0;
-
-#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
-  sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
-#endif
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-    cellV[i] = sensorV - accumV;
-    accumV += cellV[i];
-  }
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioForCurrentSensor * (sensorV - arduino5V * 0.5);
-#endif
-
-  measuredValuesAreFresh = true;
 }
 
 void BMS::control()
@@ -170,7 +147,7 @@ void BMS::control()
 
   while (measuredValuesAreFresh)
   {
-    measure();
+    measure(false);
   }
 
   jobs_done = true;
@@ -196,60 +173,71 @@ void BMS::control()
   measuredValuesAreFresh = false;
 }
 
-bool BMS::checkSafety()
+bool BMS::checkSafety(bool const reportToSerial)
 {
-  V_t const allowedV_high = 4.2, allowedV_low = 2.7;
-  A_t const allowedA_high = 2.0, allowedA_low = -0.1;
+  V_t const allowedV_max = 4.2, allowedV_min = 2.7; // <- Ok?
+  A_t const allowedA_max = 2.0, allowedA_min = -0.1; // <- Ok?
   bool isBad = false;
 
   while (measuredValuesAreFresh)
   {
-    measure();
+    measure(false);
   }
 
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  if (Iin > allowedA_high)
+  if (Iin > allowedV_max)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] 'Iin' too high.");
+    if (reportToSerial)
+    {
+      Serial.println("[Warning] 'Iin' too high.");
+    }
 #endif
   }
-  else if (Iin < allowedA_low)
+  if (Iin < allowedV_min)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] 'Iin' too low.");
+    if (reportToSerial)
+    {
+      Serial.println("[Warning] 'Iin' too low.");
+    }
 #endif
   }
 #endif
 
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    if (cellV[i] > allowedV_high)
+    if (cellV[i] > allowedA_max)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] 'cellV[");
-      Serial.print(i);
-      Serial.print("]'");
-      Serial.println(" too high.");
+      if (reportToSerial)
+      {
+        Serial.print("[Warning] 'cellV[");
+        Serial.print(i);
+        Serial.print("]'");
+        Serial.println(" too high.");
+      }
 #endif
     }
-    else if (cellV[i] < allowedV_low)
+    if (cellV[i] < allowedA_min)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] 'cellV[");
-      Serial.print(i);
-      Serial.print("]'");
-      Serial.println(" too low.");
+      if (reportToSerial)
+      {
+        Serial.print("[Warning] 'cellV[");
+        Serial.print(i);
+        Serial.print("]'");
+        Serial.println(" too low.");
+      }
 #endif
     }
   }
 
   measuredValuesAreFresh = false;
-
   return isBad;
 }
 
@@ -265,13 +253,16 @@ void BMS::goodbye()
     lcd_handle->setCursor(0, 0);
     lcd_handle->print("FULLY CHARGED");
     lcd_handle->setCursor(0, 1);
-    lcd_handle->print("REMOVE BATTERY");
+    lcd_handle->print("REMOVE BMS");
   }
 #endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
   }
+#ifndef NO_DEBUGGING
+  Serial.println("[Warning] Your arduino will abort in 10 seconds.");
+#endif
   delay(10000);
   powerIn_pin.turnOff();
   abort();
@@ -290,64 +281,87 @@ void BMS::execEmergencyMode()
   }
 }
 
-void BMS::showValues()
+void BMS::measure(bool const showValues)
 {
+  ms_t const measuring_time_for_one_sensor = 10;
+  V_t sensorV = 0.0;
+  V_t accumV = 0.0;
+
+#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
+  sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+  arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
+#endif
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+    cellV[i] = sensorV - accumV;
+    accumV += cellV[i];
+  }
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
+  sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+  Iin = refOf.conversionRatioForCurrentSensor * (sensorV - arduino5V * 0.5);
+#endif
+  measuredValuesAreFresh = true;
+
+  if (showValues)
+  {
 #ifndef NO_DEBUGGING
 #ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
-  Serial.print(">>> ");
-  Serial.print("arduino5V");
-  Serial.print(" = ");
-  Serial.print(arduino5V);
-  Serial.println("[V].");
+    Serial.print(">>> ");
+    Serial.print("arduino5V");
+    Serial.print(" = ");
+    Serial.print(arduino5V);
+    Serial.println("[V].");
 #endif
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  Serial.print(">>> ");
-  Serial.print("Iin");
-  Serial.print(" = ");
-  Serial.print(Iin);
-  Serial.print("[A]");
-  Serial.println(".");
+    Serial.print(">>> ");
+    Serial.print("Iin");
+    Serial.print(" = ");
+    Serial.print(Iin);
+    Serial.print("[A]");
+    Serial.println(".");
 #endif
 #endif
 #ifndef NO_LCD_USE
-  if (lcdOkay)
-  {
-    LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
-
-    for (int i = 0; i < LENGTH_OF(cellV); i++)
+    if (lcdOkay)
     {
-      lcd.print("B");
-      lcd.print(i + 1);
-      lcd.print("=");
-      lcd.print(cellV[i]);
-      lcd.println(" ");
-    }
+      LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
+
+      for (int i = 0; i < LENGTH_OF(cellV); i++)
+      {
+        lcd.print("B");
+        lcd.print(i + 1);
+        lcd.print("=");
+        lcd.print(cellV[i]);
+        lcd.println(" ");
+      }
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-    lcd.print("I");
-    lcd.print("=");
-    lcd.print(Iin);
-    lcd.println(" ");
+      lcd.print("I");
+      lcd.print("=");
+      lcd.print(Iin);
+      lcd.println(" ");
 #endif
-    // Here, the LCD screen will be updated, while the variable lcd being destructed.
-    //                              A1234567B1234567
-    // A possible screen will be:  ##################
-    //                            1#B1=4.25 B2=4.17 #
-    //                            2#B3=3.33 I=1.66  #
-    //                             ##################
-  }
+      // Here, the LCD screen will be updated, while the variable lcd being destructed.
+      //                              A1234567B1234567
+      // A possible screen will be:  ##################
+      //                            1#B1=4.25 B2=4.17 #
+      //                            2#B3=3.33 I=1.66  #
+      //                             ##################
+    }
 #endif
 #ifndef NO_DEBUGGING
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    Serial.print(">>> ");
-    Serial.print("cellV[");
-    Serial.print(i);
-    Serial.print("]");
-    Serial.print(" = ");
-    Serial.print(cellV[i]);
-    Serial.println("[V].");
-  }
+    for (int i = 0; i < LENGTH_OF(cellV); i++)
+    {
+      Serial.print(">>> ");
+      Serial.print("cellV[");
+      Serial.print(i);
+      Serial.print("]");
+      Serial.print(" = ");
+      Serial.print(cellV[i]);
+      Serial.println("[V].");
+    }
 #endif
+  }
 }
 
 void BMS::initWire()
