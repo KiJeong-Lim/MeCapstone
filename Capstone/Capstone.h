@@ -19,6 +19,9 @@
 #ifndef NOT_MAIN_INO_FILE
 #include <Wire.h>
 #include "LiquidCrystal_I2C.h"
+#else
+#include <stdlib.h>
+#include <stdint.h>
 #endif
 
 // macro defns
@@ -38,6 +41,7 @@ typedef double A_t;
 typedef double V_t;
 typedef double Ohm_t;
 typedef double Val_t;
+typedef uint8_t pinId_t;
 
 // class defns
 struct ReferenceCollection {
@@ -48,12 +52,12 @@ struct ReferenceCollection {
 };
 #ifndef NOT_MAIN_INO_FILE
 struct Pin {
-  int const pinId;
+  pinId_t const pinId;
 };
 class ReaderAnalogPin : public Pin {
 public:
   ReaderAnalogPin() = delete;
-  ReaderAnalogPin(int const pin_no)
+  ReaderAnalogPin(pinId_t const pin_no)
     : Pin{ .pinId = pin_no }
   {
   }
@@ -79,7 +83,7 @@ class WriterDigitalPin : public Pin {
   bool is_high;
 public:
   WriterDigitalPin() = delete;
-  WriterDigitalPin(int const pin_no)
+  WriterDigitalPin(pinId_t const pin_no)
     : Pin{ .pinId = pin_no }
     , is_high{ false }
   {
