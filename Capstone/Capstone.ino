@@ -37,30 +37,36 @@ CELL cells[] = {
 };
 
 class BMS {
+#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
   ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
+#endif
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
   ReaderAnalogPin Iin_pin = { .pin_no = A4 };
+#endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   byte wire_on = false;
   byte lcdOkay = false;
   byte jobs_done = false;
   byte measuredValuesAreFresh = false;
   LiquidCrystal_I2C *lcd_handle = nullptr;
-  A_t Iin = 0.0;
   V_t arduino5V = refOf.arduinoRegularV;
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
+  A_t Iin = 0.0;
+#endif
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
-  void init();
-  void step();
+  void init(); // FIX ME
+  void step(); // FIX ME
 private:
-  void measure();
-  void control();
-  bool checkSafety();
-  void goodbye();
-  void execEmergencyMode();
-  void showValues();
-  void initWire();
-  bool openLCD(int lcd_width, int lcd_height);
-  void hello();
+  void measure(); // TRUST ME
+  void control(); // FIX ME
+  bool checkSafety(); // TRUST ME
+  void goodbye(); // FIX ME
+  void execEmergencyMode(); // FIX ME
+  void showValues(); // FIX ME
+  void initWire(); // FIX ME
+  bool openLCD(int lcd_width, int lcd_height); // TRUST ME
+  void hello(); // TRUST ME
 } myBMS;
 
 void setup()
@@ -81,6 +87,8 @@ void BMS::init()
   beg_time = millis();
 #ifndef NO_DEBUGGING
   Serial.begin(SERIAL_PORT);
+#endif
+#ifndef NO_DEBUGGING
   Serial.println("[log] Runtime started.");
 #endif
   initWire();
@@ -142,12 +150,14 @@ void BMS::measure()
   V_t sensorV = 0.0;
   V_t accumV = 0.0;
 
+#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
-
+#endif
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   Iin = refOf.conversion_ratio_for_ampere_sensor * (sensorV - arduino5V * 0.5);
-
+#endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time) / refOf.analogSignalMax;
@@ -160,7 +170,7 @@ void BMS::measure()
 
 void BMS::control()
 {
-  V_t const V_wanted = 3.8, overV_wanted = 4.1; // FIX ME
+  V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltage?
 
   while (measuredValuesAreFresh)
   {
@@ -201,24 +211,26 @@ bool BMS::checkSafety()
     measure();
   }
 
-  if (Iin >= allowedA_high)
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
+  if (Iin > allowedA_high)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
     Serial.println("[Warning] 'Iin' too high.");
 #endif
   }
-  else if (Iin <= allowedA_low)
+  else if (Iin < allowedA_low)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
     Serial.println("[Warning] 'Iin' too low.");
 #endif
   }
+#endif
 
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    if (cellV[i] >= allowedV_high)
+    if (cellV[i] > allowedV_high)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
@@ -228,7 +240,7 @@ bool BMS::checkSafety()
       Serial.println(" too high.");
 #endif
     }
-    else if (cellV[i] <= allowedV_low)
+    else if (cellV[i] < allowedV_low)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
@@ -269,7 +281,7 @@ void BMS::goodbye()
   abort();
 }
 
-void BMS::execEmergencyMode() // FIX ME
+void BMS::execEmergencyMode()
 {
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -285,15 +297,21 @@ void BMS::execEmergencyMode() // FIX ME
 void BMS::showValues()
 {
 #ifndef NO_DEBUGGING
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    Serial.print(">>> ");
-    Serial.print("cellV[");
-    Serial.print(i);
-    Serial.print("] = ");
-    Serial.print(cellV[i]);
-    Serial.println("[V].");
-  }
+#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
+  Serial.print(">>> ");
+  Serial.print("arduino5V");
+  Serial.print(" = ");
+  Serial.print(arduino5V);
+  Serial.print("[V].");
+#endif
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
+  Serial.print(">>> ");
+  Serial.print("Iin");
+  Serial.print(" = ");
+  Serial.print(Iin);
+  Serial.print("[A]");
+  Serial.println(".");
+#endif
 #endif
 #ifndef NO_LCD_USE
   if (lcdOkay)
@@ -308,20 +326,30 @@ void BMS::showValues()
       lcd.print(cellV[i]);
       lcd.println(" ");
     }
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
     lcd.print("I");
     lcd.print("=");
     lcd.print(Iin);
     lcd.println(" ");
+#endif
+    // Here, the LCD screen will be updated, while the variable 'lcd' being destructed.
+    // A possible screen will be:
+    // * 0123456701234567
+    // 0 B1=4.25 B2=4.17
+    // 1 B3=3.33 I=1.70
   }
 #endif
 #ifndef NO_DEBUGGING
-  Serial.print(">>> ");
-  Serial.print("arduino5V = ");
-  Serial.print(arduino5V);
-  Serial.print("[V], ");
-  Serial.print("Iin = ");
-  Serial.print(Iin);
-  Serial.println("[A].");
+  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  {
+    Serial.print(">>> ");
+    Serial.print("cellV[");
+    Serial.print(i);
+    Serial.print("]");
+    Serial.print(" = ");
+    Serial.print(cellV[i]);
+    Serial.println("[V].");
+  }
 #endif
 }
 
@@ -387,11 +415,16 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 void BMS::hello()
 {
 #ifndef NO_LCD_USE
-  lcd_handle->clear();
-  lcd_handle->setCursor(0, 0);
-  lcd_handle->print("SYSTEM ONLINE");
-  lcd_handle->setCursor(0, 1);
-  lcd_handle->print("VERSION = ");
-  lcd_handle->print(BMS_VERSION);
+  if (lcdOkay)
+  {
+    lcd_handle->noBacklight();
+    lcd_handle->clear();
+    lcd_handle->backlight();
+    lcd_handle->setCursor(0, 0);
+    lcd_handle->print("SYSTEM ONLINE");
+    lcd_handle->setCursor(0, 1);
+    lcd_handle->print("VERSION = ");
+    lcd_handle->print(BMS_VERSION);
+  }
 #endif
 }

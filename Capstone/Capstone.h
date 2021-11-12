@@ -34,6 +34,8 @@
 #define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
 // #define NO_DEBUGGING
 // #define NO_LCD_USE
+// #define NOT_CONSIDER_SUPPLY_VOLTAGE
+// #define NOT_CONSIDER_SUPPLY_CURRENT
 
 // type synonym defns
 typedef int long long ms_t;
@@ -66,19 +68,28 @@ public:
     : Pin{ .pinId = pin_no }
   {
   }
+  ~ReaderAnalogPin()
+  {
+  }
+private:
+  int read_once() const
+  {
+    return analogRead(pinId);
+  }
+public:
   Val_t readSignalOnce() const
   {
-    Val_t val = analogRead(pinId);
+    Val_t val = read_once();
     return val;
   }
   Val_t readSignal(ms_t const duration) const
   {
-    int long long sum_of_vals = 0;
-    int long cnt_of_vals = 0;
+    bigInt_t sum_of_vals = 0;
+    bigInt_t cnt_of_vals = 0;
     ms_t const beg_time = millis();
     for (ms_t cur_time = beg_time; cur_time - beg_time < duration; cur_time = millis())
     {
-      sum_of_vals += analogRead(pinId);
+      sum_of_vals += read_once();
       cnt_of_vals++;
     }
     return ((double)sum_of_vals) / ((double)cnt_of_vals);
@@ -95,38 +106,50 @@ public:
     , is_high{ false }
   {
   }
+  ~WriterDigitalPin()
+  {
+  }
+private:
+  void syncPin()
+  {
+    digitalWrite(pinId, is_high ? HIGH : LOW);
+  }
+public:
   void initWith(bool const on_is_true)
   {
-    pinMode(pinId, OUTPUT);
-    digitalWrite(pinId, on_is_true);
     is_high = on_is_true;
 #ifndef NO_DEBUGGING
     Serial.print("[log] The pin ");
     Serial.print(pinId);
     Serial.print(" is initalized to ");
-    Serial.print(on_is_true ? "HIGH" : "LOW");
+    Serial.print(is_high ? "HIGH" : "LOW");
     Serial.println(".");
+    delay(5);
 #endif
+    pinMode(pinId, OUTPUT);
+    syncPin();
   }
   void turnOn()
   {
-    digitalWrite(pinId, HIGH);
     is_high = true;
 #ifndef NO_DEBUGGING
     Serial.print("[log] The pin ");
     Serial.print(pinId);
     Serial.println(" set to be HIGH.");
+    delay(5);
 #endif
+    syncPin();
   }
   void turnOff()
   {
-    digitalWrite(pinId, LOW);
     is_high = false;
 #ifndef NO_DEBUGGING
     Serial.print("[log] The pin ");
     Serial.print(pinId);
     Serial.println(" set to be LOW.");
+    delay(5);
 #endif
+    syncPin();
   }
   bool isHigh() const
   {
