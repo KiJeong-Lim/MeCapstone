@@ -57,8 +57,8 @@ struct Pin {
   int const pinId;
 };
 class ReaderAnalogPin : public Pin {
-  ReaderAnalogPin() = delete;
 public:
+  ReaderAnalogPin() = delete;
   ReaderAnalogPin(int const pin_no)
     : Pin{ .pinId = pin_no }
   {
