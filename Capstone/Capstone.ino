@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#define BMS_VERSION 1.00
+#define BMS_VERSION 0.10
 #include "Capstone.h"
 
 #ifndef NO_DEBUGGING
