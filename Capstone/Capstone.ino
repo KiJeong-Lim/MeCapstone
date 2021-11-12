@@ -121,7 +121,9 @@ void BMS::step(ms_t given_time)
   Serial.println("[log] Turn changed.");
 #endif
   measure(true);
+#ifndef NO_DEBUGGING
   delay(10);
+#endif
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
   control();
 #endif
@@ -199,8 +201,8 @@ void BMS::control()
 
 bool BMS::checkSafety(bool const reportToSerial)
 {
-  V_t const allowedV_max = 4.2, allowedV_min = 2.7; // <- Ok?
-  A_t const allowedA_max = 2.0, allowedA_min = -0.1; // <- Ok?
+  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // Confirm us.
+  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // Confirm us.
   bool isBad = false;
 
   if (measuredValuesAreFresh)
