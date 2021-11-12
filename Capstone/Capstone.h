@@ -42,6 +42,7 @@ typedef double V_t;
 typedef double Ohm_t;
 typedef double Val_t;
 typedef uint8_t pinId_t;
+typedef int long long bigInt_t;
 
 // class defns
 #ifndef NOT_MAIN_INO_FILE

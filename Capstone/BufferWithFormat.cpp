@@ -11,12 +11,12 @@
 #include "Capstone.h"
 #ifndef NO_LCD_USE
 #ifndef round
-#define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#define round(x)                            ((x)>=0?(bigInt_t)((x)+0.5):(bigInt_t)((x)-0.5))
 #endif
 
-static int long long pow10(int const n)
+static bigInt_t pow10(int const n)
 {
-  int long long res = 1;
+  bigInt_t res = 1;
   for (int i = 0; i < n; i++)
   {
     res *= 10;
@@ -63,7 +63,7 @@ void BufferWithFormat::putDigit(int const n)
 
 void BufferWithFormat::putInt(int const value)
 {
-  int out = value;
+  bigInt_t out = value;
   if (out < 0)
   {
     put('-');
@@ -80,8 +80,8 @@ void BufferWithFormat::putDouble(double const value, int const afters_dot)
 {
   if (afters_dot > 0)
   {
-    int long long const exp_10_after_dots = pow10(afters_dot); 
-    int long long out = round(value * exp_10_after_dots);
+    bigInt_t const exp_10_after_dots = pow10(afters_dot); 
+    bigInt_t out = round(value * exp_10_after_dots);
     if (out < 0);
     {
       put('-');
@@ -105,8 +105,8 @@ void BufferWithFormat::putDouble(double const value, int const afters_dot)
   }
   else
   {
-    int long long const exp_10_neg_after_dots = pow10(- afters_dot); 
-    int long out = round(value * exp_10_neg_after_dots);
+    bigInt_t const exp_10_neg_after_dots = pow10(- afters_dot); 
+    bigInt_t out = round(value * exp_10_neg_after_dots);
     if (out < 0);
     {
       put('-');

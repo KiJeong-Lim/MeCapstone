@@ -60,7 +60,7 @@ private:
   void showValues();
   void initWire();
   bool openLCD(int lcd_width, int lcd_height);
-  void greeting();
+  void hello();
 } myBMS;
 
 void setup()
@@ -92,12 +92,16 @@ void BMS::init()
 #ifndef NO_LCD_USE
   lcdOkay = openLCD(LCD_WIDTH, LCD_HEIGHT);
 #endif
-#ifndef NO_DEBUGGING
-  if (!lcdOkay)
+  if (lcdOkay)
   {
-    Serial.println("[Warning] No lcd connected.");
+    hello();
   }
+  else
+  {
+#ifndef NO_DEBUGGING
+    Serial.println("[Warning] No lcd connected.");
 #endif
+  }
   cur_time = millis();
   delay(beg_time < cur_time - given_time ? given_time - (cur_time - beg_time) : 0);
 }
@@ -114,7 +118,7 @@ void BMS::step()
   control();
   system_is_okay = checkSafety();
 
-  if (system_is_okay && jobs_done)
+  if (system_is_okay and jobs_done)
   {
     goodbye();
   }
@@ -122,7 +126,7 @@ void BMS::step()
   {
     for (cur_time = millis(); cur_time - beg_time < given_time; cur_time = millis())
     {
-      if (!system_is_okay)
+      if (not system_is_okay)
       {
         execEmergencyMode();
       }
@@ -380,18 +384,15 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
   return isGood;
 }
 
-void BMS::greeting()
+void BMS::hello()
 {
 #ifndef NO_LCD_USE
-  if (lcdOkay)
-  {
-    lcd_handle->clear();
-    lcd_handle->setCursor(0, 0);
-    lcd_handle->print("SYSTEM ONLINE");
-    lcd_handle->setCursor(0, 1);
-    lcd_handle->print("VERSION = ");
-    lcd_handle->print(BMS_VERSION);
-  }
+  lcd_handle->clear();
+  lcd_handle->setCursor(0, 0);
+  lcd_handle->print("SYSTEM ONLINE");
+  lcd_handle->setCursor(0, 1);
+  lcd_handle->print("VERSION = ");
+  lcd_handle->print(BMS_VERSION);
 #endif
 }
 
