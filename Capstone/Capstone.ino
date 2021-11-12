@@ -107,7 +107,6 @@ void BMS::init(ms_t given_time)
     Serial.println("[Warning] No lcd connected.");
 #endif
   }
-  measure(true);
   given_time -= hourglass.getDuration();
   delay(given_time >= 0 ? given_time : 0);
 }
@@ -120,6 +119,7 @@ void BMS::step(ms_t given_time)
   Serial.println("[log] Turn changed.");
 #endif
   measure(true);
+  delay(10);
   control();
   {
     bool system_is_okay = checkSafety(true);
