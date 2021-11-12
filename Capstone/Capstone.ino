@@ -42,8 +42,8 @@ class BMS {
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   byte wire_on = false;
   byte lcdOkay = false;
+  byte jobs_done = false;
   byte measuredValuesAreFresh = false;
-  byte charging_finished = false;
   LiquidCrystal_I2C *lcd_handle = nullptr;
   A_t Iin = 0.0;
   V_t arduino5V = refOf.arduinoRegularV;
@@ -114,7 +114,7 @@ void BMS::step()
   control();
   system_is_okay = checkSafety();
 
-  if (system_is_okay && charging_finished)
+  if (system_is_okay && jobs_done)
   {
     goodbye();
   }
@@ -156,24 +156,28 @@ void BMS::measure()
 
 void BMS::control()
 {
-  V_t const targetV = 3.8, targetV_overloaded = 4.1;
+  V_t const V_wanted = 3.8, overV_wanted = 4.1; // FIX ME
 
   while (measuredValuesAreFresh)
   {
     measure();
   }
 
-  charging_finished = true;
+  jobs_done = true;
+
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
-    bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? targetV_overloaded : targetV);
-    charging_finished &= this_cell_charging_finished;
+    bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
+
+    jobs_done &= this_cell_charging_finished;
+
     if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOff();
     }
-    if (this_cell_charging_finished and this_cell_being_charged_now)
+
+    if ((this_cell_charging_finished) and (this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOn();
     }
@@ -250,13 +254,13 @@ void BMS::goodbye()
     lcd_handle->print("FULLY CHARGED");
     lcd_handle->setCursor(0, 1);
     lcd_handle->print("REMOVE BATTERY");
-    for (int i = 0; i < LENGTH_OF(cells); i++)
-    {
-      cells[i].balanceCircuit_pin.turnOn();
-    }
-    delay(10000);
   }
 #endif
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    cells[i].balanceCircuit_pin.turnOn();
+  }
+  delay(10000);
   powerIn_pin.turnOff();
   abort();
 }
@@ -280,9 +284,9 @@ void BMS::showValues()
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     Serial.print(">>> ");
-    Serial.print("C");
+    Serial.print("cellV[");
     Serial.print(i);
-    Serial.print("V = ");
+    Serial.print("] = ");
     Serial.print(cellV[i]);
     Serial.println("[V].");
   }
@@ -294,8 +298,8 @@ void BMS::showValues()
 
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
-      lcd.print("C");
-      lcd.print(i);
+      lcd.print("B");
+      lcd.print(i + 1);
       lcd.print("=");
       lcd.print(cellV[i]);
       lcd.println(" ");
@@ -308,7 +312,7 @@ void BMS::showValues()
 #endif
 #ifndef NO_DEBUGGING
   Serial.print(">>> ");
-  Serial.print("A5V = ");
+  Serial.print("arduino5V = ");
   Serial.print(arduino5V);
   Serial.print("[V], ");
   Serial.print("Iin = ");
