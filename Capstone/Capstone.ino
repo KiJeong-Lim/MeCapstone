@@ -10,38 +10,29 @@
 
 #include "Capstone.h"
 
-struct ReferenceCollection {
-  Val_t analogSignalMax;
-  V_t arduinoRegularV;
-  V_t zenerdiodeVfromRtoA;
-  Ohm_t conversion_ratio_for_ampere_sensor;
-} const refOf = {
+ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
-  .arduinoRegularV = 5.0,
+  .arduinoRegularV = 5.00,
   .zenerdiodeVfromRtoA = 2.48,
   .conversion_ratio_for_ampere_sensor = 1 / SENSITIVITY_OF_20A_AMPERE_SENSOR,
 };
 
-struct CELL {
-  ReaderAnalogPin const voltageSensor_pin;
-  WriterDigitalPin const balanceCircuit_pin;
-};
-
 CELL cells[] = {
-  { .voltageSensor_pin = { .pos = A0 }, .balanceCircuit_pin = { .pos = 2 } },
-  { .voltageSensor_pin = { .pos = A1 }, .balanceCircuit_pin = { .pos = 3 } },
-  { .voltageSensor_pin = { .pos = A2 }, .balanceCircuit_pin = { .pos = 4 } },
+  { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } },
+  { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } },
+  { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } },
 };
 
 class BMS {
-  ReaderAnalogPin arduino5V_pin = { .pos = A3 };
-  ReaderAnalogPin Iin_pin = { .pos = A4 };
-  WriterDigitalPin powerIn_pin = { .pos = 5 };
+  ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
+  ReaderAnalogPin Iin_pin = { .pin_no = A4 };
+  WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   bool wire_on = false;
   bool lcdOkay = false;
+  bool measured_is_new = false;
   LiquidCrystal_I2C *lcd_handle = nullptr;
   A_t Iin = 0.0;
-  V_t arduino5V = 5.0;
+  V_t arduino5V = refOf.arduinoRegularV;
   V_t cellV[LENGTH_OF(cells)] = {};
 public:
   void init();
@@ -104,7 +95,7 @@ void BMS::step()
   beg_time = millis();
   measure();
 #ifndef NO_DEBUGGING
-  Serial.print("> A5V = ");
+  Serial.print(">>> A5V = ");
   Serial.print(arduino5V);
   Serial.print("[V], ");
   for (int i = 0; i < LENGTH_OF(cellV); i++)
@@ -139,6 +130,7 @@ void BMS::step()
   }
 #endif
   charging_finished = control();
+  measured_is_new = false;
   isOkay = checkSafety();
 
   if (isOkay && charging_finished)
@@ -168,6 +160,7 @@ void BMS::step()
       {
         execEmergencyMode();
       }
+      delay(50);
     }
   }
 }
@@ -188,30 +181,28 @@ void BMS::measure()
     cellV[i] = sensorV - accumV;
     accumV += cellV[i];
   }
+  measured_is_new = true;
 }
 
 bool BMS::control()
 {
-  V_t const targetV_min = 3.8, targetV_max = 4.1;
+  V_t const targetV = 3.8, targetV_overloaded = 4.1;
   bool are_all_cells_charged = true;
 
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    if (cellV[i] >= targetV_max)
-    {
-      cells[i].balanceCircuit_pin.turnOn();
-    }
-    else
-    {
-      are_all_cells_charged = false;
-    }
-
-    if (cellV[i] < targetV_min)
+    bool const battery_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
+    bool const battery_charging_finished = cellV[i] >= (battery_being_charged_now ? targetV_overloaded : targetV);
+    if ((not battery_charging_finished) and (not battery_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOff();
     }
+    if (battery_charging_finished and battery_being_charged_now)
+    {
+      cells[i].balanceCircuit_pin.turnOn();
+    }
+    are_all_cells_charged &= battery_charging_finished;
   }
-
   return are_all_cells_charged;
 }
 
@@ -222,7 +213,6 @@ bool BMS::checkSafety()
   bool isBad = false;
   
   measure();
-
   if (Iin >= allowedA_high)
   {
     isBad = true;
@@ -263,6 +253,7 @@ bool BMS::checkSafety()
 #endif
     }
   }
+  measured_is_new = false;
   return isBad;
 }
 
@@ -273,7 +264,7 @@ void BMS::execEmergencyMode()
   {
     cells[i].balanceCircuit_pin.turnOn();
   }
-  delay(100);
+  delay(500);
   powerIn_pin.turnOn();
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {

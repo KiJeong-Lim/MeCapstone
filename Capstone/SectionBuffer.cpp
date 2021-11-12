@@ -17,10 +17,12 @@
 inline int long long pow10(int n)
 {
   int long long res = 1;
+
   for (int i = 0; i < n; i++)
   {
     res *= 10;
   }
+
   return res;
 }
 
@@ -38,6 +40,7 @@ char const *SectionBuffer::get()
   {
     line[cnt++] = ' ';
   }
+  line[LCD_SECTION_LEN] = '\0';
   return &line[0];
 }
 
