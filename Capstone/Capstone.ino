@@ -29,7 +29,7 @@ class BMS {
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   bool wire_on = false;
   bool lcdOkay = false;
-  bool measured_is_new = false;
+  bool measuredValuesAreFresh = false;
   bool charging_finished = false;
   LiquidCrystal_I2C *lcd_handle = nullptr;
   A_t Iin = 0.0;
@@ -131,7 +131,7 @@ void BMS::step()
   }
 #endif
   control();
-  measured_is_new = false;
+  measuredValuesAreFresh = false;
   system_is_okay = checkSafety();
 
   if (system_is_okay && charging_finished)
@@ -182,7 +182,7 @@ void BMS::measure()
     cellV[i] = sensorV - accumV;
     accumV += cellV[i];
   }
-  measured_is_new = true;
+  measuredValuesAreFresh = true;
 }
 
 void BMS::control()
@@ -194,6 +194,7 @@ void BMS::control()
   {
     bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
     bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? targetV_overloaded : targetV);
+    charging_finished &= this_cell_charging_finished;
     if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOff();
@@ -202,7 +203,6 @@ void BMS::control()
     {
       cells[i].balanceCircuit_pin.turnOn();
     }
-    charging_finished &= this_cell_charging_finished;
   }
 }
 
@@ -253,7 +253,7 @@ bool BMS::checkSafety()
 #endif
     }
   }
-  measured_is_new = false;
+  measuredValuesAreFresh = false;
   return isBad;
 }
 

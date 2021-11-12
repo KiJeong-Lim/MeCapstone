@@ -33,6 +33,21 @@ typedef double V_t;
 typedef double Ohm_t;
 typedef double Val_t;
 
+// inline defns
+#ifndef PURE_CPP
+inline void printHexOnSerial(byte const integer_between_0_and_255)
+{
+#ifndef NO_DEBUGGING
+  Serial.print("0x");
+  if (integer_between_0_and_255 < 16)
+  {
+    Serial.print("0");
+  }
+  Serial.print(integer_between_0_and_255, HEX);
+#endif
+}
+#endif
+
 // class defns
 struct ReferenceCollection {
   Val_t analogSignalMax;
@@ -204,21 +219,6 @@ public:
     flush();
   }
 };
-#endif
-
-// inline defns
-#ifndef PURE_CPP
-inline void printHexOnSerial(byte const integer_between_0_and_255)
-{
-#ifndef NO_DEBUGGING
-  Serial.print("0x");
-  if (integer_between_0_and_255 < 16)
-  {
-    Serial.print("0");
-  }
-  Serial.print(integer_between_0_and_255, HEX);
-#endif
-}
 #endif
 
 // global variable decls
