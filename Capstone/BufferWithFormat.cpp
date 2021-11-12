@@ -8,82 +8,79 @@
 ** ===============================================================================
 */
 
-#define PURE_CPP "SectionBuffer"
 #include "Capstone.h"
 #ifndef round
 #define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 #endif
 
-inline int long long pow10(int n)
+inline int long long pow10(int const n)
 {
   int long long res = 1;
-
   for (int i = 0; i < n; i++)
   {
     res *= 10;
   }
-
   return res;
 }
 
-void SectionBuffer::ready()
+void BufferWithFormat::ready()
 {
-  for (int j = 0; j < LENGTH_OF(line); j++)
+  for (int j = 0; j < LENGTH_OF(buf); j++)
   {
-    line[j] = '\0';
+    buf[j] = '\0';
   }
 }
 
-char const *SectionBuffer::get()
+char const *BufferWithFormat::get()
 {
   while (cnt < LCD_SECTION_LEN)
   {
-    line[cnt++] = ' ';
+    buf[cnt++] = ' ';
   }
-  line[LCD_SECTION_LEN] = '\0';
-  return &line[0];
+  buf[LCD_SECTION_LEN] = '\0';
+  return &buf[0];
 }
 
-void SectionBuffer::put(char const ch)
+void BufferWithFormat::put(char const ch)
 {
   if (cnt < LCD_SECTION_LEN)
   {
-    line[cnt++] = ch;
+    buf[cnt++] = ch;
   }
 }
 
-void SectionBuffer::putDigit(int const n)
+void BufferWithFormat::putDigit(int const n)
 {
   if (n >= 0 && n < 16)
   {
     if (cnt < LCD_SECTION_LEN)
     {
-      line[cnt++] = "0123456789ABCDEF"[n];
+      buf[cnt++] = "0123456789ABCDEF"[n];
     }
   }
 }
 
-void SectionBuffer::putInt(int value)
+void BufferWithFormat::putInt(int const value)
 {
-  if (value < 0)
+  int out = value;
+  if (out < 0)
   {
     put('-');
-    value *= -1;
+    out *= -1;
   }
   do
   {
-    putDigit(value % 10);
-    value /= 10;
-  } while(value > 0);
+    putDigit(out % 10);
+    out /= 10;
+  } while(out > 0);
 }
 
-void SectionBuffer::putDouble(double const value, int const afters_dot)
+void BufferWithFormat::putDouble(double const value, int const afters_dot)
 {
   if (afters_dot > 0)
   {
     int long long const exp_10_after_dots = pow10(afters_dot); 
     int long long out = round(value * exp_10_after_dots);
-
     if (out < 0);
     {
       put('-');
@@ -109,7 +106,6 @@ void SectionBuffer::putDouble(double const value, int const afters_dot)
   {
     int long long const exp_10_neg_after_dots = pow10(- afters_dot); 
     int long out = round(value * exp_10_neg_after_dots);
-
     if (out < 0);
     {
       put('-');
@@ -134,13 +130,10 @@ void SectionBuffer::putDouble(double const value, int const afters_dot)
   }
 }
 
-void SectionBuffer::putString(char const *const str)
+void BufferWithFormat::putString(char const *const str)
 {
   for (char const *p_ch = str; *p_ch != '\0'; p_ch++)
   {
-    if (cnt < LCD_SECTION_LEN)
-    {
-      line[cnt++] = *p_ch;
-    }
+    put(*p_ch);
   }
 }

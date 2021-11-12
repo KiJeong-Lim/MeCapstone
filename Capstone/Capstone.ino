@@ -8,7 +8,20 @@
 ** ===============================================================================
 */
 
+#define BMS_VERSION "1.0.0"
 #include "Capstone.h"
+
+inline void printHexOnSerial(byte const integer_between_0_and_255)
+{
+#ifndef NO_DEBUGGING
+  Serial.print("0x");
+  if (integer_between_0_and_255 < 16)
+  {
+    Serial.print("0");
+  }
+  Serial.print(integer_between_0_and_255, HEX);
+#endif
+}
 
 ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
@@ -114,7 +127,7 @@ void BMS::step()
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
-    LcdSplitPrinter lcd = { .controllerOfLCD = lcd_handle };
+    LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
 
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
@@ -168,20 +181,23 @@ void BMS::step()
 
 void BMS::measure()
 {
-  ms_t measuring_time = 10;
+  ms_t const measuring_time = 10;
   V_t sensorV = 0.0;
   V_t accumV = 0.0;
 
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
+
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   Iin = refOf.conversion_ratio_for_ampere_sensor * (sensorV - arduino5V * 0.5);
+
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time) / refOf.analogSignalMax;
     cellV[i] = sensorV - accumV;
     accumV += cellV[i];
   }
+
   measuredValuesAreFresh = true;
 }
 
@@ -340,8 +356,58 @@ void BMS::greeting()
     lcd_handle->setCursor(0, 0);
     lcd_handle->print("SYSTEM ONLINE");
     lcd_handle->setCursor(0, 1);
-    lcd_handle->print("VER = ");
-    lcd_handle->print(CAPSTONE_VERSION);
+    lcd_handle->print("VERSION = ");
+    lcd_handle->print(BMS_VERSION);
   }
 #endif
+}
+
+void LcdPrettyPrinter::print(int const value)
+{
+  fbuf.putInt(value);
+}
+
+void LcdPrettyPrinter::print(double const value)
+{
+  fbuf.putDouble(value, 2);
+}
+
+void LcdPrettyPrinter::print(char const *const string)
+{
+  fbuf.putString(string);
+}
+
+void LcdPrettyPrinter::println(int const value)
+{
+  fbuf.putInt(value);
+  flush();
+}
+
+void LcdPrettyPrinter::println(double const value)
+{
+  fbuf.putDouble(value, 2);
+  flush();
+}
+
+void LcdPrettyPrinter::println(char const *const string)
+{
+  fbuf.putString(string);
+  flush();
+}
+
+void LcdPrettyPrinter::flush()
+{
+  int const c = (section_no / LCD_SECTION_EA) * 1;
+  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
+  char const *p_ch = nullptr;
+  if (c < LCD_HEIGHT && r < LCD_WIDTH)
+  {
+    p_ch = fbuf.get();
+    for (int j = 0; j < LCD_SECTION_LEN; j++)
+    {
+      buffer[c][r + j] = p_ch[j];
+    }
+  }
+  section_no++;
+  fbuf.ready();
 }
