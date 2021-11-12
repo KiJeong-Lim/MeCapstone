@@ -65,8 +65,12 @@ private:
   void execEmergencyMode(); // FIX ME
   void goodbye(int timeLeftToQuit); // TRUST ME
   void measure(bool showValues); // TRUST ME
+#ifndef NO_LCD_USE
   void initWire(); // TRUST ME
+#endif
+#ifndef NO_LCD_USE
   bool openLCD(int lcd_width, int lcd_height); // TRUST ME
+#endif
   void hello(); // TRUST ME
 } myBMS;
 
@@ -90,7 +94,9 @@ void BMS::init(ms_t given_time)
 #ifndef NO_DEBUGGING
   Serial.println("[log] Runtime started.");
 #endif
+#ifndef NO_LCD_USE
   initWire();
+#endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.initWith(true);
@@ -341,8 +347,7 @@ void BMS::measure(bool const showValues)
     Serial.print("Iin");
     Serial.print(" = ");
     Serial.print(Iin);
-    Serial.print("[A]");
-    Serial.println(".");
+    Serial.println("[A].");
 #endif
 #endif
 #ifndef NO_LCD_USE
@@ -387,12 +392,15 @@ void BMS::measure(bool const showValues)
   }
 }
 
+#ifndef NO_LCD_USE
 void BMS::initWire()
 {
   Wire.begin();
   wire_on = true;
 }
+#endif
 
+#ifndef NO_LCD_USE
 bool BMS::openLCD(int const row_dim, int const col_dim)
 {
   byte isGood = false;
@@ -445,6 +453,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 
   return isGood;
 }
+#endif
 
 void BMS::hello()
 {
