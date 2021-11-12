@@ -61,7 +61,7 @@ private:
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
   void control(); // FIX ME
 #endif
-  bool checkSafety(bool reportToSerial); // FIX ME
+  bool checkSafety(); // FIX ME
   void execEmergencyMode(); // FIX ME
   void goodbye(int timeLeftToQuit); // TRUST ME
   void measure(bool showValues); // TRUST ME
@@ -128,7 +128,7 @@ void BMS::step(ms_t given_time)
   control();
 #endif
   {
-    bool system_is_okay = checkSafety(true);
+    bool system_is_okay = checkSafety();
 
     if (system_is_okay and jobs_done)
     {
@@ -158,7 +158,7 @@ void BMS::step(ms_t given_time)
           execEmergencyMode();
         }
         delay(10);
-        system_is_okay = checkSafety(false);
+        system_is_okay = checkSafety();
       }
     }
   }
@@ -199,7 +199,7 @@ void BMS::control()
 }
 #endif
 
-bool BMS::checkSafety(bool const reportToSerial)
+bool BMS::checkSafety()
 {
   V_t const allowedV_max = 4.20, allowedV_min =  2.70; // Confirm us.
   A_t const allowedA_max = 2.00, allowedA_min = -0.10; // Confirm us.
@@ -217,20 +217,14 @@ bool BMS::checkSafety(bool const reportToSerial)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    if (reportToSerial)
-    {
-      Serial.println("[Warning] 'Iin' too high.");
-    }
+    Serial.println("[Warning] 'Iin' too high.");
 #endif
   }
   if (Iin < allowedA_min)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    if (reportToSerial)
-    {
-      Serial.println("[Warning] 'Iin' too low.");
-    }
+    Serial.println("[Warning] 'Iin' too low.");
 #endif
   }
 #endif
@@ -242,26 +236,20 @@ bool BMS::checkSafety(bool const reportToSerial)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      if (reportToSerial)
-      {
-        Serial.print("[Warning] 'cellV[");
-        Serial.print(i);
-        Serial.print("]'");
-        Serial.println(" too high.");
-      }
+      Serial.print("[Warning] 'cellV[");
+      Serial.print(i);
+      Serial.print("]'");
+      Serial.println(" too high.");
 #endif
     }
     if (cellV[i] < allowedV_min)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      if (reportToSerial)
-      {
-        Serial.print("[Warning] 'cellV[");
-        Serial.print(i);
-        Serial.print("]'");
-        Serial.println(" too low.");
-      }
+      Serial.print("[Warning] 'cellV[");
+      Serial.print(i);
+      Serial.print("]'");
+      Serial.println(" too low.");
 #endif
     }
   }
