@@ -59,22 +59,29 @@ public:
   void step(ms_t expected_elapsed_time); // FIX ME
 private:
   void control(); // FIX ME
-  bool checkSafety(bool reportToSerial); // TRUST ME
-  void goodbye(); // FIX ME
+  bool checkSafety(bool reportToSerial); // FIX ME
   void execEmergencyMode(); // FIX ME
+  void goodbye(int timeLeftToQuit); // TRUST ME
   void measure(bool showValues); // TRUST ME
-  void initWire(); // FIX ME
+  void initWire(); // TRUST ME
   bool openLCD(int lcd_width, int lcd_height); // TRUST ME
   void hello(); // TRUST ME
 } myBMS;
 
 void setup()
 {
+#ifndef NO_DEBUGGING
+  Serial.begin(SERIAL_PORT);
+  Serial.println("[log] Runtime started.");
+#endif
   myBMS.init(500);
 }
 
 void loop()
 {
+#ifndef NO_DEBUGGING
+  Serial.println("[log] Turn changed.");
+#endif
   myBMS.step(3000);
 }
 
@@ -82,12 +89,6 @@ void BMS::init(ms_t given_time)
 {
   Timer hourglass;
 
-#ifndef NO_DEBUGGING
-  Serial.begin(SERIAL_PORT);
-#endif
-#ifndef NO_DEBUGGING
-  Serial.println("[log] Runtime started.");
-#endif
   initWire();
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -113,30 +114,28 @@ void BMS::init(ms_t given_time)
 
 void BMS::step(ms_t given_time)
 {
-  bool system_is_okay = true;
   Timer hourglass;
 
-#ifndef NO_DEBUGGING
-  Serial.println("[log] Turn changed.");
-#endif
   measure(true);
   control();
-  system_is_okay = checkSafety(true);
+  {
+    bool system_is_okay = checkSafety(true);
 
-  if (system_is_okay and jobs_done)
-  {
-    goodbye();
-  }
-  else
-  {
-    for (given_time -= hourglass.getDuration(); given_time > 0; given_time -= hourglass.getDuration())
+    if (system_is_okay and jobs_done)
     {
-      if (not system_is_okay)
+      goodbye(10);
+    }
+    else
+    {
+      for (given_time -= hourglass.getDuration(); given_time > 0; given_time -= hourglass.getDuration())
       {
-        execEmergencyMode();
+        if (not system_is_okay)
+        {
+          execEmergencyMode();
+        }
+        delay(100);
+        system_is_okay = checkSafety(false);
       }
-      delay(100);
-      system_is_okay = checkSafety(false);
     }
   }
 }
@@ -206,7 +205,6 @@ bool BMS::checkSafety(bool const reportToSerial)
 #endif
   }
 #endif
-
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     if (cellV[i] > allowedA_max)
@@ -241,33 +239,6 @@ bool BMS::checkSafety(bool const reportToSerial)
   return isBad;
 }
 
-void BMS::goodbye()
-{
-#ifndef NO_DEBUGGING
-  Serial.println("[log] CHARGING COMPLETED.");
-#endif
-#ifndef NO_LCD_USE
-  if (lcdOkay)
-  {
-    lcd_handle->clear();
-    lcd_handle->setCursor(0, 0);
-    lcd_handle->print("FULLY CHARGED");
-    lcd_handle->setCursor(0, 1);
-    lcd_handle->print("REMOVE BMS");
-  }
-#endif
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOn();
-  }
-#ifndef NO_DEBUGGING
-  Serial.println("[Warning] Your arduino will abort in 10 seconds.");
-#endif
-  delay(10000);
-  powerIn_pin.turnOff();
-  abort();
-}
-
 void BMS::execEmergencyMode()
 {
   for (int i = 0; i < LENGTH_OF(cells); i++)
@@ -279,6 +250,45 @@ void BMS::execEmergencyMode()
   {
     cells[i].balanceCircuit_pin.turnOff();
   }
+}
+
+void BMS::goodbye(int const countDown)
+{
+#ifndef NO_DEBUGGING
+  Serial.println("[log] CHARGING COMPLETED.");
+#endif
+#ifndef NO_LCD_USE
+  if (lcdOkay)
+  {
+    lcd_handle->clear();
+    lcd_handle->setCursor(0, 1);
+    lcd_handle->print("JOBS FINISHED");
+    lcd_handle->setCursor(1, 0);
+    lcd_handle->print("SECS LEFT");
+  }
+#endif
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    cells[i].balanceCircuit_pin.turnOn();
+  }
+  for (int i = countDown; i > 0; i--)
+  {
+#ifndef NO_LCD_USE
+    if (lcdOkay)
+    {
+      lcd_handle->setCursor(0, 0);
+      lcd_handle->print(i - 1);
+    }
+#endif
+#ifndef NO_DEBUGGING
+    Serial.print("[Warning] Your arduino will abort in");
+    Serial.print(i);
+    Serial.println("seconds.");
+#endif
+    delay(toMilliSeconds(1));
+  }
+  powerIn_pin.turnOff();
+  abort();
 }
 
 void BMS::measure(bool const showValues)

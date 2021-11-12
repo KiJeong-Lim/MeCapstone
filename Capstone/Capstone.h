@@ -35,6 +35,7 @@
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
 #define SENSITIVITY_OF_20A_CURRENT_SENSOR   100.0
 #define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
+#define toMilliSeconds(secs)                ((ms_t)(1000 * (secs)))
 // #define NO_DEBUGGING
 // #define NO_LCD_USE
 // #define NOT_CONSIDER_SUPPLY_VOLTAGE
