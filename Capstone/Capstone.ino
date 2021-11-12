@@ -30,6 +30,7 @@ class BMS {
   bool wire_on = false;
   bool lcdOkay = false;
   bool measured_is_new = false;
+  bool charging_finished = false;
   LiquidCrystal_I2C *lcd_handle = nullptr;
   A_t Iin = 0.0;
   V_t arduino5V = refOf.arduinoRegularV;
@@ -39,22 +40,22 @@ public:
   void step();
 private:
   void measure();
-  bool control();
+  void control();
   bool checkSafety();
   void execEmergencyMode();
-  bool openLCD(int lcd_width, int lcd_height);
   void initWire();
+  bool openLCD(int lcd_width, int lcd_height);
   void greeting();
-} my_bms;
+} myBMS;
 
 void setup()
 {
-  my_bms.init();
+  myBMS.init();
 }
 
 void loop()
 {
-  my_bms.step();
+  myBMS.step();
 }
 
 void BMS::init()
@@ -89,7 +90,7 @@ void BMS::init()
 void BMS::step()
 {
   ms_t const given_time = 3000;
-  bool isOkay = true, charging_finished = false;
+  bool system_is_okay = true;
   ms_t beg_time, cur_time;
 
   beg_time = millis();
@@ -129,11 +130,11 @@ void BMS::step()
     lcd.println(" ");
   }
 #endif
-  charging_finished = control();
+  control();
   measured_is_new = false;
-  isOkay = checkSafety();
+  system_is_okay = checkSafety();
 
-  if (isOkay && charging_finished)
+  if (system_is_okay && charging_finished)
   {
 #ifndef NO_DEBUGGING
     Serial.print("[log] CHARGING COMPLETED");
@@ -155,8 +156,8 @@ void BMS::step()
   {
     for (cur_time = millis(); cur_time - beg_time < given_time; cur_time = millis())
     {
-      isOkay = checkSafety();
-      if (!isOkay)
+      system_is_okay = checkSafety();
+      if (!system_is_okay)
       {
         execEmergencyMode();
       }
@@ -184,26 +185,25 @@ void BMS::measure()
   measured_is_new = true;
 }
 
-bool BMS::control()
+void BMS::control()
 {
   V_t const targetV = 3.8, targetV_overloaded = 4.1;
-  bool are_all_cells_charged = true;
 
+  charging_finished = true;
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    bool const battery_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
-    bool const battery_charging_finished = cellV[i] >= (battery_being_charged_now ? targetV_overloaded : targetV);
-    if ((not battery_charging_finished) and (not battery_being_charged_now))
+    bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
+    bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? targetV_overloaded : targetV);
+    if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOff();
     }
-    if (battery_charging_finished and battery_being_charged_now)
+    if (this_cell_charging_finished and this_cell_being_charged_now)
     {
       cells[i].balanceCircuit_pin.turnOn();
     }
-    are_all_cells_charged &= battery_charging_finished;
+    charging_finished &= this_cell_charging_finished;
   }
-  return are_all_cells_charged;
 }
 
 bool BMS::checkSafety()
@@ -272,6 +272,12 @@ void BMS::execEmergencyMode()
   }
 }
 
+void BMS::initWire()
+{
+  Wire.begin();
+  wire_on = true;
+}
+
 bool BMS::openLCD(int const row_dim, int const col_dim)
 {
   byte isGood = false;
@@ -323,12 +329,6 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 #endif
 
   return isGood;
-}
-
-void BMS::initWire()
-{
-  Wire.begin();
-  wire_on = true;
 }
 
 void BMS::greeting()
