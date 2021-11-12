@@ -143,7 +143,7 @@ struct CELL {
 #ifndef NO_LCD_USE
 class BufferWithFormat {
   int cnt = 0;
-  char buf[LCD_SECTION_LEN + 1] = {};
+  char buf[LCD_SECTION_LEN + 1] = { };
 public:
   void ready();
   char const *get();
@@ -191,14 +191,51 @@ public:
       }
     }
   }
-  void print(int value);
-  void print(double value);
-  void print(char const * string);
-  void println(int value);
-  void println(double value);
-  void println(char const *string);
 private:
-  void flush();
+  void flush()
+  {
+    int const c = (section_no / LCD_SECTION_EA) * 1;
+    int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
+    char const *p_ch = nullptr;
+    if (c < LCD_HEIGHT && r < LCD_WIDTH)
+    {
+      p_ch = fbuf.get();
+      for (int j = 0; j < LCD_SECTION_LEN; j++)
+      {
+        buffer[c][r + j] = p_ch[j];
+      }
+    }
+    section_no++;
+    fbuf.ready();
+  }
+public:
+  void print(int const value)
+  {
+    fbuf.putInt(value);
+  }
+  void print(double const value)
+  {
+    fbuf.putDouble(value, 2);
+  }
+  void print(char const *const string)
+  {
+    fbuf.putString(string);
+  }
+  void println(int const value)
+  {
+    fbuf.putInt(value);
+    flush();
+  }
+  void println(double const value)
+  {
+    fbuf.putDouble(value, 2);
+    flush();
+  }
+  void println(char const *const string)
+  {
+    fbuf.putString(string);
+    flush();
+  }
 #endif
 };
 #endif

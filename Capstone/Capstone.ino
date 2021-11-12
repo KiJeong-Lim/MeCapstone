@@ -47,7 +47,7 @@ class BMS {
   LiquidCrystal_I2C *lcd_handle = nullptr;
   A_t Iin = 0.0;
   V_t arduino5V = refOf.arduinoRegularV;
-  V_t cellV[LENGTH_OF(cells)] = {};
+  V_t cellV[LENGTH_OF(cells)] = { };
 public:
   void init();
   void step();
@@ -269,7 +269,7 @@ void BMS::goodbye()
   abort();
 }
 
-void BMS::execEmergencyMode()
+void BMS::execEmergencyMode() // FIX ME
 {
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -395,55 +395,3 @@ void BMS::hello()
   lcd_handle->print(BMS_VERSION);
 #endif
 }
-
-#ifndef NO_LCD_USE
-void LcdPrettyPrinter::print(int const value)
-{
-  fbuf.putInt(value);
-}
-
-void LcdPrettyPrinter::print(double const value)
-{
-  fbuf.putDouble(value, 2);
-}
-
-void LcdPrettyPrinter::print(char const *const string)
-{
-  fbuf.putString(string);
-}
-
-void LcdPrettyPrinter::println(int const value)
-{
-  fbuf.putInt(value);
-  flush();
-}
-
-void LcdPrettyPrinter::println(double const value)
-{
-  fbuf.putDouble(value, 2);
-  flush();
-}
-
-void LcdPrettyPrinter::println(char const *const string)
-{
-  fbuf.putString(string);
-  flush();
-}
-
-void LcdPrettyPrinter::flush()
-{
-  int const c = (section_no / LCD_SECTION_EA) * 1;
-  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
-  char const *p_ch = nullptr;
-  if (c < LCD_HEIGHT && r < LCD_WIDTH)
-  {
-    p_ch = fbuf.get();
-    for (int j = 0; j < LCD_SECTION_LEN; j++)
-    {
-      buffer[c][r + j] = p_ch[j];
-    }
-  }
-  section_no++;
-  fbuf.ready();
-}
-#endif
