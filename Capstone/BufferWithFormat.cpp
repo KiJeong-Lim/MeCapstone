@@ -73,7 +73,7 @@ void BufferWithFormat::putInt(int const value)
   {
     putDigit(out % 10);
     out /= 10;
-  } while(out > 0);
+  } while (out > 0);
 }
 
 void BufferWithFormat::putDouble(double const value, int const afters_dot)
