@@ -133,7 +133,6 @@ void BMS::step(ms_t given_time)
       {
         cells[i].balanceCircuit_pin.turnOn();
       }
-      goodbye(10);
 #ifndef NO_LCD_USE
       if (lcdOkay)
       {
@@ -142,6 +141,7 @@ void BMS::step(ms_t given_time)
         lcd_handle->print("JOBS FINISHED");
       }
 #endif
+      goodbye(10);
     }
     else
     {
