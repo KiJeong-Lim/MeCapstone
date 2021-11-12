@@ -135,7 +135,7 @@ void BMS::step(ms_t given_time)
         {
           execEmergencyMode();
         }
-        delay(100);
+        delay(10);
         system_is_okay = checkSafety(false);
       }
     }
@@ -148,6 +148,7 @@ void BMS::control()
 
   while (measuredValuesAreFresh)
   {
+    delay(10);
     measure(false);
   }
 
@@ -182,6 +183,7 @@ bool BMS::checkSafety(bool const reportToSerial)
 
   while (measuredValuesAreFresh)
   {
+    delay(10);
     measure(false);
   }
 
