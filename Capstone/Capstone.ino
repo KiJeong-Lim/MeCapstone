@@ -201,8 +201,8 @@ void BMS::control()
 
 bool BMS::checkSafety()
 {
-  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // Confirm us.
-  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // Confirm us.
+  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US
+  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US
   bool isBad = false;
 
   if (measuredValuesAreFresh)
@@ -294,9 +294,9 @@ void BMS::goodbye(int const countDown)
     }
 #endif
 #ifndef NO_DEBUGGING
-    Serial.print("[Warning] Your arduino will abort in");
+    Serial.print("[Warning] Your arduino will abort in ");
     Serial.print(i);
-    Serial.println("seconds.");
+    Serial.println(" seconds.");
 #endif
     delay(toMilliSeconds(1));
   }
