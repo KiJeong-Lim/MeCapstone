@@ -298,7 +298,7 @@ void BMS::showValues()
   Serial.print("arduino5V");
   Serial.print(" = ");
   Serial.print(arduino5V);
-  Serial.print("[V].");
+  Serial.println("[V].");
 #endif
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
   Serial.print(">>> ");
@@ -328,11 +328,12 @@ void BMS::showValues()
     lcd.print(Iin);
     lcd.println(" ");
 #endif
-    // Here, the LCD screen will be updated, while the variable 'lcd' being destructed.
-    // A possible screen will be:
-    // * 0123456701234567
-    // 0 B1=4.25 B2=4.17
-    // 1 B3=3.33 I=1.70
+    // Here, the LCD screen will be updated, while the variable lcd being destructed.
+    //                              A1234567B1234567
+    // A possible screen will be:  ##################
+    //                            1#B1=4.25 B2=4.17 #
+    //                            2#B3=3.33 I=1.66  #
+    //                             ##################
   }
 #endif
 #ifndef NO_DEBUGGING
