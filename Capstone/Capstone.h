@@ -37,7 +37,7 @@
 #define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
 #define toMilliSeconds(secs)                ((ms_t)(1000 * (secs)))
 // #define NO_DEBUGGING
-// #define NO_LCD_USE
+#define NO_LCD_USE
 // #define NOT_CONSIDER_SUPPLY_VOLTAGE
 // #define NOT_CONSIDER_SUPPLY_CURRENT
 // #define NOT_CONTROL_BALANCE_CIRCUIT
@@ -160,6 +160,10 @@ public:
   {
     return is_high;
   }
+};
+#endif
+#ifndef NOT_MAIN_INO_FILE
+class PwmDigitalPin : public Pin {
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE

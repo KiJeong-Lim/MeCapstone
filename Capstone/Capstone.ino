@@ -44,11 +44,15 @@ class BMS {
   ReaderAnalogPin Iin_pin = { .pin_no = A4 };
 #endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
+#ifndef NO_LCD_USE
   byte wire_on = false;
+#endif
   byte lcdOkay = false;
   byte jobs_done = false;
   byte measuredValuesAreFresh = false;
+#ifndef NO_LCD_USE
   LiquidCrystal_I2C *lcd_handle = nullptr;
+#endif
   V_t arduino5V = refOf.arduinoRegularV;
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
   A_t Iin = 0.0;
@@ -407,7 +411,6 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 
   if (wire_on)
   {
-#ifndef NO_LCD_USE
     if (row_dim > 0 && col_dim > 0)
     {
       for (byte adr = 0x01; adr <= 0xFF; adr++)
@@ -442,7 +445,6 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
         isGood = true;
       }
     }
-#endif
   }
   else
   {
