@@ -54,7 +54,6 @@ private:
   bool openLCD(int lcd_width, int lcd_height);
   void initWire();
   void greeting();
-  void printValues();
 } my_bms;
 
 void setup()
@@ -120,7 +119,25 @@ void BMS::step()
   Serial.print(Iin);
   Serial.println("[A]. ");
 #endif
-  printValues();
+#ifndef NO_LCD_USE
+  if (lcdOkay)
+  {
+    LcdSplitPrinter lcd = { .controllerOfLCD = lcd_handle };
+
+    for (int i = 0; i < LENGTH_OF(cellV); i++)
+    {
+      lcd.print("C");
+      lcd.print(i);
+      lcd.print("=");
+      lcd.print(cellV[i]);
+      lcd.println(" ");
+    }
+    lcd.print("I");
+    lcd.print("=");
+    lcd.print(Iin);
+    lcd.println(" ");
+  }
+#endif
   charging_finished = control();
   isOkay = checkSafety();
 
@@ -336,104 +353,4 @@ void BMS::greeting()
     lcd_handle->print(CAPSTONE_VERSION);
   }
 #endif
-}
-
-void BMS::printValues()
-{
-  char const *cellV_prefixes[] = {"C1=", "C2=", "C3="};
-#ifndef NO_LCD_USE
-  if (lcdOkay)
-  {
-    LcdSplitPrinter lcd = { .controllerOfLCD = lcd_handle };
-
-    for (int i = 0; i < LENGTH_OF(cellV); i++)
-    {
-      lcd.print("C");
-      lcd.print(i);
-      lcd.print("=");
-      lcd.print(cellV[i]);
-      lcd.println(" ");
-    }
-    lcd.print("I");
-    lcd.print("=");
-    lcd.print(Iin);
-    lcd.println(" ");
-  }
-#endif
-}
-
-void SectionBuffer::ready()
-{
-  for (int j = 0; j < LENGTH_OF(line); j++)
-  {
-    line[j] = '\0';
-  }
-}
-
-char const *SectionBuffer::get()
-{
-  while (cnt < LCD_SECTION_LEN)
-  {
-    line[cnt++] = ' ';
-  }
-  return &line[0];
-}
-
-void SectionBuffer::put(char const ch)
-{
-  if (cnt < LCD_SECTION_LEN)
-  {
-    line[cnt++] = ch;
-  }
-}
-
-void LcdSplitPrinter::flushLine()
-{
-  int const c = (section_no / LCD_SECTION_EA) * 1;
-  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
-  char const *p_ch = nullptr;
-
-  if (c < LCD_HEIGHT && r < LCD_WIDTH)
-  {
-    p_ch = line.get();
-    for (int j = 0; j < LCD_SECTION_LEN; j++)
-    {
-      buffer[c][r + j] = p_ch[j];
-    }
-    section_no++;
-  }
-  line.ready();
-}
-
-void LcdSplitPrinter::print(int const value)
-{
-  line.putInt(value);
-}
-
-void LcdSplitPrinter::print(double const value)
-{
-  line.putDouble(value, 2);
-}
-
-void LcdSplitPrinter::print(const char *const string)
-{
-  line.putString(string);
-}
-
-void LcdSplitPrinter::println(int const value)
-{
-  line.putInt(value);
-  flushLine();
-}
-
-void LcdSplitPrinter::println(double const value)
-{
-  line.putDouble(value, 2);
-  flushLine();
-}
-
-void LcdSplitPrinter::println(const char *const string)
-{
-  line.putString(string);
-  flushLine();
 }

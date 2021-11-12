@@ -24,6 +24,31 @@ inline int long long pow10(int n)
   return res;
 }
 
+void SectionBuffer::ready()
+{
+  for (int j = 0; j < LENGTH_OF(line); j++)
+  {
+    line[j] = '\0';
+  }
+}
+
+char const *SectionBuffer::get()
+{
+  while (cnt < LCD_SECTION_LEN)
+  {
+    line[cnt++] = ' ';
+  }
+  return &line[0];
+}
+
+void SectionBuffer::put(char const ch)
+{
+  if (cnt < LCD_SECTION_LEN)
+  {
+    line[cnt++] = ch;
+  }
+}
+
 void SectionBuffer::putDigit(int const n)
 {
   if (n >= 0 && n < 16)

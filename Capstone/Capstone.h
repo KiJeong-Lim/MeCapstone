@@ -66,8 +66,8 @@ struct Pin {
   int const pin_no;
 };
 class ReaderAnalogPin : public Pin {
-  ReaderAnalogPin() = delete;
 public:
+  ReaderAnalogPin() = delete;
   ReaderAnalogPin(int const pos)
     : Pin{ .pin_no = pos }
   {
@@ -88,8 +88,8 @@ public:
   }
 };
 class WriterDigitalPin : public Pin {
-  WriterDigitalPin() = delete;
 public:
+  WriterDigitalPin() = delete;
   WriterDigitalPin(int pos)
     : Pin{ .pin_no = pos }
   {
@@ -116,12 +116,12 @@ public:
   }
 };
 class LcdSplitPrinter {
-  LcdSplitPrinter() = delete;
   LiquidCrystal_I2C *const lcd_handle;
   int section_no = 0;
   SectionBuffer line = {};
   char buffer[LCD_HEIGHT][LCD_WIDTH + 1] = {};
 public:
+  LcdSplitPrinter() = delete;
   LcdSplitPrinter(LiquidCrystal_I2C *const controllerOfLCD)
     : lcd_handle{ controllerOfLCD }
   {
@@ -147,14 +147,50 @@ public:
       }
     }
   }
-  void print(int value);
-  void print(double value);
-  void print(char const *string);
-  void println(int value);
-  void println(double value);
-  void println(char const *string);
-private:
-  void flushLine();
+  void print(int const value)
+  {
+    line.putInt(value);
+  }
+  void print(double const value)
+  {
+    line.putDouble(value, 2);
+  }
+  void print(const char *const string)
+  {
+    line.putString(string);
+  }
+  void flush()
+  {
+    int const c = (section_no / LCD_SECTION_EA) * 1;
+    int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
+    char const *p_ch = nullptr;
+
+    if (c < LCD_HEIGHT && r < LCD_WIDTH)
+    {
+      p_ch = line.get();
+      for (int j = 0; j < LCD_SECTION_LEN; j++)
+      {
+        buffer[c][r + j] = p_ch[j];
+      }
+    }
+    section_no++;
+    line.ready();
+  }
+  void println(int const value)
+  {
+    line.putInt(value);
+    flush();
+  }
+  void println(double const value)
+  {
+    line.putDouble(value, 2);
+    flush();
+  }
+  void println(const char *const string)
+  {
+    line.putString(string);
+    flush();
+  }
 };
 #endif
 
