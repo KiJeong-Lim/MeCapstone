@@ -269,35 +269,34 @@ public:
 #endif
 #ifndef NOT_MAIN_INO_FILE
 class Timer {
-  ms_t beg_time = 0;
+  ms_t curTime = 0;
 public:
   Timer()
   {
-    beg_time = millis();
+    curTime = millis();
   }
   ~Timer()
   {
   }
 private:
-  ms_t getTimeDiff(ms_t const currentTime) const
+  void syncTime()
   {
-    return currentTime - beg_time;
+    curTime = millis();
   }
 public:
   ms_t getDuration()
   {
-    ms_t const currentTime = millis();
-    ms_t const result = getTimeDiff(currentTime);
-    beg_time = currentTime;
-    return result;
+    ms_t const begTime = curTime;
+    syncTime();
+    return curTime - begTime;
   }
-  bool wait(ms_t given_time)
+  bool wait(ms_t givenTime)
   {
-    given_time -= getDuration();
-    if (given_time >= 0)
+    givenTime -= getDuration();
+    if (givenTime >= 0)
     {
-      delay(given_time);
-      beg_time = millis();
+      delay(givenTime);
+      syncTime();
       return true;
     }
     else
