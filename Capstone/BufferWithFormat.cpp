@@ -10,7 +10,7 @@
 
 #include "Capstone.h"
 #ifndef round
-#define round(x)                            ((x)>=0?(bigInt_t)((x)+0.5):(bigInt_t)((x)-0.5))
+#define round(x)  ((x)>=0?(bigInt_t)((x)+0.5):(bigInt_t)((x)-0.5))
 #endif
 
 static bigInt_t pow10(int const n)
