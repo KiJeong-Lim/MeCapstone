@@ -26,13 +26,6 @@ static void printByteOnSerial(byte const integer_between_0_and_255)
 }
 #endif
 
-#ifndef NO_DEBUGGING
-static void waitUntilRecieveSerialTransmission()
-{
-  delay(10);
-}
-#endif
-
 ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
   .arduinoRegularV = 5.00,
@@ -61,7 +54,7 @@ class BMS {
   byte jobsDone = false;
   byte measuredValuesAreFresh = false;
 #ifndef NO_LCD_USE
-  LiquidCrystal_I2C *lcd_handle = nullptr;
+  LiquidCrystal_I2C *lcdHandle = nullptr;
 #endif
   V_t arduino5V = refOf.arduinoRegularV;
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
@@ -154,9 +147,9 @@ void BMS::step(ms_t const given_time)
 #ifndef NO_LCD_USE
       if (lcdOkay)
       {
-        lcd_handle->clear();
-        lcd_handle->setCursor(0, 1);
-        lcd_handle->print("JOBS FINISHED");
+        lcdHandle->clear();
+        lcdHandle->setCursor(0, 1);
+        lcdHandle->print("JOBS FINISHED");
       }
 #endif
       goodbye(10);
@@ -240,6 +233,7 @@ void BMS::measureValues(bool const showValues)
     Serial.print(" = ");
     Serial.print(arduino5V);
     Serial.println("[V].");
+    waitForSerial();
 #endif
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
     Serial.print(">>> ");
@@ -247,12 +241,13 @@ void BMS::measureValues(bool const showValues)
     Serial.print(" = ");
     Serial.print(Iin);
     Serial.println("[A].");
+    waitForSerial();
 #endif
 #endif
 #ifndef NO_LCD_USE
     if (lcdOkay)
     {
-      LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
+      LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
 
       for (int i = 0; i < LENGTH_OF(cellV); i++)
       {
@@ -287,10 +282,8 @@ void BMS::measureValues(bool const showValues)
       Serial.print(" = ");
       Serial.print(cellV[i]);
       Serial.println("[V].");
+      waitForSerial();
     }
-#endif
-#ifndef NO_DEBUGGING
-    waitUntilRecieveSerialTransmission();
 #endif
   }
 }
@@ -352,7 +345,7 @@ bool BMS::checkSafety()
 #ifndef NO_DEBUGGING
   if (isBad)
   {
-    waitUntilRecieveSerialTransmission();
+    waitForSerial();
   }
 #endif
   measuredValuesAreFresh = false;
@@ -388,8 +381,8 @@ void BMS::goodbye(int const countDown)
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
-    lcd_handle->setCursor(1, 0);
-    lcd_handle->print(" SECS LEFT");
+    lcdHandle->setCursor(1, 0);
+    lcdHandle->print(" SECS LEFT");
   }
 #endif
   for (int i = countDown; i > 0; i--)
@@ -397,8 +390,8 @@ void BMS::goodbye(int const countDown)
 #ifndef NO_LCD_USE
     if (lcdOkay)
     {
-      lcd_handle->setCursor(0, 0);
-      lcd_handle->print(i - 1);
+      lcdHandle->setCursor(0, 0);
+      lcdHandle->print(i - 1);
     }
 #endif
 #ifndef NO_DEBUGGING
@@ -441,8 +434,8 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
           printByteOnSerial(adr);
           Serial.println(".");
 #endif
-          lcd_handle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
-          if (lcd_handle)
+          lcdHandle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
+          if (lcdHandle)
           {
 #ifndef NO_DEBUGGING
             Serial.print("[log] I2C connected: address = ");
@@ -454,11 +447,11 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
         }
       }
 
-      if (lcd_handle)
+      if (lcdHandle)
       {
-        lcd_handle->init();
-        lcd_handle->backlight();
-        lcd_handle->noCursor();
+        lcdHandle->init();
+        lcdHandle->backlight();
+        lcdHandle->noCursor();
         is_good = true;
       }
     }
@@ -479,7 +472,7 @@ void BMS::hello()
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
-    LcdPrettyPrinter lcd = { .controllerOfLCD = lcd_handle };
+    LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
     
     lcd.println("> SYSTEM");
     lcd.println(" ONLINE");

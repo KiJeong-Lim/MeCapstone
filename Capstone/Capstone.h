@@ -38,7 +38,8 @@
 #define LCD_SECTION_EA                      2
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
 #define SENSITIVITY_OF_20A_CURRENT_SENSOR   100.0
-#define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
+#define LENGTH_OF(array)                    (sizeof(array) / sizeof(*(array)))
+#define waitForSerial()                     delay(5)
 
 // type synonym defns
 typedef int long long ms_t; // type for milliseconds
@@ -127,7 +128,7 @@ public:
     Serial.print(" is initalized to ");
     Serial.print(is_high ? "HIGH" : "LOW");
     Serial.println(".");
-    delay(5);
+    waitForSerial();
 #endif
     pinMode(pinId, OUTPUT);
     syncPin();
@@ -139,7 +140,7 @@ public:
     Serial.print("[log] The pin ");
     Serial.print(pinId);
     Serial.println(" set to be HIGH.");
-    delay(5);
+    waitForSerial();
 #endif
     syncPin();
   }
@@ -150,7 +151,7 @@ public:
     Serial.print("[log] The pin ");
     Serial.print(pinId);
     Serial.println(" set to be LOW.");
-    delay(5);
+    waitForSerial();
 #endif
     syncPin();
   }
