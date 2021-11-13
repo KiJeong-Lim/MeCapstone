@@ -69,23 +69,25 @@ class BMS {
 #endif
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
-  void init(ms_t expected_elapsed_time); // TRUST ME
-  void step(ms_t expected_elapsed_time); // FIX ME
+  void init(ms_t expected_elapsed_time); // 
+  void step(ms_t expected_elapsed_time); // 
 private:
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  void control(); // FIX ME
+  void control(); // 
 #endif
-  bool checkSafety(); // FIX ME
-  void execEmergencyMode(); // FIX ME
-  void goodbye(int timeLeftToQuit); // TRUST ME
-  void measure(bool showValues); // TRUST ME
+  void measure(bool showValues); // 
+  bool checkSafety(); // 
+  void execEmergencyMode(); // 
+  void goodbye(int timeLeftToQuit); // 
 #ifndef NO_LCD_USE
-  void initWire(); // TRUST ME
+  void initWire(); // 
 #endif
 #ifndef NO_LCD_USE
-  bool openLCD(int lcd_width, int lcd_height); // TRUST ME
+  bool openLCD(int lcd_width, int lcd_height); // 
 #endif
-  void hello(); // TRUST ME
+#ifndef NO_LCD_USE
+  void hello(); // 
+#endif
 } myBMS;
 
 void setup()
@@ -101,7 +103,7 @@ void loop()
   myBMS.step(3000);
 }
 
-void BMS::init(ms_t given_time)
+void BMS::init(ms_t const given_time)
 {
   Timer hourglass;
 
@@ -121,7 +123,9 @@ void BMS::init(ms_t given_time)
 #endif
   if (lcdOkay)
   {
+#ifndef NO_LCD_USE
     hello();
+#endif
   }
   else
   {
@@ -129,11 +133,10 @@ void BMS::init(ms_t given_time)
     Serial.println("[Warning] LCD not connected.");
 #endif
   }
-  given_time -= hourglass.getDuration();
-  delay(given_time >= 0 ? given_time : 0);
+  hourglass(given_time);
 }
 
-void BMS::step(ms_t given_time)
+void BMS::step(ms_t const given_time)
 {
   Timer hourglass;
 
@@ -152,10 +155,6 @@ void BMS::step(ms_t given_time)
 #ifndef NO_DEBUGGING
       Serial.println("[log] CHARGING COMPLETED.");
 #endif
-      for (int i = 0; i < LENGTH_OF(cells); i++)
-      {
-        cells[i].balanceCircuit_pin.turnOn();
-      }
 #ifndef NO_LCD_USE
       if (lcdOkay)
       {
@@ -168,7 +167,7 @@ void BMS::step(ms_t given_time)
     }
     else
     {
-      for (given_time -= hourglass.getDuration(); given_time > 0; given_time -= hourglass.getDuration())
+      for (ms_t remain_time = given_time - hourglass.getDuration(); remain_time > 0; remain_time -= hourglass.getDuration())
       {
         if (not system_is_okay)
         {
@@ -213,116 +212,6 @@ void BMS::control()
   measuredValuesAreFresh = false;
 }
 #endif
-
-bool BMS::checkSafety()
-{
-  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US!!!
-  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US!!!
-  bool isBad = false;
-
-  if (measuredValuesAreFresh)
-  {
-    measure(false);
-  }
-
-  // Check current
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  if (Iin > allowedA_max)
-  {
-    isBad = true;
-#ifndef NO_DEBUGGING
-    Serial.println("[Warning] 'Iin' too high.");
-#endif
-  }
-  if (Iin < allowedA_min)
-  {
-    isBad = true;
-#ifndef NO_DEBUGGING
-    Serial.println("[Warning] 'Iin' too low.");
-#endif
-  }
-#endif
-
-  // Check voltage
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    if (cellV[i] > allowedV_max)
-    {
-      isBad = true;
-#ifndef NO_DEBUGGING
-      Serial.print("[Warning] 'cellV[");
-      Serial.print(i);
-      Serial.print("]'");
-      Serial.println(" too high.");
-#endif
-    }
-    if (cellV[i] < allowedV_min)
-    {
-      isBad = true;
-#ifndef NO_DEBUGGING
-      Serial.print("[Warning] 'cellV[");
-      Serial.print(i);
-      Serial.print("]'");
-      Serial.println(" too low.");
-#endif
-    }
-  }
-
-#ifndef NO_DEBUGGING
-  if (isBad)
-  {
-    waitUntilRecieveSerialTransmission();
-  }
-#endif
-  measuredValuesAreFresh = false;
-  return isBad;
-}
-
-void BMS::execEmergencyMode()
-{
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOn();
-  }
-#endif
-  delay(500); // <- It is only to hide from the problem.
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOff();
-  }
-#endif
-}
-
-void BMS::goodbye(int const countDown)
-{
-#ifndef NO_LCD_USE
-  if (lcdOkay)
-  {
-    lcd_handle->setCursor(1, 0);
-    lcd_handle->print(" SECS LEFT");
-  }
-#endif
-  for (int i = countDown; i > 0; i--)
-  {
-#ifndef NO_LCD_USE
-    if (lcdOkay)
-    {
-      lcd_handle->setCursor(0, 0);
-      lcd_handle->print(i - 1);
-    }
-#endif
-#ifndef NO_DEBUGGING
-    Serial.print("[Warning] Your arduino will abort in ");
-    Serial.print(i);
-    Serial.println(" seconds.");
-#endif
-    delay(toMilliSeconds(1));
-  }
-  powerIn_pin.turnOff();
-  abort();
-}
 
 void BMS::measure(bool const showValues)
 {
@@ -383,7 +272,8 @@ void BMS::measure(bool const showValues)
       lcd.print(Iin);
       lcd.println(" ");
 #endif
-      // Here, the LCD screen will be updated, while the variable lcd being destructed.
+      // Here, the LCD screen will be updated,
+      //       while the variable lcd being destructed.
       //                              A1234567B1234567
       // A possible screen will be:  ##################
       //                            1#B1=4.25 B2=4.17 #
@@ -407,6 +297,123 @@ void BMS::measure(bool const showValues)
     waitUntilRecieveSerialTransmission();
 #endif
   }
+}
+
+bool BMS::checkSafety()
+{
+  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US!!!
+  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US!!!
+  bool isBad = false;
+
+  if (measuredValuesAreFresh)
+  {
+    measure(false);
+  }
+
+  // Check current
+#ifndef NOT_CONSIDER_SUPPLY_CURRENT
+  if (Iin > allowedA_max)
+  {
+    isBad = true;
+#ifndef NO_DEBUGGING
+    Serial.println("[Warning] 'Iin' too high.");
+#endif
+  }
+  if (Iin < allowedA_min)
+  {
+    isBad = true;
+#ifndef NO_DEBUGGING
+    Serial.println("[Warning] 'Iin' too low.");
+#endif
+  }
+#endif
+
+  // Check voltages
+  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  {
+    if (cellV[i] > allowedV_max)
+    {
+      isBad = true;
+#ifndef NO_DEBUGGING
+      Serial.print("[Warning] 'cellV[");
+      Serial.print(i);
+      Serial.print("]'");
+      Serial.println(" too high.");
+#endif
+    }
+    if (cellV[i] < allowedV_min)
+    {
+      isBad = true;
+#ifndef NO_DEBUGGING
+      Serial.print("[Warning] 'cellV[");
+      Serial.print(i);
+      Serial.print("]'");
+      Serial.println(" too low.");
+#endif
+    }
+  }
+
+#ifndef NO_DEBUGGING
+  if (isBad)
+  {
+    waitUntilRecieveSerialTransmission();
+  }
+#endif
+  measuredValuesAreFresh = false;
+  return isBad;
+}
+
+void BMS::execEmergencyMode()
+{
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    cells[i].balanceCircuit_pin.turnOn();
+  }
+#endif
+  delay(500); // <- This is JUST hiding from the problem.
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    cells[i].balanceCircuit_pin.turnOff();
+  }
+#endif
+}
+
+void BMS::goodbye(int const countDown)
+{
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
+  for (int i = 0; i < LENGTH_OF(cells); i++)
+  {
+    cells[i].balanceCircuit_pin.turnOn();
+  }
+#endif
+#ifndef NO_LCD_USE
+  if (lcdOkay)
+  {
+    lcd_handle->setCursor(1, 0);
+    lcd_handle->print(" SECS LEFT");
+  }
+#endif
+  for (int i = countDown; i > 0; i--)
+  {
+    Timer hourglass;
+#ifndef NO_LCD_USE
+    if (lcdOkay)
+    {
+      lcd_handle->setCursor(0, 0);
+      lcd_handle->print(i - 1);
+    }
+#endif
+#ifndef NO_DEBUGGING
+    Serial.print("[Warning] Your arduino will abort in ");
+    Serial.print(i);
+    Serial.println(" seconds.");
+#endif
+    hourglass(1000);
+  }
+  powerIn_pin.turnOff();
+  abort();
 }
 
 #ifndef NO_LCD_USE

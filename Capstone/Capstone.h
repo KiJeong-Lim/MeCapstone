@@ -39,7 +39,6 @@
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
 #define SENSITIVITY_OF_20A_CURRENT_SENSOR   100.0
 #define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
-#define toMilliSeconds(secs)                ((ms_t)(1000 * (secs)))
 
 // type synonym defns
 typedef int long long ms_t; // type for milliseconds
@@ -291,6 +290,20 @@ public:
     ms_t const result = getTimeDiff(currentTime);
     beg_time = currentTime;
     return result;
+  }
+  bool operator()(ms_t given_time)
+  {
+    given_time -= getDuration();
+    if (given_time >= 0)
+    {
+      delay(given_time);
+      beg_time = millis();
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 };
 #endif
