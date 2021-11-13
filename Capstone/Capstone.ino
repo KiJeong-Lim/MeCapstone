@@ -133,7 +133,7 @@ void BMS::init(ms_t const given_time)
     Serial.println("[Warning] LCD not connected.");
 #endif
   }
-  hourglass(given_time);
+  hourglass.wait(given_time);
 }
 
 void BMS::step(ms_t const given_time)
@@ -382,6 +382,7 @@ void BMS::execEmergencyMode()
 
 void BMS::goodbye(int const countDown)
 {
+  Timer hourglass;
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -397,7 +398,6 @@ void BMS::goodbye(int const countDown)
 #endif
   for (int i = countDown; i > 0; i--)
   {
-    Timer hourglass;
 #ifndef NO_LCD_USE
     if (lcdOkay)
     {
@@ -410,7 +410,7 @@ void BMS::goodbye(int const countDown)
     Serial.print(i);
     Serial.println(" seconds.");
 #endif
-    hourglass(1000);
+    hourglass.wait(1000);
   }
   powerIn_pin.turnOff();
   abort();

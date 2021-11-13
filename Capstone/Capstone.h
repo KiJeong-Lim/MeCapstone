@@ -291,7 +291,7 @@ public:
     beg_time = currentTime;
     return result;
   }
-  bool operator()(ms_t given_time)
+  bool wait(ms_t given_time)
   {
     given_time -= getDuration();
     if (given_time >= 0)
