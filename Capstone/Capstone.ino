@@ -34,15 +34,15 @@ ReferenceCollection const refOf =
 };
 
 CELL cells[] =
-  // B13V7
+  // B1(3V7)
 { { .voltageSensor_pin = { .pin_no = A0 }
   , .balanceCircuit_pin = { .pin_no = 2 }
   }
-  // B27V4
+  // B2(7V4)
 , { .voltageSensor_pin = { .pin_no = A1 }
   , .balanceCircuit_pin = { .pin_no = 3 }
   }
-  // B311V1
+  // B3(11V1)
 , { .voltageSensor_pin = { .pin_no = A2 }
   , .balanceCircuit_pin = { .pin_no = 4 }
   }
@@ -56,9 +56,6 @@ class BMS {
   ReaderAnalogPin Iin_pin = { .pin_no = A4 };
 #endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
-#ifndef NO_LCD_USE
-  byte wireOn = false;
-#endif
   byte lcdOkay = false;
   byte jobsDone = false;
   byte measuredValuesAreFresh = false;
@@ -71,36 +68,39 @@ class BMS {
 #endif
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
-  void init(ms_t expected_elapsed_time); // 
-  void step(ms_t expected_elapsed_time); // 
+  void init(ms_t expected_elapsed_time);
+  void play(ms_t expected_elapsed_time);
 private:
-  void controlSystem(); // 
-  void measureValues(bool showValues); // 
-  bool checkSafety(); // 
-  void execEmergencyMode(); // 
-  void goodbye(int timeLeftToQuit); // 
+  void controlSystem();
+  void measureValues(bool showValues);
+  bool checkSafety();
+  void execEmergencyMode();
+  void goodbye(int timeLeftToQuit);
 #ifndef NO_LCD_USE
-  void initWire(); // 
+  bool openLCD(int lcd_width, int lcd_height);
 #endif
 #ifndef NO_LCD_USE
-  bool openLCD(int lcd_width, int lcd_height); // 
-#endif
-#ifndef NO_LCD_USE
-  void hello(); // 
+  void hello();
 #endif
 } myBMS;
 
 void setup()
 {
+  do // NOT change the following block:
+  {
 #ifndef NO_DEBUGGING
-  Serial.begin(SERIAL_PORT);
+    Serial.begin(SERIAL_PORT);
 #endif
-  myBMS.init(500);
+#ifndef NO_LCD_USE
+    Wire.begin();
+#endif
+  } while (false);
+  myBMS.init(1000);
 }
 
 void loop()
 {
-  myBMS.step(3000);
+  myBMS.play(3000);
 }
 
 void BMS::init(ms_t const given_time)
@@ -110,9 +110,6 @@ void BMS::init(ms_t const given_time)
 #ifndef NO_DEBUGGING
   Serial.print("[log] ");
   Serial.println("Runtime started.");
-#endif
-#ifndef NO_LCD_USE
-  initWire();
 #endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -138,7 +135,7 @@ void BMS::init(ms_t const given_time)
   hourglass.wait(given_time);
 }
 
-void BMS::step(ms_t const given_time)
+void BMS::play(ms_t const given_time)
 {
   Timer hourglass;
 
@@ -183,7 +180,7 @@ void BMS::step(ms_t const given_time)
 
 void BMS::controlSystem()
 {
-  V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltages? We must derive them!
+  V_t const V_wanted = 3.7, overV_wanted = 4.1; // <- How to calculate these voltages? We must derive them!!!
 
   if (measuredValuesAreFresh)
   {
@@ -437,74 +434,55 @@ void BMS::goodbye(int const countDown)
 }
 
 #ifndef NO_LCD_USE
-void BMS::initWire()
-{
-  Wire.begin();
-  wireOn = true;
-}
-#endif
-
-#ifndef NO_LCD_USE
 bool BMS::openLCD(int const row_dim, int const col_dim)
 {
   byte is_good = false;
 
-  if (wireOn)
+  if (row_dim > 0 && col_dim > 0)
   {
-    if (row_dim > 0 && col_dim > 0)
+    for (byte adr = 0x01; adr <= 0xFF; adr++)
     {
-      for (byte adr = 0x01; adr <= 0xFF; adr++)
+      byte response = 4;
+      Wire.beginTransmission(adr);
+      response = Wire.endTransmission(adr);
+      if (response == 0)
       {
-        byte response = 4;
-        Wire.beginTransmission(adr);
-        response = Wire.endTransmission(adr);
-        if (response == 0)
+#ifndef NO_DEBUGGING
+        Serial.print("[log] ");
+        Serial.print("I2C ");
+        Serial.print("address");
+        Serial.print(" found");
+        Serial.print(": ");
+        Serial.print("address");
+        Serial.print(" = ");
+        printByteOnSerial(adr);
+        Serial.println(".");
+#endif
+        lcdHandle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
+        if (lcdHandle)
         {
 #ifndef NO_DEBUGGING
           Serial.print("[log] ");
           Serial.print("I2C ");
-          Serial.print("address");
-          Serial.print(" found");
+          Serial.print("connected");
           Serial.print(": ");
           Serial.print("address");
           Serial.print(" = ");
           printByteOnSerial(adr);
           Serial.println(".");
 #endif
-          lcdHandle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
-          if (lcdHandle)
-          {
-#ifndef NO_DEBUGGING
-            Serial.print("[log] ");
-            Serial.print("I2C ");
-            Serial.print("connected");
-            Serial.print(": ");
-            Serial.print("address");
-            Serial.print(" = ");
-            printByteOnSerial(adr);
-            Serial.println(".");
-#endif
-            break;
-          }
+          break;
         }
       }
-
-      if (lcdHandle)
-      {
-        lcdHandle->init();
-        lcdHandle->backlight();
-        lcdHandle->noCursor();
-        is_good = true;
-      }
     }
-  }
-  else
-  {
-#ifndef NO_DEBUGGING
-    Serial.print("[Warning] ");
-    Serial.print("Please ");
-    Serial.println("execute `this->initWire()` before calling `BMS::openLCD`.");
-#endif
+
+    if (lcdHandle)
+    {
+      lcdHandle->init();
+      lcdHandle->backlight();
+      lcdHandle->noCursor();
+      is_good = true;
+    }
   }
 
   return is_good;
