@@ -188,7 +188,7 @@ private:
     }
     else
     {
-      int PWM_value = 256 * duty_ratio;
+      int const PWM_value = 256 * duty_ratio;
       analogWrite(pinId, PWM_value);
     }
   }
