@@ -158,6 +158,8 @@ void BMS::play(ms_t const given_time)
       if (lcdOkay)
       {
         lcdHandle->clear();
+        lcdHandle->noBacklight();
+        lcdHandle->backlight();
         lcdHandle->setCursor(0, 1);
         lcdHandle->print("JOBS FINISHED");
       }
