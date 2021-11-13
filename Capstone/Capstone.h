@@ -123,7 +123,8 @@ public:
   {
     is_high = on_is_true;
 #ifndef NO_DEBUGGING
-    Serial.print("[log] The pin ");
+    Serial.print("[log] ");
+    Serial.print("The pin ");
     Serial.print(pinId);
     Serial.print(" is initalized to ");
     Serial.println(is_high ? "HIGH." : "LOW.");
@@ -136,7 +137,8 @@ public:
   {
     is_high = true;
 #ifndef NO_DEBUGGING
-    Serial.print("[log] The pin ");
+    Serial.print("[log] ");
+    Serial.print("The pin ");
     Serial.print(pinId);
     Serial.print(" set to be ");
     Serial.println("HIGH.");
@@ -148,7 +150,8 @@ public:
   {
     is_high = false;
 #ifndef NO_DEBUGGING
-    Serial.print("[log] The pin ");
+    Serial.print("[log] ");
+    Serial.print("The pin ");
     Serial.print(pinId);
     Serial.println(" set to be ");
     Serial.println("LOW.");
