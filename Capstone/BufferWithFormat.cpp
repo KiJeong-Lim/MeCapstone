@@ -23,25 +23,25 @@ static bigInt_t pow10(int const n)
   return res;
 }
 
-void BufferWithFormat::ready()
+void BufferWithFormat::memzero()
 {
-  for (int j = 0; j < LENGTH_OF(buf); j++)
+  for (cnt = 0; cnt < LCD_SECTION_LEN; cnt++)
   {
-    buf[j] = '\0';
+    buf[cnt] = ' ';
+  }
+  buf[cnt] = '\0';
+  cnt = 0;
+}
+
+void BufferWithFormat::memsend(char *p_ch)
+{
+  for (cnt = 0; cnt < LCD_SECTION_LEN; cnt++)
+  {
+    *p_ch++ = buf[cnt];
   }
 }
 
-char const *BufferWithFormat::get()
-{
-  while (cnt < LCD_SECTION_LEN)
-  {
-    buf[cnt++] = ' ';
-  }
-  buf[LCD_SECTION_LEN] = '\0';
-  return &buf[0];
-}
-
-void BufferWithFormat::put(char const ch)
+void BufferWithFormat::putChar(char const ch)
 {
   if (cnt < LCD_SECTION_LEN)
   {
@@ -49,84 +49,57 @@ void BufferWithFormat::put(char const ch)
   }
 }
 
-void BufferWithFormat::putDigit(int const n)
+void BufferWithFormat::putDigit(int const d)
 {
-  if (n >= 0 && n < 16)
-  {
-    if (cnt < LCD_SECTION_LEN)
-    {
-      buf[cnt++] = "0123456789ABCDEF"[n];
-    }
-  }
+  putChar("0123456789ABCDEF"[d]);
 }
 
-void BufferWithFormat::putInt(int const value)
+void BufferWithFormat::putInt(bigInt_t const printMe)
 {
-  bigInt_t out = value;
-  if (out < 0)
+  bigInt_t val = printMe;
+  int cn = 0;
+  if (val < 0)
   {
-    put('-');
-    out *= -1;
+    putChar('-');
+    val *= -1;
+  }
+  for (bigInt_t _val = 1; _val <= val; _val *= 10)
+  {
+    cn++;
   }
   do
   {
-    putDigit(out % 10);
-    out /= 10;
-  } while (out > 0);
+    putDigit(((10 * val) / pow10(cn)) % 10);
+  } while (--cn > 0);
 }
 
-void BufferWithFormat::putDouble(double const value, int const afters_dot)
+void BufferWithFormat::putDouble(double const printMe, int const afters_dot)
 {
+  double val = printMe;
+  if (printMe < 0.0)
+  {
+    putChar('-');
+    val *= -1;
+  }
   if (afters_dot > 0)
   {
-    bigInt_t const exp_10_after_dots = pow10(afters_dot); 
-    bigInt_t out = round(value * exp_10_after_dots);
-    if (out < 0);
+    bigInt_t valN = val;
+    bigInt_t valF = val * pow10(afters_dot);
+    int cn = afters_dot;
+    putInt(valN);
+    putChar('.');
+    do
     {
-      put('-');
-      out *= -1;
-    }
-    if (out < exp_10_after_dots)
-    {
-      put('0');
-    }
-    while (out >= exp_10_after_dots)
-    {
-      putDigit(out % 10);
-      out /= 10;
-    }
-    put('.');
-    for (int j = 0; j < afters_dot; j++)
-    {
-      putDigit(out % 10);
-      out /= 10;
-    }
+      putDigit(((10 * valF) / pow10(cn)) % 10);
+    } while (--cn > 0);
   }
   else
   {
-    bigInt_t const exp_10_neg_after_dots = pow10(- afters_dot); 
-    bigInt_t out = round(value * exp_10_neg_after_dots);
-    if (out < 0);
-    {
-      put('-');
-      out *= -1;
-    }
-    if (out == 0)
-    {
-      put('0');
-    }
-    else
-    {
-      while (out > 0)
-      {
-        putDigit(out % 10);
-        out /= 10;
-      }
-      for (int befores_dot = - afters_dot; befores_dot > 0; befores_dot--)
-      {
-        put('0');
-      }
-    }
+    bigInt_t valN = val;
+    bigInt_t valE = pow10(- afters_dot);
+    valN /= valE;
+    valN *= valE;
+    putInt(valN);
   }
 }
 

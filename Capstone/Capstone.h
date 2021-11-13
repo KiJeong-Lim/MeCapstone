@@ -213,11 +213,11 @@ class BufferWithFormat {
   int cnt = 0;
   char buf[LCD_SECTION_LEN + 1] = { };
 public:
-  void ready();
-  char const *get();
-  void put(char character_being_printed);
+  void memzero();
+  void memsend(char *tgt);
+  void putChar(char character_being_printed);
   void putDigit(int digit_being_printed);
-  void putInt(int value_being_printed);
+  void putInt(bigInt_t value_being_printed);
   void putString(char const *string_being_printed);
   void putDouble(double value_being_printed, int number_of_digits_after_dot);
 };
@@ -227,7 +227,7 @@ class LcdPrettyPrinter {
   LiquidCrystal_I2C *const lcd_handle;
   int section_no;
   BufferWithFormat fbuf;
-  char buffer[LCD_HEIGHT][LCD_WIDTH + 1];
+  char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
   LcdPrettyPrinter() = delete;
   LcdPrettyPrinter(LcdPrettyPrinter const &other) = delete;
@@ -235,16 +235,16 @@ public:
     : lcd_handle{ controllerOfLCD }
     , section_no{ 0 }
     , fbuf{ }
-    , buffer{ }
+    , mybuf{ }
   {
-    for (int c = 0; c < LENGTH_OF(buffer); c++)
+    for (int c = 0; c < LENGTH_OF(mybuf); c++)
     {
-      for (int r = 0; r < LENGTH_OF(*buffer); r++)
+      for (int r = 0; r < LENGTH_OF(*mybuf); r++)
       {
-        buffer[c][r] = '\0';
+        mybuf[c][r] = '\0';
       }
     }
-    fbuf.ready();
+    fbuf.memzero();
   }
   ~LcdPrettyPrinter()
   {
@@ -254,8 +254,8 @@ public:
       for (int c = 0; c < LCD_HEIGHT; c++)
       {
         lcd_handle->setCursor(0, c);
-        buffer[c][LCD_WIDTH] = '\0';
-        lcd_handle->print(buffer[c]);
+        mybuf[c][LCD_WIDTH - 1] = '\0';
+        lcd_handle->print(mybuf[c]);
       }
     }
   }
@@ -264,17 +264,12 @@ private:
   {
     int const c = (section_no / LCD_SECTION_EA) * 1;
     int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
-    char const *p_ch = nullptr;
     if (c < LCD_HEIGHT && r < LCD_WIDTH)
     {
-      p_ch = fbuf.get();
-      for (int j = 0; j < LCD_SECTION_LEN; j++)
-      {
-        buffer[c][r + j] = p_ch[j];
-      }
+      fbuf.memsend(&mybuf[c][r]);
     }
     section_no++;
-    fbuf.ready();
+    fbuf.memzero();
   }
 public:
   void print(int const value)

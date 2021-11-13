@@ -11,7 +11,7 @@
 #define MAJOR_VERSION   0
 #define MINOR_VERSION   1
 #define REVISION_NUMBER 1
-#define WITH_NANO
+#define WITH_UNO
 #include "Version.h"
 #include "Capstone.h"
 
@@ -39,22 +39,14 @@ CELL cells[] =
 { { .voltageSensor_pin = { .pin_no = A0 }
   , .balanceCircuit_pin = { .pin_no = 2 }
   }
-  // B2(7V4)
-, { .voltageSensor_pin = { .pin_no = A1 }
-  , .balanceCircuit_pin = { .pin_no = 3 }
-  }
-  // B3(11V1)
-, { .voltageSensor_pin = { .pin_no = A2 }
-  , .balanceCircuit_pin = { .pin_no = 4 }
-  }
 };
 
 class BMS {
 #ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
-  ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
+  ReaderAnalogPin arduino5V_pin = { .pin_no = A1 };
 #endif
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  ReaderAnalogPin Iin_pin = { .pin_no = A6 };
+  ReaderAnalogPin Iin_pin = { .pin_no = A2 };
 #endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   byte lcdOkay = false;
@@ -99,7 +91,7 @@ void setup()
 
 void loop()
 {
-  myBMS.play(3000);
+  myBMS.play(2000);
 }
 
 void BMS::init(ms_t const given_time)
@@ -224,8 +216,9 @@ void BMS::measureValues(bool const showValues)
 #endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
+    Ohm_t const R1 = 18000.0, R2 = 2000.0;
     sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-    cellV[i] = sensorV - accumV;
+    cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
     accumV += cellV[i];
   }
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
