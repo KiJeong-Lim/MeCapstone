@@ -126,8 +126,7 @@ public:
     Serial.print("[log] The pin ");
     Serial.print(pinId);
     Serial.print(" is initalized to ");
-    Serial.print(is_high ? "HIGH" : "LOW");
-    Serial.println(".");
+    Serial.println(is_high ? "HIGH." : "LOW.");
     waitForSerial();
 #endif
     pinMode(pinId, OUTPUT);
@@ -139,7 +138,8 @@ public:
 #ifndef NO_DEBUGGING
     Serial.print("[log] The pin ");
     Serial.print(pinId);
-    Serial.println(" set to be HIGH.");
+    Serial.print(" set to be ");
+    Serial.println("HIGH.");
     waitForSerial();
 #endif
     syncPin();
@@ -150,7 +150,8 @@ public:
 #ifndef NO_DEBUGGING
     Serial.print("[log] The pin ");
     Serial.print(pinId);
-    Serial.println(" set to be LOW.");
+    Serial.println(" set to be ");
+    Serial.println("LOW.");
     waitForSerial();
 #endif
     syncPin();

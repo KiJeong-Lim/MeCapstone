@@ -26,17 +26,26 @@ static void printByteOnSerial(byte const integer_between_0_and_255)
 }
 #endif
 
-ReferenceCollection const refOf = {
-  .analogSignalMax = 1024.0,
-  .arduinoRegularV = 5.00,
-  .zenerdiodeVfromRtoA = 2.48,
-  .conversionRatioOfCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR,
+ReferenceCollection const refOf =
+{ .analogSignalMax = 1024.0
+, .arduinoRegularV = 5.00
+, .zenerdiodeVfromRtoA = 2.48
+, .conversionRatioOfCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR
 };
 
-CELL cells[] = {
-  { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } },
-  { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } },
-  { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } },
+CELL cells[] =
+  // B13V7
+{ { .voltageSensor_pin = { .pin_no = A0 }
+  , .balanceCircuit_pin = { .pin_no = 2 }
+  }
+  // B27V4
+, { .voltageSensor_pin = { .pin_no = A1 }
+  , .balanceCircuit_pin = { .pin_no = 3 }
+  }
+  // B311V1
+, { .voltageSensor_pin = { .pin_no = A2 }
+  , .balanceCircuit_pin = { .pin_no = 4 }
+  }
 };
 
 class BMS {
