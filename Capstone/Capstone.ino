@@ -108,7 +108,8 @@ void BMS::init(ms_t const given_time)
   Timer hourglass;
 
 #ifndef NO_DEBUGGING
-  Serial.println("[log] Runtime started.");
+  Serial.print("[log] ");
+  Serial.println("Runtime started.");
 #endif
 #ifndef NO_LCD_USE
   initWire();
@@ -130,7 +131,8 @@ void BMS::init(ms_t const given_time)
   else
   {
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] LCD not connected.");
+    Serial.print("[Warning] ");
+    Serial.println("LCD not connected.");
 #endif
   }
   hourglass.wait(given_time);
@@ -141,7 +143,8 @@ void BMS::step(ms_t const given_time)
   Timer hourglass;
 
 #ifndef NO_DEBUGGING
-  Serial.println("[log] Turn changed.");
+  Serial.print("[log] ");
+  Serial.println("Turn changed.");
 #endif
   measureValues(true);
   controlSystem();
@@ -151,7 +154,8 @@ void BMS::step(ms_t const given_time)
     if (system_is_okay and jobsDone)
     {
 #ifndef NO_DEBUGGING
-      Serial.println("[log] CHARGING COMPLETED.");
+      Serial.print("[log] ");
+      Serial.println("CHARGING COMPLETED.");
 #endif
 #ifndef NO_LCD_USE
       if (lcdOkay)
@@ -313,14 +317,24 @@ bool BMS::checkSafety()
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] 'Iin' too high.");
+    Serial.print("[Warning] ");
+    Serial.print("`");
+    Serial.print("Iin");
+    Serial.print("`");
+    Serial.print(" too ");
+    Serial.println("HIGH.");
 #endif
   }
   if (Iin < allowedA_min)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] 'Iin' too low.");
+    Serial.print("[Warning] ");
+    Serial.print("`");
+    Serial.print("Iin");
+    Serial.print("`");
+    Serial.print(" too ");
+    Serial.println("LOW.");
 #endif
   }
 #endif
@@ -332,20 +346,28 @@ bool BMS::checkSafety()
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] 'cellV[");
+      Serial.print("[Warning] ");
+      Serial.print("`");
+      Serial.print("cellV[");
       Serial.print(i);
-      Serial.print("]'");
-      Serial.println(" too high.");
+      Serial.print("]");
+      Serial.print("`");
+      Serial.print(" too ");
+      Serial.println("HIGH.");
 #endif
     }
     if (cellV[i] < allowedV_min)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] 'cellV[");
+      Serial.print("[Warning] ");
+      Serial.print("`");
+      Serial.print("cellV[");
       Serial.print(i);
-      Serial.print("]'");
-      Serial.println(" too low.");
+      Serial.print("]");
+      Serial.print("`");
+      Serial.print(" too ");
+      Serial.println("LOW.");
 #endif
     }
   }
@@ -403,7 +425,8 @@ void BMS::goodbye(int const countDown)
     }
 #endif
 #ifndef NO_DEBUGGING
-    Serial.print("[Warning] Your arduino will abort in ");
+    Serial.print("[Warning] ");
+    Serial.print("Your arduino will abort in ");
     Serial.print(i);
     Serial.println(" seconds.");
 #endif
@@ -438,7 +461,13 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
         if (response == 0)
         {
 #ifndef NO_DEBUGGING
-          Serial.print("[log] I2C address found: address = ");
+          Serial.print("[log] ");
+          Serial.print("I2C ");
+          Serial.print("address");
+          Serial.print(" found");
+          Serial.print(": ");
+          Serial.print("address");
+          Serial.print(" = ");
           printByteOnSerial(adr);
           Serial.println(".");
 #endif
@@ -446,7 +475,12 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
           if (lcdHandle)
           {
 #ifndef NO_DEBUGGING
-            Serial.print("[log] I2C connected: address = ");
+            Serial.print("[log] ");
+            Serial.print("I2C ");
+            Serial.print("connected");
+            Serial.print(": ");
+            Serial.print("address");
+            Serial.print(" = ");
             printByteOnSerial(adr);
             Serial.println(".");
 #endif
@@ -467,7 +501,9 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
   else
   {
 #ifndef NO_DEBUGGING
-    Serial.println("[Warning] Please execute 'this->initWire()' before calling 'BMS::openLCD'.");
+    Serial.print("[Warning] ");
+    Serial.print("Please ");
+    Serial.println("execute `this->initWire()` before calling `BMS::openLCD`.");
 #endif
   }
 
