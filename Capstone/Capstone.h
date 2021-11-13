@@ -53,10 +53,10 @@ typedef int long long bigInt_t; // type for big integer
 // class defns
 #ifndef NOT_MAIN_INO_FILE
 struct ReferenceCollection {
-  Val_t analogSignalMax;
-  V_t arduinoRegularV;
-  V_t zenerdiodeVfromRtoA;
-  Ohm_t conversionRatioOfCurrentSensor;
+  Val_t const analogSignalMax;
+  V_t const arduinoRegularV;
+  V_t const zenerdiodeVfromRtoA;
+  Ohm_t const conversionRatioOfCurrentSensor;
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
@@ -72,6 +72,7 @@ public:
     : Pin{ .pinId = pin_no }
   {
   }
+  ReaderAnalogPin(ReaderAnalogPin const &other) = delete;
   ~ReaderAnalogPin()
   {
   }
@@ -83,8 +84,7 @@ private:
 public:
   Val_t readSignalOnce() const
   {
-    Val_t val = read_once();
-    return val;
+    return read_once();
   }
   Val_t readSignal(ms_t const duration) const
   {
@@ -110,6 +110,7 @@ public:
     , is_high{ false }
   {
   }
+  WriterDigitalPin(WriterDigitalPin const &other) = delete;
   ~WriterDigitalPin()
   {
   }
@@ -167,6 +168,40 @@ public:
 #endif
 #ifndef NOT_MAIN_INO_FILE
 class PwmDigitalPin : public Pin {
+public:
+  PwmDigitalPin() = delete;
+  PwmDigitalPin(pinId_t const pin_no)
+    : Pin{ .pinId = pin_no }
+  {
+  }
+  PwmDigitalPin(PwmDigitalPin const &other) = delete;
+private:
+  void setPWM(double const duty_ratio) const
+  {
+    if (duty_ratio < 0.0)
+    {
+      analogWrite(pinId, LOW);
+    }
+    else if (duty_ratio >= 1.0)
+    {
+      analogWrite(pinId, HIGH);
+    }
+    else
+    {
+      int PWM_value = 256 * duty_ratio;
+      analogWrite(pinId, PWM_value);
+    }
+  }
+public:
+  void init() const
+  {
+    pinMode(pinId, OUTPUT);
+    analogWrite(pinId, LOW);
+  }
+  void setPwm(double const duty_ratio) const
+  {
+    setPWM(duty_ratio);
+  }
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
@@ -196,6 +231,7 @@ class LcdPrettyPrinter {
   char buffer[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
   LcdPrettyPrinter() = delete;
+  LcdPrettyPrinter(LcdPrettyPrinter const &other) = delete;
   LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD)
     : lcd_handle{ controllerOfLCD }
     , section_no{ 0 }
@@ -274,11 +310,20 @@ public:
 #endif
 #ifndef NOT_MAIN_INO_FILE
 class Timer {
-  ms_t curTime = 0;
+  ms_t curTime;
 public:
   Timer()
+    : curTime{ 0 }
   {
     curTime = millis();
+  }
+  Timer(Timer const &other)
+    : curTime{ other.curTime }
+  {
+  }
+  Timer &operator=(Timer &&rhs)
+  {
+    this->curTime = rhs.curTime;
   }
   ~Timer()
   {
@@ -291,16 +336,16 @@ private:
 public:
   ms_t getDuration()
   {
-    ms_t const begTime = curTime;
+    ms_t const beg_time = curTime;
     syncTime();
-    return curTime - begTime;
+    return curTime - beg_time;
   }
-  bool wait(ms_t givenTime)
+  bool wait(ms_t given_time)
   {
-    givenTime -= getDuration();
-    if (givenTime >= 0)
+    given_time -= getDuration();
+    if (given_time >= 0)
     {
-      delay(givenTime);
+      delay(given_time);
       syncTime();
       return true;
     }
