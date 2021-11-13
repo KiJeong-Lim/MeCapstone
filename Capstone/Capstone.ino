@@ -42,12 +42,8 @@ CELL cells[] =
 };
 
 class BMS {
-#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
   ReaderAnalogPin arduino5V_pin = { .pin_no = A1 };
-#endif
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
   ReaderAnalogPin Iin_pin = { .pin_no = A2 };
-#endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   byte lcdOkay = false;
   byte jobsDone = false;
@@ -56,9 +52,7 @@ class BMS {
   LiquidCrystal_I2C *lcdHandle = nullptr;
 #endif
   V_t arduino5V = refOf.arduinoRegularV;
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
   A_t Iin = 0.0;
-#endif
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
   void init(ms_t timeLimit);
@@ -67,7 +61,6 @@ private:
   void controlSystem();
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
-  void execEmergencyMode();
   void goodbye(int timeLeftToQuit);
 #ifndef NO_LCD_USE
   bool openLCD(int lcdWidth, int lcdHeight);
@@ -162,7 +155,7 @@ void BMS::play(ms_t const given_time)
       {
         if (not system_is_okay)
         {
-          execEmergencyMode();
+          delay(100);
         }
         system_is_okay = checkSafety(false);
       }
@@ -172,14 +165,13 @@ void BMS::play(ms_t const given_time)
 
 void BMS::controlSystem()
 {
-  V_t const V_wanted = 3.7, overV_wanted = 4.1; // <- How to calculate these voltages? We must derive them!!!
+  V_t const V_wanted = 3.6, overV_wanted = 3.6; // <- How to calculate these voltages? We must derive them!!!
 
   if (measuredValuesAreFresh)
   {
     measureValues(false);
   }
 
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
   jobsDone = true;
 
   for (int i = 0; i < LENGTH_OF(cellV); i++)
@@ -199,8 +191,6 @@ void BMS::controlSystem()
       cells[i].balanceCircuit_pin.turnOn();
     }
   }
-#endif
-
   measuredValuesAreFresh = false;
 }
 
@@ -210,10 +200,8 @@ void BMS::measureValues(bool const showValues)
   V_t sensorV = 0.0;
   V_t accumV = 0.0;
 
-#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
-#endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     Ohm_t const R1 = 18000.0, R2 = 2000.0;
@@ -221,33 +209,24 @@ void BMS::measureValues(bool const showValues)
     cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
     accumV += cellV[i];
   }
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - arduino5V * 0.5);
-#endif
+  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V);
   measuredValuesAreFresh = true;
 
   if (showValues)
   {
-#ifndef NO_DEBUGGING
-#ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
     Serial.print("*Arduino> ");
     Serial.print("arduino5V");
     Serial.print(" = ");
     Serial.print(arduino5V);
     Serial.println("[V].");
     waitForSerial();
-#endif
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
     Serial.print("*Arduino> ");
     Serial.print("Iin");
     Serial.print(" = ");
     Serial.print(Iin);
     Serial.println("[A].");
     waitForSerial();
-#endif
-#endif
-#ifndef NO_LCD_USE
     if (lcdOkay)
     {
       LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
@@ -260,12 +239,10 @@ void BMS::measureValues(bool const showValues)
         lcd.print(cellV[i]);
         lcd.println(" ");
       }
-#ifndef NOT_CONSIDER_SUPPLY_CURRENT
       lcd.print("I");
       lcd.print("=");
       lcd.print(Iin);
       lcd.println(" ");
-#endif
       // Here, the variable `lcd` is destructed,
     } //       the LCD screen being updated.
       //                                   A1234567B1234567
@@ -273,8 +250,6 @@ void BMS::measureValues(bool const showValues)
       //                                 1#B1=4.25 B2=4.17 #
       //                                 2#B3=3.33 I=1.66  #
       //                                  ##################
-#endif
-#ifndef NO_DEBUGGING
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
       Serial.print("*Arduino> ");
@@ -286,7 +261,6 @@ void BMS::measureValues(bool const showValues)
       Serial.println("[V].");
       waitForSerial();
     }
-#endif
   }
 }
 
@@ -387,32 +361,13 @@ bool BMS::checkSafety(bool const reportsToSerial)
   return isBad;
 }
 
-void BMS::execEmergencyMode()
-{
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOn();
-  }
-#endif
-  delay(500); // <- This is JUST hiding from the problem.
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    cells[i].balanceCircuit_pin.turnOff();
-  }
-#endif
-}
-
 void BMS::goodbye(int const countDown)
 {
   Timer hourglass;
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
   }
-#endif
 #ifndef NO_LCD_USE
   if (lcdOkay)
   {
@@ -448,7 +403,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 
   if (row_dim > 0 && col_dim > 0)
   {
-    byte adr = 0x01;
+    byte adr = 0xFF;
 
     do
     {
@@ -485,7 +440,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
           break;
         }
       }
-      adr++;
+      adr--;
     } while (adr != 0x00);
 
     if (lcdHandle)
