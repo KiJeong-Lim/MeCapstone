@@ -1,4 +1,4 @@
-/* 2021-11-12 <CAPSTONE PROJECT>
+/* 2021-11-13 <CAPSTONE PROJECT>
 ** ===============================================================================
 ** MEMBERS       | AFFILIATION                                                   |
 ** ===============================================================================
@@ -9,7 +9,6 @@
 */
 
 #include "Capstone.h"
-#ifndef NO_LCD_USE
 #ifndef round
 #define round(x)                            ((x)>=0?(bigInt_t)((x)+0.5):(bigInt_t)((x)-0.5))
 #endif
@@ -145,4 +144,3 @@ void BufferWithFormat::putString(char const *const str)
     }
   }
 }
-#endif

@@ -1,4 +1,4 @@
-/* 2021-11-12 <CAPSTONE PROJECT>
+/* 2021-11-13 <CAPSTONE PROJECT>
 ** ===============================================================================
 ** MEMBERS       | AFFILIATION                                                   |
 ** ===============================================================================
@@ -6,15 +6,19 @@
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
 ** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
 ** ===============================================================================
-** Notes
-** [1] Do not change the definition of 'ms_t' to some type of unsigned integers.
-**     Because it is used to present time-differences which might be negative.
 */
 
 #ifndef CAPSTONE
 #define CAPSTONE
 
-#ifndef BMS_VERSION
+/* <Notes>
+** [1] Do not change the definition of 'ms_t' to some type of unsigned integers.
+**     Because it is used to present time-differences which might be negative.
+** [2] How to connect LCD I2C module to Arduino board: https://codingrun.com/119
+** [3] How voltage sensors work? https://en.wikipedia.org/wiki/Voltage_divider
+*/
+
+#ifndef VERSION
 #define NOT_MAIN_INO_FILE
 #endif
 
@@ -36,11 +40,6 @@
 #define SENSITIVITY_OF_20A_CURRENT_SENSOR   100.0
 #define LENGTH_OF(ARR)                      (sizeof(ARR) / sizeof(*(ARR)))
 #define toMilliSeconds(secs)                ((ms_t)(1000 * (secs)))
-// #define NO_DEBUGGING
-// #define NO_LCD_USE
-// #define NOT_CONSIDER_SUPPLY_VOLTAGE
-// #define NOT_CONSIDER_SUPPLY_CURRENT
-// #define NOT_CONTROL_BALANCE_CIRCUIT
 
 // type synonym defns
 typedef int long long ms_t; // type for milliseconds
@@ -57,7 +56,7 @@ struct ReferenceCollection {
   Val_t analogSignalMax;
   V_t arduinoRegularV;
   V_t zenerdiodeVfromRtoA;
-  Ohm_t conversionRatioForCurrentSensor;
+  Ohm_t conversionRatioOfCurrentSensor;
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
@@ -172,7 +171,6 @@ struct CELL {
   WriterDigitalPin const balanceCircuit_pin;
 };
 #endif
-#ifndef NO_LCD_USE
 class BufferWithFormat {
   int cnt = 0;
   char buf[LCD_SECTION_LEN + 1] = { };
@@ -185,7 +183,6 @@ public:
   void putString(char const *string_being_printed);
   void putDouble(double value_being_printed, int number_of_digits_after_dot);
 };
-#endif
 #ifndef NOT_MAIN_INO_FILE
 class LcdPrettyPrinter {
 #ifndef NO_LCD_USE

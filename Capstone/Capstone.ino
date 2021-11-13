@@ -1,4 +1,4 @@
-/* 2021-11-12 <CAPSTONE PROJECT>
+/* 2021-11-13 <CAPSTONE PROJECT>
 ** ===============================================================================
 ** MEMBERS       | AFFILIATION                                                   |
 ** ===============================================================================
@@ -8,7 +8,10 @@
 ** ===============================================================================
 */
 
-#define BMS_VERSION 0.10
+#define MAJOR_VERSION   0
+#define MINOR_VERSION   1
+#define REVISION_NUMBER 1
+#include "Version.h"
 #include "Capstone.h"
 
 #ifndef NO_DEBUGGING
@@ -23,11 +26,18 @@ static void printByteOnSerial(byte const integer_between_0_and_255)
 }
 #endif
 
+#ifndef NO_DEBUGGING
+static void waitUntilRecieveSerialTransmission()
+{
+  delay(10);
+}
+#endif
+
 ReferenceCollection const refOf = {
   .analogSignalMax = 1024.0,
   .arduinoRegularV = 5.00,
   .zenerdiodeVfromRtoA = 2.48,
-  .conversionRatioForCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR,
+  .conversionRatioOfCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR,
 };
 
 CELL cells[] = {
@@ -131,9 +141,6 @@ void BMS::step(ms_t given_time)
   Serial.println("[log] Turn changed.");
 #endif
   measure(true);
-#ifndef NO_DEBUGGING
-  delay(10);
-#endif
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
   control();
 #endif
@@ -167,7 +174,6 @@ void BMS::step(ms_t given_time)
         {
           execEmergencyMode();
         }
-        delay(10);
         system_is_okay = checkSafety();
       }
     }
@@ -177,11 +183,10 @@ void BMS::step(ms_t given_time)
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
 void BMS::control()
 {
-  V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltages?
+  V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltages? We must derive them!
 
   if (measuredValuesAreFresh)
   {
-    delay(10);
     measure(false);
   }
 
@@ -211,17 +216,16 @@ void BMS::control()
 
 bool BMS::checkSafety()
 {
-  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US
-  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US
+  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US!!!
+  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US!!!
   bool isBad = false;
 
   if (measuredValuesAreFresh)
   {
-    delay(10);
     measure(false);
   }
 
-  // check current
+  // Check current
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
   if (Iin > allowedA_max)
   {
@@ -239,7 +243,7 @@ bool BMS::checkSafety()
   }
 #endif
 
-  // check voltage
+  // Check voltage
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     if (cellV[i] > allowedV_max)
@@ -264,6 +268,12 @@ bool BMS::checkSafety()
     }
   }
 
+#ifndef NO_DEBUGGING
+  if (isBad)
+  {
+    waitUntilRecieveSerialTransmission();
+  }
+#endif
   measuredValuesAreFresh = false;
   return isBad;
 }
@@ -276,7 +286,7 @@ void BMS::execEmergencyMode()
     cells[i].balanceCircuit_pin.turnOn();
   }
 #endif
-  delay(500);
+  delay(500); // <- It is only to hide from the problem.
 #ifndef NOT_CONTROL_BALANCE_CIRCUIT
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
@@ -332,7 +342,7 @@ void BMS::measure(bool const showValues)
   }
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioForCurrentSensor * (sensorV - arduino5V * 0.5);
+  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - arduino5V * 0.5);
 #endif
   measuredValuesAreFresh = true;
 
@@ -393,6 +403,9 @@ void BMS::measure(bool const showValues)
       Serial.println("[V].");
     }
 #endif
+#ifndef NO_DEBUGGING
+    waitUntilRecieveSerialTransmission();
+#endif
   }
 }
 
@@ -442,6 +455,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
       {
         lcd_handle->init();
         lcd_handle->backlight();
+        lcd_handle->noCursor();
         isGood = true;
       }
     }
@@ -468,7 +482,7 @@ void BMS::hello()
     lcd.println(" ONLINE");
     lcd.println("VERSION");
     lcd.print("= ");
-    lcd.println(BMS_VERSION);
+    lcd.println(VERSION);
   }
 #endif
 }
