@@ -55,10 +55,10 @@ class BMS {
 #endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
 #ifndef NO_LCD_USE
-  byte wire_on = false;
+  byte wireOn = false;
 #endif
   byte lcdOkay = false;
-  byte jobs_done = false;
+  byte jobsDone = false;
   byte measuredValuesAreFresh = false;
 #ifndef NO_LCD_USE
   LiquidCrystal_I2C *lcd_handle = nullptr;
@@ -72,10 +72,8 @@ public:
   void init(ms_t expected_elapsed_time); // 
   void step(ms_t expected_elapsed_time); // 
 private:
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  void control(); // 
-#endif
-  void measure(bool showValues); // 
+  void controlSystem(); // 
+  void measureValues(bool showValues); // 
   bool checkSafety(); // 
   void execEmergencyMode(); // 
   void goodbye(int timeLeftToQuit); // 
@@ -143,14 +141,12 @@ void BMS::step(ms_t const given_time)
 #ifndef NO_DEBUGGING
   Serial.println("[log] Turn changed.");
 #endif
-  measure(true);
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-  control();
-#endif
+  measureValues(true);
+  controlSystem();
   {
     bool system_is_okay = checkSafety();
 
-    if (system_is_okay and jobs_done)
+    if (system_is_okay and jobsDone)
     {
 #ifndef NO_DEBUGGING
       Serial.println("[log] CHARGING COMPLETED.");
@@ -179,24 +175,24 @@ void BMS::step(ms_t const given_time)
   }
 }
 
-#ifndef NOT_CONTROL_BALANCE_CIRCUIT
-void BMS::control()
+void BMS::controlSystem()
 {
   V_t const V_wanted = 3.8, overV_wanted = 4.1; // <- How to calculate these voltages? We must derive them!
 
   if (measuredValuesAreFresh)
   {
-    measure(false);
+    measureValues(false);
   }
 
-  jobs_done = true;
+#ifndef NOT_CONTROL_BALANCE_CIRCUIT
+  jobsDone = true;
 
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
     bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
 
-    jobs_done &= this_cell_charging_finished;
+    jobsDone &= this_cell_charging_finished;
 
     if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
@@ -208,12 +204,12 @@ void BMS::control()
       cells[i].balanceCircuit_pin.turnOn();
     }
   }
+#endif
 
   measuredValuesAreFresh = false;
 }
-#endif
 
-void BMS::measure(bool const showValues)
+void BMS::measureValues(bool const showValues)
 {
   ms_t const measuring_time_for_one_sensor = 10;
   V_t sensorV = 0.0;
@@ -307,7 +303,7 @@ bool BMS::checkSafety()
 
   if (measuredValuesAreFresh)
   {
-    measure(false);
+    measureValues(false);
   }
 
   // Check current
@@ -420,16 +416,16 @@ void BMS::goodbye(int const countDown)
 void BMS::initWire()
 {
   Wire.begin();
-  wire_on = true;
+  wireOn = true;
 }
 #endif
 
 #ifndef NO_LCD_USE
 bool BMS::openLCD(int const row_dim, int const col_dim)
 {
-  byte isGood = false;
+  byte is_good = false;
 
-  if (wire_on)
+  if (wireOn)
   {
     if (row_dim > 0 && col_dim > 0)
     {
@@ -463,7 +459,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
         lcd_handle->init();
         lcd_handle->backlight();
         lcd_handle->noCursor();
-        isGood = true;
+        is_good = true;
       }
     }
   }
@@ -474,7 +470,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
 #endif
   }
 
-  return isGood;
+  return is_good;
 }
 #endif
 
