@@ -51,7 +51,7 @@ typedef int long long bigInt_t; // type for big integer
 
 // class defns
 #ifndef NOT_MAIN_INO_FILE
-struct ReferenceCollection {
+struct ReferenceCollection { // OKAY
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;
   V_t const zenerdiodeVfromRtoA;
@@ -59,12 +59,12 @@ struct ReferenceCollection {
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
-struct Pin {
+struct Pin { // OKAY
   pinId_t const pinId;
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
-class ReaderAnalogPin : public Pin {
+class ReaderAnalogPin : public Pin { // OKAY
 public:
   ReaderAnalogPin() = delete;
   ReaderAnalogPin(pinId_t const pin_no)
@@ -100,7 +100,7 @@ public:
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
-class WriterDigitalPin : public Pin {
+class WriterDigitalPin : public Pin { // OKAY
   bool is_high;
 public:
   WriterDigitalPin() = delete;
@@ -166,7 +166,7 @@ public:
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
-class PwmDigitalPin : public Pin {
+class PwmDigitalPin : public Pin { // OKAY
 public:
   PwmDigitalPin() = delete;
   PwmDigitalPin(pinId_t const pin_no)
@@ -204,7 +204,7 @@ public:
 };
 #endif
 #ifndef NOT_MAIN_INO_FILE
-struct CELL {
+struct CELL { // OKAY
   ReaderAnalogPin const voltageSensor_pin;
   WriterDigitalPin const balanceCircuit_pin;
 };
@@ -222,7 +222,7 @@ public:
   void putDouble(double value_being_printed, int number_of_digits_after_dot);
 };
 #ifndef NOT_MAIN_INO_FILE
-class LcdPrettyPrinter {
+class LcdPrettyPrinter { // OKAY
 #ifndef NO_LCD_USE
   LiquidCrystal_I2C *const lcd_handle;
   int section_no;

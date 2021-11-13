@@ -36,6 +36,16 @@
 #define CONSIDER_SUPPLY_CURRENT
 #define CONTROL_BALANCE_CIRCUIT
 #endif
+#if MINOR_VERSION == 2
+/* <SCHEMATIC>
+** {- ToDo: Draw schematic here -}
+*/
+#define DEBUGGING
+#define LCD_USE
+#define CONSIDER_SUPPLY_VOLTAGE
+#define CONSIDER_SUPPLY_CURRENT
+#define CONTROL_BALANCE_CIRCUIT
+#endif
 #endif
 
 #ifndef DEBUGGING

@@ -194,7 +194,7 @@ void BMS::controlSystem()
   measuredValuesAreFresh = false;
 }
 
-void BMS::measureValues(bool const showValues)
+void BMS::measureValues(bool const showValues) // OKAY
 {
   ms_t const measuring_time_for_one_sensor = 10;
   V_t sensorV = 0.0;
@@ -210,7 +210,7 @@ void BMS::measureValues(bool const showValues)
     accumV += cellV[i];
   }
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V);
+  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V) + 0.04;
   measuredValuesAreFresh = true;
 
   if (showValues)
@@ -397,7 +397,7 @@ void BMS::goodbye(int const countDown)
 }
 
 #ifndef NO_LCD_USE
-bool BMS::openLCD(int const row_dim, int const col_dim)
+bool BMS::openLCD(int const row_dim, int const col_dim) // OKAY
 {
   bool is_good = false;
 

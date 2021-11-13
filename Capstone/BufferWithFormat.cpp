@@ -10,7 +10,7 @@
 
 #include "Capstone.h"
 
-static bigInt_t pow10(int const n)
+static bigInt_t pow10(int const n) // OKAY
 {
   bigInt_t res = 1;
   for (int i = 0; i < n; i++)
@@ -20,7 +20,7 @@ static bigInt_t pow10(int const n)
   return res;
 }
 
-void BufferWithFormat::memzero()
+void BufferWithFormat::memzero() // OKAY
 {
   for (cnt = 0; cnt < LCD_SECTION_LEN; cnt++)
   {
@@ -30,7 +30,7 @@ void BufferWithFormat::memzero()
   cnt = 0;
 }
 
-void BufferWithFormat::memsend(char *p_ch)
+void BufferWithFormat::memsend(char *p_ch) // OKAY
 {
   for (cnt = 0; cnt < LCD_SECTION_LEN; cnt++)
   {
@@ -38,7 +38,7 @@ void BufferWithFormat::memsend(char *p_ch)
   }
 }
 
-void BufferWithFormat::putChar(char const ch)
+void BufferWithFormat::putChar(char const ch) // OKAY
 {
   if (cnt < LCD_SECTION_LEN)
   {
@@ -46,12 +46,12 @@ void BufferWithFormat::putChar(char const ch)
   }
 }
 
-void BufferWithFormat::putDigit(int const d)
+void BufferWithFormat::putDigit(int const d) // OKAY
 {
   putChar("0123456789ABCDEF"[d]);
 }
 
-void BufferWithFormat::putInt(bigInt_t const printMe)
+void BufferWithFormat::putInt(bigInt_t const printMe) // OKAY
 {
   bigInt_t val = printMe;
   int cn = 0;
@@ -70,7 +70,7 @@ void BufferWithFormat::putInt(bigInt_t const printMe)
   } while (--cn > 0);
 }
 
-void BufferWithFormat::putDouble(double const printMe, int const afters_dot)
+void BufferWithFormat::putDouble(double const printMe, int const afters_dot) // OKAY
 {
   double val = printMe;
   if (printMe < 0.0)
@@ -100,7 +100,7 @@ void BufferWithFormat::putDouble(double const printMe, int const afters_dot)
   }
 }
 
-void BufferWithFormat::putString(char const *const str)
+void BufferWithFormat::putString(char const *const str) // OKAY
 {
   for (char const *p_ch = str; *p_ch != '\0'; p_ch++)
   {
