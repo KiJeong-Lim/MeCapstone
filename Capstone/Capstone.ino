@@ -272,14 +272,13 @@ void BMS::measureValues(bool const showValues)
       lcd.print(Iin);
       lcd.println(" ");
 #endif
-      // Here, the LCD screen will be updated,
-      //       while the variable lcd being destructed.
+      // Here, the variable lcd is destructed,
+    } //       the LCD screen being updated.
       //                              A1234567B1234567
-      // A possible screen will be:  ##################
-      //                            1#B1=4.25 B2=4.17 #
-      //                            2#B3=3.33 I=1.66  #
+      // A possible screen might be: ##################
+      //                             #B1=4.25 B2=4.17 #1
+      //                             #B3=3.33 I=1.66  #2
       //                             ##################
-    }
 #endif
 #ifndef NO_DEBUGGING
     for (int i = 0; i < LENGTH_OF(cellV); i++)
