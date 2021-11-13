@@ -1,3 +1,6 @@
 */build/*
 .vscode/*
 libraries/*
+*/libraries/*
+Capstone/*.ino.*
+BufferWithFormat.cpp

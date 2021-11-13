@@ -19,6 +19,12 @@
 #define VERSION (0.00)
 #endif
 
+#if defined(WITH_NANO)
+#define SERIAL_PORT_NUMBER 115200
+#elif defined(WITH_UNO)
+#define SERIAL_PORT_NUMBER 9600
+#endif
+
 #if MAJOR_VERSION == 0
 #if MINOR_VERSION == 1
 /* <SCHEMATIC>
@@ -28,7 +34,7 @@
 #define LCD_USE
 #define CONSIDER_SUPPLY_VOLTAGE
 #define CONSIDER_SUPPLY_CURRENT
-#define CONTROL_BALANCE_CIRCUIT
+//#define CONTROL_BALANCE_CIRCUIT
 #endif
 #endif
 

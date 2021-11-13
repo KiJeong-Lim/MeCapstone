@@ -11,6 +11,7 @@
 #define MAJOR_VERSION   0
 #define MINOR_VERSION   1
 #define REVISION_NUMBER 1
+#define WITH_NANO
 #include "Version.h"
 #include "Capstone.h"
 
@@ -53,7 +54,7 @@ class BMS {
   ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
 #endif
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-  ReaderAnalogPin Iin_pin = { .pin_no = A4 };
+  ReaderAnalogPin Iin_pin = { .pin_no = A6 };
 #endif
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   byte lcdOkay = false;
@@ -68,20 +69,18 @@ class BMS {
 #endif
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
-  void init(ms_t expected_elapsed_time);
-  void play(ms_t expected_elapsed_time);
+  void init(ms_t timeLimit);
+  void play(ms_t timeLimit);
 private:
   void controlSystem();
   void measureValues(bool showValues);
-  bool checkSafety();
+  bool checkSafety(bool reportsToSerial);
   void execEmergencyMode();
   void goodbye(int timeLeftToQuit);
 #ifndef NO_LCD_USE
-  bool openLCD(int lcd_width, int lcd_height);
+  bool openLCD(int lcdWidth, int lcdHeight);
 #endif
-#ifndef NO_LCD_USE
   void hello();
-#endif
 } myBMS;
 
 void setup()
@@ -89,7 +88,7 @@ void setup()
   do // NOT change the following block:
   {
 #ifndef NO_DEBUGGING
-    Serial.begin(SERIAL_PORT);
+    Serial.begin(SERIAL_PORT_NUMBER);
 #endif
 #ifndef NO_LCD_USE
     Wire.begin();
@@ -108,7 +107,7 @@ void BMS::init(ms_t const given_time)
   Timer hourglass;
 
 #ifndef NO_DEBUGGING
-  Serial.print("[log] ");
+  Serial.print("    [log] ");
   Serial.println("Runtime started.");
 #endif
   for (int i = 0; i < LENGTH_OF(cells); i++)
@@ -140,18 +139,17 @@ void BMS::play(ms_t const given_time)
   Timer hourglass;
 
 #ifndef NO_DEBUGGING
-  Serial.print("[log] ");
-  Serial.println("Turn changed.");
+  Serial.println("=========");
 #endif
   measureValues(true);
   controlSystem();
   {
-    bool system_is_okay = checkSafety();
+    bool system_is_okay = checkSafety(true);
 
     if (system_is_okay and jobsDone)
     {
 #ifndef NO_DEBUGGING
-      Serial.print("[log] ");
+      Serial.print("    [log] ");
       Serial.println("CHARGING COMPLETED.");
 #endif
 #ifndef NO_LCD_USE
@@ -174,7 +172,7 @@ void BMS::play(ms_t const given_time)
         {
           execEmergencyMode();
         }
-        system_is_okay = checkSafety();
+        system_is_okay = checkSafety(false);
       }
     }
   }
@@ -240,7 +238,7 @@ void BMS::measureValues(bool const showValues)
   {
 #ifndef NO_DEBUGGING
 #ifndef NOT_CONSIDER_SUPPLY_VOLTAGE
-    Serial.print(">>> ");
+    Serial.print("*Arduino> ");
     Serial.print("arduino5V");
     Serial.print(" = ");
     Serial.print(arduino5V);
@@ -248,7 +246,7 @@ void BMS::measureValues(bool const showValues)
     waitForSerial();
 #endif
 #ifndef NOT_CONSIDER_SUPPLY_CURRENT
-    Serial.print(">>> ");
+    Serial.print("*Arduino> ");
     Serial.print("Iin");
     Serial.print(" = ");
     Serial.print(Iin);
@@ -286,7 +284,7 @@ void BMS::measureValues(bool const showValues)
 #ifndef NO_DEBUGGING
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
-      Serial.print(">>> ");
+      Serial.print("*Arduino> ");
       Serial.print("cellV[");
       Serial.print(i);
       Serial.print("]");
@@ -299,7 +297,7 @@ void BMS::measureValues(bool const showValues)
   }
 }
 
-bool BMS::checkSafety()
+bool BMS::checkSafety(bool const reportsToSerial)
 {
   V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US!!!
   A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US!!!
@@ -316,24 +314,30 @@ bool BMS::checkSafety()
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.print("[Warning] ");
-    Serial.print("`");
-    Serial.print("Iin");
-    Serial.print("`");
-    Serial.print(" too ");
-    Serial.println("HIGH.");
+    if (reportsToSerial)
+    {
+      Serial.print("[Warning] ");
+      Serial.print("`");
+      Serial.print("Iin");
+      Serial.print("`");
+      Serial.print(" too ");
+      Serial.println("HIGH.");
+    }
 #endif
   }
   if (Iin < allowedA_min)
   {
     isBad = true;
 #ifndef NO_DEBUGGING
-    Serial.print("[Warning] ");
-    Serial.print("`");
-    Serial.print("Iin");
-    Serial.print("`");
-    Serial.print(" too ");
-    Serial.println("LOW.");
+    if (reportsToSerial)
+    {
+      Serial.print("[Warning] ");
+      Serial.print("`");
+      Serial.print("Iin");
+      Serial.print("`");
+      Serial.print(" too ");
+      Serial.println("LOW.");
+    }
 #endif
   }
 #endif
@@ -345,28 +349,34 @@ bool BMS::checkSafety()
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] ");
-      Serial.print("`");
-      Serial.print("cellV[");
-      Serial.print(i);
-      Serial.print("]");
-      Serial.print("`");
-      Serial.print(" too ");
-      Serial.println("HIGH.");
+      if (reportsToSerial)
+      {
+        Serial.print("[Warning] ");
+        Serial.print("`");
+        Serial.print("cellV[");
+        Serial.print(i);
+        Serial.print("]");
+        Serial.print("`");
+        Serial.print(" too ");
+        Serial.println("HIGH.");
+      }
 #endif
     }
     if (cellV[i] < allowedV_min)
     {
       isBad = true;
 #ifndef NO_DEBUGGING
-      Serial.print("[Warning] ");
-      Serial.print("`");
-      Serial.print("cellV[");
-      Serial.print(i);
-      Serial.print("]");
-      Serial.print("`");
-      Serial.print(" too ");
-      Serial.println("LOW.");
+      if (reportsToSerial)
+      {
+        Serial.print("[Warning] ");
+        Serial.print("`");
+        Serial.print("cellV[");
+        Serial.print(i);
+        Serial.print("]");
+        Serial.print("`");
+        Serial.print(" too ");
+        Serial.println("LOW.");
+      }
 #endif
     }
   }
@@ -374,7 +384,10 @@ bool BMS::checkSafety()
 #ifndef NO_DEBUGGING
   if (isBad)
   {
-    waitForSerial();
+    if (reportsToSerial)
+    {
+      waitForSerial();
+    }
   }
 #endif
   measuredValuesAreFresh = false;
@@ -438,22 +451,25 @@ void BMS::goodbye(int const countDown)
 #ifndef NO_LCD_USE
 bool BMS::openLCD(int const row_dim, int const col_dim)
 {
-  byte is_good = false;
+  bool is_good = false;
 
   if (row_dim > 0 && col_dim > 0)
   {
-    for (byte adr = 0x01; adr <= 0xFF; adr++)
+    byte adr = 0x01;
+
+    do
     {
       byte response = 4;
+
       Wire.beginTransmission(adr);
       response = Wire.endTransmission(adr);
       if (response == 0)
       {
 #ifndef NO_DEBUGGING
-        Serial.print("[log] ");
+        Serial.print("    [log] ");
         Serial.print("I2C ");
         Serial.print("address");
-        Serial.print(" found");
+        Serial.print(" found ");
         Serial.print(": ");
         Serial.print("address");
         Serial.print(" = ");
@@ -464,7 +480,7 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
         if (lcdHandle)
         {
 #ifndef NO_DEBUGGING
-          Serial.print("[log] ");
+          Serial.print("    [log] ");
           Serial.print("I2C ");
           Serial.print("connected");
           Serial.print(": ");
@@ -476,13 +492,13 @@ bool BMS::openLCD(int const row_dim, int const col_dim)
           break;
         }
       }
-    }
+      adr++;
+    } while (adr != 0x00);
 
     if (lcdHandle)
     {
       lcdHandle->init();
       lcdHandle->backlight();
-      lcdHandle->noCursor();
       is_good = true;
     }
   }
