@@ -167,7 +167,7 @@ void BMS::step(ms_t const given_time)
     }
     else
     {
-      for (ms_t remain_time = given_time - hourglass.getDuration(); remain_time > 0; remain_time -= hourglass.getDuration())
+      for (ms_t remaining_time = given_time - hourglass.getDuration(); remaining_time > 0; remaining_time -= hourglass.getDuration())
       {
         if (not system_is_okay)
         {
