@@ -32,7 +32,7 @@ public:
 private:
   void syncTime();
 public:
-  ms_t getDuration();
+  ms_t &&getDuration();
   bool wait(ms_t given_time);
 };
 struct Pin {
@@ -121,6 +121,7 @@ class SerialPrinter {
 public:
   SerialPrinter() = delete;
   SerialPrinter(SerialPrinter const &other) = delete;
+  SerialPrinter(SerialPrinter &&other) = delete;
   SerialPrinter(char const *prefix);
   SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();

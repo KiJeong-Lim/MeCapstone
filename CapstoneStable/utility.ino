@@ -16,7 +16,7 @@ void Timer::syncTime()
 {
   curTime = millis();
 }
-ms_t Timer::getDuration()
+ms_t &&Timer::getDuration()
 {
   ms_t const beg_time = curTime;
   syncTime();
@@ -56,8 +56,8 @@ Val_t ReaderAnalogPin::readSignal(ms_t const duration) const
 {
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;
-  ms_t const beg_time = millis();
-  for (ms_t cur_time = beg_time; cur_time - beg_time < duration; cur_time = millis())
+  Timer hourglass;
+  for (ms_t remaining_time = duration; remaining_time >= 0; remaining_time -= hourglass.getDuration())
   {
     sum_of_vals += read_once();
     cnt_of_vals++;
