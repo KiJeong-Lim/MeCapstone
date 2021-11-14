@@ -1,6 +1,21 @@
+/* <CAPSTONE PROJECT>
+** ===============================================================================
+** MEMBERS       | AFFILIATION                                                   |
+** ===============================================================================
+** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
+** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
+** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
+** ===============================================================================
+*/
+
 #include "header.h"
 
 static
+SerialPrinter &&SerialPrinter_trick()
+{
+  return { .prefix = nullptr, .lend = true };
+}
+
 bigInt_t pow10(int const n)
 {
   bigInt_t res = 1;
@@ -9,12 +24,6 @@ bigInt_t pow10(int const n)
     res *= 10;
   }
   return res;
-}
-
-static
-SerialPrinter &&SerialPrinter_trick()
-{
-  return { .prefix = nullptr, .lend = true };
 }
 
 LiquidCrystal_I2C *openLcdI2C()

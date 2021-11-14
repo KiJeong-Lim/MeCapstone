@@ -1,3 +1,13 @@
+/* <CAPSTONE PROJECT>
+** ===============================================================================
+** MEMBERS       | AFFILIATION                                                   |
+** ===============================================================================
+** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
+** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
+** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
+** ===============================================================================
+*/
+
 #ifndef HEADER
 #define HEADER
 
@@ -82,6 +92,7 @@ struct CELL {
 };
 
 // implemented in "printer.ino"
+bigInt_t pow10(int expn);
 LiquidCrystal_I2C *openLcdI2C();
 class BufferWithFormat {
   int cnt = 0;
