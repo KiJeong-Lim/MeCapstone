@@ -10,7 +10,7 @@ static bigInt_t pow10(int const n)
   return res;
 }
 
-static SerialPrinter &&serialPrinter_trick()
+static SerialPrinter_trick &&serialPrinter_trick()
 {
   return { .prefix = nullptr, .is_last = true };
 }
@@ -82,7 +82,7 @@ SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
   }
   Serial.print(hex, HEX);
 #endif
-  return serialPrinter_trick();
+  return SerialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(int const &num)
 {
@@ -90,7 +90,7 @@ SerialPrinter &&SerialPrinter::operator<<(int const &num)
   this->newline = false;
   Serial.print(num);
 #endif
-  return serialPrinter_trick();
+  return SerialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
 {
@@ -98,14 +98,15 @@ SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
   this->newline = false;
   Serial.print(str);
 #endif
-  return serialPrinter_trick();
+  return SerialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(double const &val)
 {
 #if defined(SERIAL_PORT)
+  this->newline = false;
   Serial.print(val);
 #endif
-  return serialPrinter_trick();
+  return SerialPrinter_trick();
 }
 
 void BufferWithFormat::memzero()
