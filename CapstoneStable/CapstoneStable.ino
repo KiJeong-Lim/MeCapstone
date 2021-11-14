@@ -10,18 +10,6 @@
 
 #include "header.h"
 
-SerialPrinter const cout =
-{ .prefix = "          "
-};
-
-SerialPrinter const cerr =
-{ .prefix = "[Warning] "
-};
-
-SerialPrinter const shell =
-{ .prefix = "*Arduino> "
-};
-
 static
 ReferenceCollection const refOf =
 { .analogSignalMax = 1024.0
@@ -31,7 +19,7 @@ ReferenceCollection const refOf =
 };
 
 static
-CELL cells[] =
+CELL const cells[] =
   // B1(3V7)
 { { .voltageSensor_pin = { .pin_no = A0 }
   , .balanceCircuit_pin = { .pin_no = 2 }
@@ -47,9 +35,9 @@ CELL cells[] =
 };
 
 class BMS {
-  ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
-  ReaderAnalogPin Iin_pin = { .pin_no = A6 };
-  WriterDigitalPin powerIn_pin = { .pin_no = 5 };
+  ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
+  ReaderAnalogPin const Iin_pin = { .pin_no = A6 };
+  WriterDigitalPin const powerIn_pin = { .pin_no = 5 };
   byte jobsDone = false;
   byte measuredValuesAreFresh = false;
   LiquidCrystal_I2C *lcdHandle = nullptr;
@@ -316,3 +304,15 @@ void BMS::hello()
     lcd.println(VERSION);
   }
 }
+
+SerialPrinter const cout =
+{ .prefix = "          "
+};
+
+SerialPrinter const cerr =
+{ .prefix = "[WARNING] "
+};
+
+SerialPrinter const shell =
+{ .prefix = "*Arduino> "
+};

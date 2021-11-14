@@ -142,6 +142,6 @@ struct ReferenceCollection {
   V_t const zenerdiodeVfromRtoA;
   Ohm_t const conversionRatioOfCurrentSensor;
 };
-extern SerialPrinter const consoleLog, alert, shell;
+extern SerialPrinter const cout, cerr, shell;
 
 #endif
