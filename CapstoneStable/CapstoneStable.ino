@@ -214,8 +214,8 @@ void BMS::measureValues(bool const showValues)
     } //       the LCD screen being updated.
       //                                   A1234567B1234567
       // One of the possible screens is:  ##################
-      //                                 1#B1=4.25 B2=4.17 #
-      //                                 2#B3=3.33 I=1.66  #
+      //                                 0#B1=4.25 B2=4.17 #
+      //                                 1#B3=3.33 I=1.66  #
       //                                  ##################
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
@@ -241,7 +241,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
     isBad = true;
     if (reportsToSerial)
     {
-      cerr << "`Iin`" << " too " << "HIGH.";
+      cerr << "`Iin`" << " too HIGH.";
     }
   }
   if (Iin < allowedA_min)
@@ -249,7 +249,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
     isBad = true;
     if (reportsToSerial)
     {
-      cerr << "`Iin`" << " too " << "LOW.";
+      cerr << "`Iin`" << " too LOW.";
     }
   }
 
@@ -259,12 +259,12 @@ bool BMS::checkSafety(bool const reportsToSerial)
     if (cellV[i] > allowedV_max)
     {
       isBad = true;
-      cerr << "`cellV[" << i << "]`" << " too " << "HIGH.";
+      cerr << "`cellV[" << i << "]`" << " too HIGH.";
     }
     if (cellV[i] < allowedV_min)
     {
       isBad = true;
-      cerr << "`cellV[" << i << "]`" << "too " << "LOW.";
+      cerr << "`cellV[" << i << "]`" << " too LOW.";
     }
   }
 
