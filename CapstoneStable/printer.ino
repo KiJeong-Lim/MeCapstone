@@ -33,11 +33,11 @@ LiquidCrystal_I2C *openLcdI2C()
       response = Wire.endTransmission(adr);
       if (response == 0)
       {
-        consoleLog << "I2C address found: address = " << adr << ".";
+        cout << "I2C address found: address = " << adr << ".";
         lcdHandle = new LiquidCrystal_I2C(adr, LCD_WIDTH, LCD_HEIGHT);
         if (lcdHandle)
         {
-          consoleLog << "I2C connected: address = " << adr << ".";
+          cout << "I2C connected: address = " << adr << ".";
           break;
         }
       }

@@ -10,11 +10,11 @@
 
 #include "header.h"
 
-SerialPrinter const consoleLog =
-{ .prefix = "    [log] "
+SerialPrinter const cout =
+{ .prefix = "          "
 };
 
-SerialPrinter const alert =
+SerialPrinter const cerr =
 { .prefix = "[Warning] "
 };
 
@@ -86,7 +86,7 @@ void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass;
 
-  consoleLog << "Run time started.";
+  cout << "Run time started.";
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.initWith(true);
@@ -99,7 +99,7 @@ void BMS::initialize(ms_t const given_time)
   }
   else
   {
-    alert << "LCD not connected.";
+    cerr << "LCD not connected.";
   }
   hourglass.wait(given_time);
 }
@@ -115,7 +115,7 @@ void BMS::progressing(ms_t const given_time)
 
     if (system_is_okay and jobsDone)
     {
-      consoleLog << "CHARGING COMPLETED.";
+      cout << "CHARGING COMPLETED.";
       if (lcdHandle)
       {
         lcdHandle->clear();
@@ -171,7 +171,7 @@ void BMS::controlSystem()
   measuredValuesAreFresh = false;
 }
 
-void BMS::measureValues(bool const showValues) // OKAY
+void BMS::measureValues(bool const showValues)
 {
   ms_t const measuring_time_for_one_sensor = 10;
   V_t sensorV = 0.0;
@@ -241,7 +241,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
     isBad = true;
     if (reportsToSerial)
     {
-      alert << "`Iin`" << " too " << "HIGH.";
+      cerr << "`Iin`" << " too " << "HIGH.";
     }
   }
   if (Iin < allowedA_min)
@@ -249,7 +249,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
     isBad = true;
     if (reportsToSerial)
     {
-      alert << "`Iin` too " << "LOW.";
+      cerr << "`Iin`" << " too " << "LOW.";
     }
   }
 
@@ -259,12 +259,12 @@ bool BMS::checkSafety(bool const reportsToSerial)
     if (cellV[i] > allowedV_max)
     {
       isBad = true;
-      alert << "`cellV[" << i << "]` too " << "HIGH.";
+      cerr << "`cellV[" << i << "]`" << " too " << "HIGH.";
     }
     if (cellV[i] < allowedV_min)
     {
       isBad = true;
-      alert << "`cellV[" << i << "]` too " << "LOW.";
+      cerr << "`cellV[" << i << "]`" << "too " << "LOW.";
     }
   }
 
@@ -291,7 +291,7 @@ void BMS::goodbye(int const countDown)
       lcdHandle->setCursor(0, 0);
       lcdHandle->print(i - 1);
     }
-    alert << "Your arduino will abort in " << i << " seconds.";
+    cerr << "Your arduino will abort in " << i << " seconds.";
     hourglass.wait(1000);
   }
   if (lcdHandle)

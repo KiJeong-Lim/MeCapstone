@@ -80,20 +80,20 @@ void WriterDigitalPin::syncPin()
 void WriterDigitalPin::initWith(bool const on_is_true)
 {
   is_high = on_is_true;
-  consoleLog << "The pin " << pinId << " is initalized to " << (is_high ? "HIGH." : "LOW.");
+  cout << "The pin " << pinId << " is initalized to " << (is_high ? "HIGH." : "LOW.");
   pinMode(pinId, OUTPUT);
   syncPin();
 }
 void WriterDigitalPin::turnOn()
 {
   is_high = true;
-  consoleLog << "The pin " << pinId << " set to be " << "HIGH.";
+  cout << "The pin " << pinId << " set to be " << "HIGH.";
   syncPin();
 }
 void WriterDigitalPin::turnOff()
 {
   is_high = false;
-  consoleLog << "The pin " << pinId << " set to be " << "LOW.";  
+  cout << "The pin " << pinId << " set to be " << "LOW.";  
   syncPin();
 }
 bool WriterDigitalPin::isHigh() const
@@ -109,25 +109,25 @@ void PwmDigitalPin::setPWM(double const duty_ratio) const
 {
   if (duty_ratio < 0.0)
   {
-    consoleLog << "The pin " << pinId << " set to be " << "LOW.";  
+    cout << "The pin " << pinId << " set to be " << "LOW.";  
     analogWrite(pinId, LOW);
   }
   else if (duty_ratio >= 1.0)
   {
-    consoleLog << "The pin " << pinId << " set to be " << "HIGH.";  
+    cout << "The pin " << pinId << " set to be " << "HIGH.";  
     analogWrite(pinId, HIGH);
   }
   else
   {
     int const PWM_value = 256 * duty_ratio;
-    consoleLog << "The pin " << pinId << " set to be " << PWM_value << ".";  
+    cout << "The pin " << pinId << " set to be " << PWM_value << ".";  
     analogWrite(pinId, PWM_value);
   }
 }
 void PwmDigitalPin::init() const
 {
   pinMode(pinId, OUTPUT);
-  consoleLog << "The pin " << pinId << " is initalized to " << "LOW.";
+  cout << "The pin " << pinId << " is initalized to " << "LOW.";
   analogWrite(pinId, LOW);
 }
 void PwmDigitalPin::setPwm(double const duty_ratio) const
