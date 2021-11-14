@@ -107,14 +107,15 @@ public:
   LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD);
   ~LcdPrettyPrinter();
 private:
-  void flush();
+  void newline();
 public:
-  void print(int const value);
-  void print(double const value);
-  void print(char const *const string);
-  void println(int const value);
-  void println(double const value);
-  void println(char const *const string);
+  void flush();
+  void print(int const num);
+  void print(double const val);
+  void print(char const *const str);
+  void println(int const num);
+  void println(double const val);
+  void println(char const *const str);
 };
 class SerialPrinter {
   char const *const messenger;

@@ -89,44 +89,48 @@ void LcdPrettyPrinter::flush()
   {
     fbuf.write(&mybuf[c][r]);
   }
-  section_no++;
   fbuf.clear();
 }
-void LcdPrettyPrinter::print(int const value)
+void LcdPrettyPrinter::newline()
 {
-  fbuf.putInt(value);
-}
-void LcdPrettyPrinter::print(double const value)
-{
-  fbuf.putDouble(value, 2);
-}
-void LcdPrettyPrinter::print(char const *const string)
-{
-  fbuf.putString(string);
-}
-void LcdPrettyPrinter::println(int const value)
-{
-  fbuf.putInt(value);
   flush();
+  section_no++;
 }
-void LcdPrettyPrinter::println(double const value)
+void LcdPrettyPrinter::print(int const num)
 {
-  fbuf.putDouble(value, 2);
-  flush();
+  fbuf.putInt(num);
 }
-void LcdPrettyPrinter::println(char const *const string)
+void LcdPrettyPrinter::print(double const val)
 {
-  fbuf.putString(string);
-  flush();
+  fbuf.putDouble(val, 2);
+}
+void LcdPrettyPrinter::print(char const *const str)
+{
+  fbuf.putString(str);
+}
+void LcdPrettyPrinter::println(int const num)
+{
+  fbuf.putInt(num);
+  newline();
+}
+void LcdPrettyPrinter::println(double const val)
+{
+  fbuf.putDouble(val, 2);
+  newline();
+}
+void LcdPrettyPrinter::println(char const *const str)
+{
+  fbuf.putString(str);
+  newline();
 }
 
 #if defined(SERIAL_PORT)
-SerialPrinter::SerialPrinter(char const *prefix)
+SerialPrinter::SerialPrinter(char const *const prefix)
   : messenger{ prefix }
   , newline{ false }
 {
 }
-SerialPrinter::SerialPrinter(char const *prefix, bool const lend)
+SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
   : messenger{ prefix }, newline{ lend }
 {
 }
