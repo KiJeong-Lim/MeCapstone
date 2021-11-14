@@ -119,8 +119,6 @@ void BMS::progressing(ms_t const given_time)
       if (lcdHandle)
       {
         lcdHandle->clear();
-        lcdHandle->noBacklight();
-        lcdHandle->backlight();
         lcdHandle->setCursor(0, 1);
         lcdHandle->print("JOBS FINISHED");
       }

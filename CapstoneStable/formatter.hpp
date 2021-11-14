@@ -34,16 +34,19 @@ public:
       *p_ch++ = buf[cnt];
     }
   }
-  void putChar(char const ch)
+  void putChar(char const printMe)
   {
     if (cnt < Capacity)
     {
-      buf[cnt++] = ch;
+      buf[cnt++] = printMe;
     }
   }
-  void putDigit(int const d)
+  void putDigit(int const printMe)
   {
-    putChar("0123456789ABCDEF"[d]);
+    if (printMe >= 0 && printMe < 16)
+    {
+      putChar("0123456789ABCDEF"[printMe]);
+    }
   }
   void putInt(bigInt_t const printMe)
   {
@@ -91,9 +94,9 @@ public:
       putInt(valN);
     }
   }
-  void putString(char const *const str)
+  void putString(char const *const printMe)
   {
-    for (char const *p_ch = str; *p_ch != '\0'; p_ch++)
+    for (char const *p_ch = printMe; *p_ch != '\0'; p_ch++)
     {
       if (cnt < Capacity)
       {
