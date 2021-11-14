@@ -139,6 +139,5 @@ struct ReferenceCollection {
   Ohm_t const conversionRatioOfCurrentSensor;
 };
 extern SerialPrinter const consoleLog, alert, shell;
-extern ReferenceCollection const refOf;
 
 #endif

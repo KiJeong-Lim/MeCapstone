@@ -22,6 +22,7 @@ SerialPrinter const shell =
 { .prefix = "*Arduino> "
 };
 
+static
 ReferenceCollection const refOf =
 { .analogSignalMax = 1024.0
 , .arduinoRegularV = 5.00
@@ -29,6 +30,7 @@ ReferenceCollection const refOf =
 , .conversionRatioOfCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR
 };
 
+static
 CELL cells[] =
   // B1(3V7)
 { { .voltageSensor_pin = { .pin_no = A0 }
