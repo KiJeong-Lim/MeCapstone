@@ -17,11 +17,11 @@ SerialPrinter &&SerialPrinter_trick()
   return { .prefix = nullptr, .lend = true };
 }
 
-LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
+LiquidCrystal_I2C *openLcdI2C()
 {
   LiquidCrystal_I2C *lcdHandle = nullptr;
 
-  if (row_dim > 0 && col_dim > 0)
+  if (LCD_WIDTH > 0 && LCD_HEIGHT > 0)
   {
     byte adr = 0xFF;
 
@@ -34,7 +34,7 @@ LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
       if (response == 0)
       {
         consoleLog << "I2C address found: address = " << adr << ".";
-        lcdHandle = new LiquidCrystal_I2C(adr, row_dim, col_dim);
+        lcdHandle = new LiquidCrystal_I2C(adr, LCD_WIDTH, LCD_HEIGHT);
         if (lcdHandle)
         {
           consoleLog << "I2C connected: address = " << adr << ".";
@@ -54,92 +54,7 @@ LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
   return lcdHandle;
 }
 
-#ifndef SERIAL_PORT
-SerialPrinter::SerialPrinter(const char *prefix)
-  : messenger{ prefix }
-  , newline{ false }
-{
-}
-SerialPrinter::SerialPrinter(const char *prefix, bool lend)
-  : messenger{ prefix }, newline{ lend }
-{
-}
-SerialPrinter::~SerialPrinter()
-{
-}
-void SerialPrinter::print_messenger()
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(int const &num)
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(double const &val)
-{
-}
-#else
-SerialPrinter::SerialPrinter(const char *prefix)
-  : messenger{ prefix }
-  , newline{ false }
-{
-}
-SerialPrinter::SerialPrinter(const char *prefix, bool lend)
-  : messenger{ prefix }, newline{ lend }
-{
-}
-SerialPrinter::~SerialPrinter()
-{
-  if (newline)
-  {
-    Serial.println("");
-    delay(5);
-  }
-}
-void SerialPrinter::print_messenger()
-{
-  newline = false;
-  if (messenger)
-  {
-    Serial.print(messenger);
-  }
-}
-SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
-{
-  print_messenger();
-  Serial.print("0x");
-  if (hex < 16)
-  {
-    Serial.print("0");
-  }
-  Serial.print(hex, HEX);
-  return SerialPrinter_trick();
-}
-SerialPrinter &&SerialPrinter::operator<<(int const &num)
-{
-  print_messenger();
-  Serial.print(num);
-  return SerialPrinter_trick();
-}
-SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
-{
-  print_messenger();
-  Serial.print(str);
-  return SerialPrinter_trick();
-}
-SerialPrinter &&SerialPrinter::operator<<(double const &val)
-{
-  print_messenger();
-  Serial.print(val);
-  return SerialPrinter_trick();
-}
-#endif
-
-void BufferWithFormat::memzero()
+void BufferWithFormat::clear()
 {
   for (cnt = 0; cnt < LCD_SECTION_LEN; cnt++)
   {
@@ -148,7 +63,7 @@ void BufferWithFormat::memzero()
   buf[cnt] = '\0';
   cnt = 0;
 }
-void BufferWithFormat::memsend(char *p_ch)
+void BufferWithFormat::write(char *p_ch)
 {
   for (cnt = 0; cnt < LCD_SECTION_LEN; cnt++)
   {
@@ -241,7 +156,7 @@ LcdPrettyPrinter::LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD)
       mybuf[c][r] = '\0';
     }
   }
-  fbuf.memzero();
+  fbuf.clear();
 }
 LcdPrettyPrinter::~LcdPrettyPrinter()
 {
@@ -262,10 +177,10 @@ void LcdPrettyPrinter::flush()
   int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
   if (c < LCD_HEIGHT && r < LCD_WIDTH)
   {
-    fbuf.memsend(&mybuf[c][r]);
+    fbuf.write(&mybuf[c][r]);
   }
   section_no++;
-  fbuf.memzero();
+  fbuf.clear();
 }
 void LcdPrettyPrinter::print(int const value)
 {
@@ -294,3 +209,88 @@ void LcdPrettyPrinter::println(char const *const string)
   fbuf.putString(string);
   flush();
 }
+
+#if defined(SERIAL_PORT)
+SerialPrinter::SerialPrinter(const char *prefix)
+  : messenger{ prefix }
+  , newline{ false }
+{
+}
+SerialPrinter::SerialPrinter(const char *prefix, bool lend)
+  : messenger{ prefix }, newline{ lend }
+{
+}
+SerialPrinter::~SerialPrinter()
+{
+  if (newline)
+  {
+    Serial.println("");
+    delay(5);
+  }
+}
+void SerialPrinter::print_messenger()
+{
+  newline = false;
+  if (messenger)
+  {
+    Serial.print(messenger);
+  }
+}
+SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
+{
+  print_messenger();
+  Serial.print("0x");
+  if (hex < 16)
+  {
+    Serial.print("0");
+  }
+  Serial.print(hex, HEX);
+  return SerialPrinter_trick();
+}
+SerialPrinter &&SerialPrinter::operator<<(int const &num)
+{
+  print_messenger();
+  Serial.print(num);
+  return SerialPrinter_trick();
+}
+SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
+{
+  print_messenger();
+  Serial.print(str);
+  return SerialPrinter_trick();
+}
+SerialPrinter &&SerialPrinter::operator<<(double const &val)
+{
+  print_messenger();
+  Serial.print(val);
+  return SerialPrinter_trick();
+}
+#else
+SerialPrinter::SerialPrinter(const char *prefix)
+  : messenger{ prefix }
+  , newline{ false }
+{
+}
+SerialPrinter::SerialPrinter(const char *prefix, bool lend)
+  : messenger{ prefix }, newline{ lend }
+{
+}
+SerialPrinter::~SerialPrinter()
+{
+}
+void SerialPrinter::print_messenger()
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(int const &num)
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(double const &val)
+{
+}
+#endif

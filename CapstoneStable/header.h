@@ -82,29 +82,13 @@ struct CELL {
 };
 
 // Implemented in "printer.ino"
-class SerialPrinter {
-  char const *const messenger;
-  bool newline;
-public:
-  SerialPrinter() = delete;
-  SerialPrinter(SerialPrinter const &other) = delete;
-  SerialPrinter(char const *prefix);
-  SerialPrinter(char const *prefix, bool lend);
-  ~SerialPrinter();
-private:
-  void print_messenger();
-public:
-  SerialPrinter &&operator<<(byte const &hex);
-  SerialPrinter &&operator<<(int const &num);
-  SerialPrinter &&operator<<(char const *const & str);
-  SerialPrinter &&operator<<(double const &val);
-};
+LiquidCrystal_I2C *openLcdI2C();
 class BufferWithFormat {
   int cnt = 0;
   char buf[LCD_SECTION_LEN + 1] = { };
 public:
-  void memzero();
-  void memsend(char *tgt);
+  void clear();
+  void write(char *tgt);
   void putChar(char character_being_printed);
   void putDigit(int digit_being_printed);
   void putInt(bigInt_t value_being_printed);
@@ -131,7 +115,23 @@ public:
   void println(double const value);
   void println(char const *const string);
 };
-LiquidCrystal_I2C *openLcdI2C(int lcd_width, int lcd_height);
+class SerialPrinter {
+  char const *const messenger;
+  bool newline;
+public:
+  SerialPrinter() = delete;
+  SerialPrinter(SerialPrinter const &other) = delete;
+  SerialPrinter(char const *prefix);
+  SerialPrinter(char const *prefix, bool lend);
+  ~SerialPrinter();
+private:
+  void print_messenger();
+public:
+  SerialPrinter &&operator<<(byte const &hex);
+  SerialPrinter &&operator<<(int const &num);
+  SerialPrinter &&operator<<(char const *const & str);
+  SerialPrinter &&operator<<(double const &val);
+};
 
 // Implemented in "CapstoneStable.ino"
 struct ReferenceCollection {

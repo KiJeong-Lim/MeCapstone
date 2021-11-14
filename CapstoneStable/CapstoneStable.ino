@@ -69,22 +69,17 @@ private:
 
 void setup()
 {
-#ifndef SERIAL_PORT
-  myBMS.initialize(1000);
-#else
+#if defined(SERIAL_PORT)
   Serial.begin(SERIAL_PORT);
-  myBMS.initialize(1000);
 #endif
+  myBMS.initialize(1000);
 }
-
 void loop()
 {
-#ifndef SERIAL_PORT
-  myBMS.progressing(2000);
-#else
+#if defined(SERIAL_PORT)
   Serial.println("=========");
-  myBMS.progressing(2000);
 #endif
+  myBMS.progressing(2000);
 }
 
 void BMS::initialize(ms_t const given_time)
@@ -97,7 +92,7 @@ void BMS::initialize(ms_t const given_time)
     cells[i].balanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(true);
-  lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
+  lcdHandle = openLcdI2C();
   if (lcdHandle)
   {
     hello();
