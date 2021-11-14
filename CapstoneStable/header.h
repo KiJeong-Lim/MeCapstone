@@ -89,8 +89,10 @@ public:
   SerialPrinter() = delete;
   SerialPrinter(SerialPrinter const &other) = delete;
   SerialPrinter(char const *prefix);
-  SerialPrinter(char const *prefix, bool is_last);
+  SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();
+private:
+  void print_messenger();
 public:
   SerialPrinter &&operator<<(byte const &hex);
   SerialPrinter &&operator<<(int const &num);

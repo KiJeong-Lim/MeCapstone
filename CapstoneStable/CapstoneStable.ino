@@ -67,18 +67,24 @@ private:
   void hello();
 } myBMS;
 
-void setup() {
-#if defined(SERIAL_PORT)
-  Serial.begin(SERIAL_PORT);
-#endif
+void setup()
+{
+#ifndef SERIAL_PORT
   myBMS.initialize(1000);
+#else
+  Serial.begin(SERIAL_PORT);
+  myBMS.initialize(1000);
+#endif
 }
 
-void loop() {
-#if defined(SERIAL_PORT)
-  Serial.println("=========");
-#endif
+void loop()
+{
+#ifndef SERIAL_PORT
   myBMS.progressing(2000);
+#else
+  Serial.println("=========");
+  myBMS.progressing(2000);
+#endif
 }
 
 void BMS::initialize(ms_t const given_time)

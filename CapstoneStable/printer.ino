@@ -1,6 +1,7 @@
 #include "header.h"
 
-static bigInt_t pow10(int const n)
+static
+bigInt_t pow10(int const n)
 {
   bigInt_t res = 1;
   for (int i = 0; i < n; i++)
@@ -10,9 +11,10 @@ static bigInt_t pow10(int const n)
   return res;
 }
 
-static SerialPrinter_trick &&serialPrinter_trick()
+static
+SerialPrinter &&SerialPrinter_trick()
 {
-  return { .prefix = nullptr, .is_last = true };
+  return { .prefix = nullptr, .lend = true };
 }
 
 LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
@@ -52,62 +54,90 @@ LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
   return lcdHandle;
 }
 
+#ifndef SERIAL_PORT
 SerialPrinter::SerialPrinter(const char *prefix)
   : messenger{ prefix }
   , newline{ false }
 {
 }
+SerialPrinter::SerialPrinter(const char *prefix, bool lend)
+  : messenger{ prefix }, newline{ lend }
+{
+}
 SerialPrinter::~SerialPrinter()
 {
-#if defined(SERIAL_PORT)
+}
+void SerialPrinter::print_messenger()
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(int const &num)
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
+{
+}
+SerialPrinter &&SerialPrinter::operator<<(double const &val)
+{
+}
+#else
+SerialPrinter::SerialPrinter(const char *prefix)
+  : messenger{ prefix }
+  , newline{ false }
+{
+}
+SerialPrinter::SerialPrinter(const char *prefix, bool lend)
+  : messenger{ prefix }, newline{ lend }
+{
+}
+SerialPrinter::~SerialPrinter()
+{
   if (newline)
   {
     Serial.println("");
     delay(5);
   }
-#endif
 }
-SerialPrinter::SerialPrinter(const char *prefix, bool is_last)
-  : messenger{ prefix }, newline{ is_last }
+void SerialPrinter::print_messenger()
 {
+  newline = false;
+  if (messenger)
+  {
+    Serial.print(messenger);
+  }
 }
 SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
 {
-#if defined(SERIAL_PORT)
-  this->newline = false;
+  print_messenger();
   Serial.print("0x");
   if (hex < 16)
   {
     Serial.print("0");
   }
   Serial.print(hex, HEX);
-#endif
   return SerialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(int const &num)
 {
-#if defined(SERIAL_PORT)
-  this->newline = false;
+  print_messenger();
   Serial.print(num);
-#endif
   return SerialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
 {
-#if defined(SERIAL_PORT)
-  this->newline = false;
+  print_messenger();
   Serial.print(str);
-#endif
   return SerialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(double const &val)
 {
-#if defined(SERIAL_PORT)
-  this->newline = false;
+  print_messenger();
   Serial.print(val);
-#endif
   return SerialPrinter_trick();
 }
+#endif
 
 void BufferWithFormat::memzero()
 {
