@@ -47,8 +47,8 @@ CELL cells[] =
 };
 
 class BMS {
-  ReaderAnalogPin arduino5V_pin = { .pin_no = A1 };
-  ReaderAnalogPin Iin_pin = { .pin_no = A2 };
+  ReaderAnalogPin arduino5V_pin = { .pin_no = A3 };
+  ReaderAnalogPin Iin_pin = { .pin_no = A6 };
   WriterDigitalPin powerIn_pin = { .pin_no = 5 };
   byte jobsDone = false;
   byte measuredValuesAreFresh = false;
@@ -185,12 +185,12 @@ void BMS::measureValues(bool const showValues)
     accumV += cellV[i];
   }
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V) + 0.04;
+  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V) + 0.04; // `0.04` is calibration.
   measuredValuesAreFresh = true;
 
   if (showValues)
   {
-    shell << "arduino5V = " << Iin << "[V].";
+    shell << "arduino5V = " << arduino5V << "[V].";
     shell << "Iin = " << Iin << "[A].";
     if (lcdHandle)
     {
