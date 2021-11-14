@@ -72,7 +72,7 @@ void setup()
 #if defined(SERIAL_PORT)
   Serial.begin(SERIAL_PORT);
 #endif
-  myBMS.initialize(1000);
+  myBMS.initialize(2000);
 }
 void loop()
 {
