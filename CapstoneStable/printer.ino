@@ -131,7 +131,8 @@ SerialPrinter::SerialPrinter(char const *const prefix)
 {
 }
 SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
-  : messenger{ prefix }, newline{ lend }
+  : messenger{ prefix }
+  , newline{ lend }
 {
 }
 SerialPrinter::~SerialPrinter()
@@ -180,13 +181,14 @@ SerialPrinter &&SerialPrinter::operator<<(double const &val)
   return SerialPrinter_trick();
 }
 #else
-SerialPrinter::SerialPrinter(char const *prefix)
+SerialPrinter::SerialPrinter(char const *const prefix)
   : messenger{ prefix }
   , newline{ false }
 {
 }
-SerialPrinter::SerialPrinter(char const *prefix, bool const lend)
-  : messenger{ prefix }, newline{ lend }
+SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
+  : messenger{ prefix }
+  , newline{ lend }
 {
 }
 SerialPrinter::~SerialPrinter()

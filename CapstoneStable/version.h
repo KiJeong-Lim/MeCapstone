@@ -14,9 +14,7 @@
 #define SERIAL_PORT   9600
 #define VERSION       0.10
 
-#endif
-
-/* change.log
+/* History
 ** [2021-11-14]
 ** Make new files `CapstoneStable/version.h`,
 **                `CapstoneStable/header.h`,
@@ -24,7 +22,9 @@
 **                `CapstoneStable/printer.ino`,
 **                `CapstoneStable/utility.ino`,
 **                `CapstoneStable/CapstoneStable.ino`.
-** Relace `BufferWithFormat`
-**   with `Formatter<LCD_SECTION_LEN>`.
+** Relace `BufferWithFormat` with
+**        `Formatter<LCD_SECTION_LEN>`.
 ** Set `VERSION` to be `0.10`.
 */
+
+#endif
