@@ -22,10 +22,9 @@
 **                `CapstoneStable/header.h`,
 **                `CapstoneStable/printer.ino`,
 **                `CapstoneStable/utility.ino`,
+**                `CapstoneStable/formatter.hpp`,
 **                `CapstoneStable/CapstoneStable.ino`.
-** Set `VERSION` to be `0.10`.
-** [2021-11-15]
-** Make new file `CapstoneStable/formatter.h`.
 ** Relace `BufferWithFormat`
 **   with `Formatter<LCD_SECTION_LEN>`.
+** Set `VERSION` to be `0.10`.
 */

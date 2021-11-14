@@ -95,7 +95,7 @@ struct CELL {
 
 // implemented in "printer.ino"
 LiquidCrystal_I2C *openLcdI2C();
-#include "formatter.h"
+#include "formatter.hpp"
 class LcdPrettyPrinter {
   LiquidCrystal_I2C *const lcdHandle;
   int section_no;
