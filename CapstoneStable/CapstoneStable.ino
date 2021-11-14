@@ -189,13 +189,11 @@ void BMS::measureValues(bool const showValues)
         lcd.print("B");
         lcd.print(i + 1);
         lcd.print("=");
-        lcd.print(cellV[i]);
-        lcd.println(" ");
+        lcd.println(cellV[i]);
       }
       lcd.print("I");
       lcd.print("=");
-      lcd.print(Iin);
-      lcd.println(" ");
+      lcd.println(Iin);
       // Here, the variable `lcd` is destructed,
     } //       the LCD screen being updated.
       //                                   A1234567B1234567
