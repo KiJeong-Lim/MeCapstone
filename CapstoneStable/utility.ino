@@ -10,6 +10,16 @@
 
 #include "header.h"
 
+bigInt_t pow10(int const n)
+{
+  bigInt_t res = 1;
+  for (int i = 0; i < n; i++)
+  {
+    res *= 10;
+  }
+  return res;
+}
+
 Timer::Timer()
   : curTime{ 0 }
 {

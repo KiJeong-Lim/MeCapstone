@@ -16,12 +16,16 @@
 
 #endif
 
-/* Diary [2021-11-14]
-** Make new folder `CapstoneStable`
-**      new files  `CapstoneStable/version.h`
-**                 `CapstoneStable/header.h`
-**                 `CapstoneStable/printer.ino`
-**                 `CapstoneStable/utility.ino`
-**                 `CapstoneStable/CapstoneStable.ino`
-** Set `VERSION` to be 0.10
+/* change.log
+** [2021-11-14]
+** Make new files `CapstoneStable/version.h`,
+**                `CapstoneStable/header.h`,
+**                `CapstoneStable/printer.ino`,
+**                `CapstoneStable/utility.ino`,
+**                `CapstoneStable/CapstoneStable.ino`.
+** Set `VERSION` to be `0.10`.
+** [2021-11-15]
+** Make new file `CapstoneStable/formatter.h`.
+** Relace `BufferWithFormat`
+**   with `Formatter<LCD_SECTION_LEN>`.
 */

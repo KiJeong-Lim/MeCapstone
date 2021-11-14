@@ -22,6 +22,7 @@
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
 #define SENSITIVITY_OF_20A_CURRENT_SENSOR   0.100
 #define LENGTH_OF(array)                    (sizeof(array) / sizeof(*(array)))
+#define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 
 // type synonym defns
 typedef int long long ms_t;
@@ -33,6 +34,7 @@ typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
 
 // implemented in "utility.ino"
+bigInt_t pow10(int expn);
 class Timer {
   ms_t curTime;
 public:
@@ -92,24 +94,12 @@ struct CELL {
 };
 
 // implemented in "printer.ino"
-bigInt_t pow10(int expn);
 LiquidCrystal_I2C *openLcdI2C();
-class BufferWithFormat {
-  int cnt = 0;
-  char buf[LCD_SECTION_LEN + 1] = { };
-public:
-  void clear();
-  void write(char *tgt);
-  void putChar(char character_being_printed);
-  void putDigit(int digit_being_printed);
-  void putInt(bigInt_t value_being_printed);
-  void putString(char const *string_being_printed);
-  void putDouble(double value_being_printed, int number_of_digits_after_dot);
-};
+#include "formatter.h"
 class LcdPrettyPrinter {
   LiquidCrystal_I2C *const lcdHandle;
   int section_no;
-  BufferWithFormat fbuf;
+  Formatter<LCD_SECTION_LEN> fbuf;
   char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
   LcdPrettyPrinter() = delete;
