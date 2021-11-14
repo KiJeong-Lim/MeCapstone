@@ -10,6 +10,11 @@ static bigInt_t pow10(int const n)
   return res;
 }
 
+static SerialPrinter &&serialPrinter_trick()
+{
+  return { .prefix = nullptr, .is_last = true };
+}
+
 LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
 {
   LiquidCrystal_I2C *lcdHandle = nullptr;
@@ -48,22 +53,28 @@ LiquidCrystal_I2C *openLcdI2C(int const row_dim, int const col_dim)
 }
 
 SerialPrinter::SerialPrinter(const char *prefix)
-  : _prefix{ prefix }
+  : messenger{ prefix }
+  , newline{ false }
 {
 }
-SerialPrinter &&SerialPrinter::trick()
+SerialPrinter::~SerialPrinter()
 {
 #if defined(SERIAL_PORT)
-  if (this->_prefix)
+  if (newline)
   {
-    Serial.print(this->_prefix);
+    Serial.println("");
+    delay(5);
   }
 #endif
-  return { .prefix = nullptr };
+}
+SerialPrinter::SerialPrinter(const char *prefix, bool is_last)
+  : messenger{ prefix }, newline{ is_last }
+{
 }
 SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
 {
 #if defined(SERIAL_PORT)
+  this->newline = false;
   Serial.print("0x");
   if (hex < 16)
   {
@@ -71,35 +82,30 @@ SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
   }
   Serial.print(hex, HEX);
 #endif
-  return trick();
+  return serialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(int const &num)
 {
 #if defined(SERIAL_PORT)
+  this->newline = false;
   Serial.print(num);
 #endif
-  return trick();
+  return serialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
 {
 #if defined(SERIAL_PORT)
+  this->newline = false;
   Serial.print(str);
 #endif
-  return trick();
+  return serialPrinter_trick();
 }
 SerialPrinter &&SerialPrinter::operator<<(double const &val)
 {
 #if defined(SERIAL_PORT)
   Serial.print(val);
 #endif
-  return trick();
-}
-SerialPrinter::~SerialPrinter()
-{
-#if defined(SERIAL_PORT)
-  Serial.println("");
-  delay(5);
-#endif
+  return serialPrinter_trick();
 }
 
 void BufferWithFormat::memzero()

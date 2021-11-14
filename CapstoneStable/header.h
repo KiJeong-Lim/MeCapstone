@@ -83,14 +83,14 @@ struct CELL {
 
 // Implemented in "printer.ino"
 class SerialPrinter {
-  char const *const _prefix;
+  char const *const messenger;
+  bool newline;
 public:
   SerialPrinter() = delete;
   SerialPrinter(SerialPrinter const &other) = delete;
   SerialPrinter(char const *prefix);
+  SerialPrinter(char const *prefix, bool is_last);
   ~SerialPrinter();
-private:
-  SerialPrinter &&trick();
 public:
   SerialPrinter &&operator<<(byte const &hex);
   SerialPrinter &&operator<<(int const &num);
