@@ -38,15 +38,15 @@ class BMS {
   ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
   ReaderAnalogPin const Iin_pin = { .pin_no = A6 };
   WriterDigitalPin const powerIn_pin = { .pin_no = 5 };
-  byte jobsDone = false;
-  byte measuredValuesAreFresh = false;
+  bool jobsDone = false;
+  bool measuredValuesAreFresh = false;
   LiquidCrystal_I2C *lcdHandle = nullptr;
   V_t arduino5V = refOf.arduinoRegularV;
   A_t Iin = 0.0;
   V_t cellV[LENGTH_OF(cells)] = { };
 public:
   void initialize(ms_t timeLimit);
-  void progressing(ms_t timeLimit);
+  void progress(ms_t timeLimit);
 private:
   void controlSystem();
   void measureValues(bool showValues);
@@ -67,7 +67,7 @@ void loop()
 #if defined(SERIAL_PORT)
   Serial.println("=========");
 #endif
-  myBMS.progressing(2000);
+  myBMS.progress(2000);
 }
 
 void BMS::initialize(ms_t const given_time)
@@ -92,7 +92,7 @@ void BMS::initialize(ms_t const given_time)
   hourglass.wait(given_time);
 }
 
-void BMS::progressing(ms_t const given_time)
+void BMS::progress(ms_t const given_time)
 {
   Timer hourglass;
 
