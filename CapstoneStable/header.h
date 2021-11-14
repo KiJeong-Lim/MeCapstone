@@ -2,7 +2,7 @@
 #define HEADER
 
 #include <Wire.h>
-#include "LiquidCrystal_I2C.h"
+#include <LiquidCrystal_I2C.h>
 #include "version.h"
 
 // macro defns
@@ -22,7 +22,7 @@ typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
 
-// Implemented in "utility.ino"
+// implemented in "utility.ino"
 class Timer {
   ms_t curTime;
 public:
@@ -81,7 +81,7 @@ struct CELL {
   WriterDigitalPin const balanceCircuit_pin;
 };
 
-// Implemented in "printer.ino"
+// implemented in "printer.ino"
 LiquidCrystal_I2C *openLcdI2C();
 class BufferWithFormat {
   int cnt = 0;
@@ -134,7 +134,7 @@ public:
   SerialPrinter &&operator<<(double const &val);
 };
 
-// Implemented in "CapstoneStable.ino"
+// implemented in "CapstoneStable.ino"
 struct ReferenceCollection {
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;
