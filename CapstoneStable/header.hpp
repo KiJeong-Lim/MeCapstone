@@ -21,7 +21,7 @@
 #define round(val)          ((val) >= 0 ? (bigInt_t)((val) + 0.5) : (bigInt_t)((val) - 0.5))
 
 // type synonym defns
-typedef int long long ms_t;
+typedef int long long millis_t;
 typedef double A_t;
 typedef double V_t;
 typedef double Ohm_t;
@@ -32,7 +32,7 @@ typedef int long long bigInt_t;
 // implemented in "utility.ino"
 bigInt_t pow10(int expn);
 class Timer {
-  ms_t curTime;
+  millis_t curTime;
 public:
   Timer();
   Timer(Timer const &other);
@@ -40,8 +40,8 @@ public:
 private:
   void syncTime();
 public:
-  ms_t &&getDuration();
-  bool wait(ms_t given_time);
+  millis_t &&getDuration();
+  bool wait(millis_t given_time);
 };
 struct Pin {
   pinId_t const pinId;
@@ -56,7 +56,7 @@ private:
   int read_once() const;
 public:
   Val_t readSignalOnce() const;
-  Val_t readSignal(ms_t duration) const;
+  Val_t readSignal(millis_t duration) const;
 };
 class WriterDigitalPin : public Pin {
   bool is_high;

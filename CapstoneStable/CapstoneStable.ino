@@ -38,8 +38,8 @@ class BMS {
   A_t Iin                             = 0.00;
   V_t cellV[LENGTH_OF(cells)]         = { };
 public:
-  void initialize(ms_t timeLimit);
-  void progress(ms_t timeLimit);
+  void initialize(millis_t timeLimit);
+  void progress(millis_t timeLimit);
 private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
@@ -63,7 +63,7 @@ void loop()
   myBMS.progress(2000);
 }
 
-void BMS::initialize(ms_t const given_time)
+void BMS::initialize(millis_t const given_time)
 {
   Timer hourglass;
 
@@ -91,7 +91,7 @@ void BMS::initialize(ms_t const given_time)
   }
   hourglass.wait(given_time);
 }
-void BMS::progress(ms_t const given_time)
+void BMS::progress(millis_t const given_time)
 {
   Timer hourglass;
 
@@ -113,7 +113,7 @@ void BMS::progress(ms_t const given_time)
     }
     else
     {
-      for (ms_t remaining_time = given_time - hourglass.getDuration(); remaining_time > 0; remaining_time -= hourglass.getDuration())
+      for (millis_t remaining_time = given_time - hourglass.getDuration(); remaining_time > 0; remaining_time -= hourglass.getDuration())
       {
         if (not system_is_okay)
         {
@@ -133,7 +133,7 @@ void BMS::progress(ms_t const given_time)
 }
 void BMS::measureValues(bool const showValues)
 {
-  constexpr ms_t measuring_time_for_one_sensor = 10;
+  constexpr millis_t measuring_time_for_one_sensor = 10;
   V_t sensorV = 0.00;
   V_t accumV = 0.00;
   // Calculate the voltage of the pin `5V`
