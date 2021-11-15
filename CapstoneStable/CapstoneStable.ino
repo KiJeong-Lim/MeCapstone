@@ -12,38 +12,29 @@
 
 constexpr
 ReferenceCollection refOf =
-{ .analogSignalMax = 1024.0
-, .arduinoRegularV = 5.00
-, .zenerdiodeVfromRtoA = 2.48
+{ .analogSignalMax                = 1024
+, .arduinoRegularV                = 5.00
+, .zenerdiodeVfromRtoA            = 2.48
 , .conversionRatioOfCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR
 };
 
 static
 CELL const cells[] =
-  // B1(3V7)
-{ { .voltageSensor_pin = { .pin_no = A0 }
-  , .balanceCircuit_pin = { .pin_no = 2 }
-  }
-  // B2(7V4)
-, { .voltageSensor_pin = { .pin_no = A1 }
-  , .balanceCircuit_pin = { .pin_no = 3 }
-  }
-  // B3(11V1)
-, { .voltageSensor_pin = { .pin_no = A2 }
-  , .balanceCircuit_pin = { .pin_no = 4 }
-  }
+{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
+, { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } } // B2(7V4)
+, { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } } // B3(11V1)
 };
 
 class BMS {
   ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
-  ReaderAnalogPin const Iin_pin = { .pin_no = A6 };
-  WriterDigitalPin const powerIn_pin = { .pin_no = 5 };
-  bool jobsDone = false;
-  bool measuredValuesAreFresh = false;
-  LiquidCrystal_I2C *lcdHandle = nullptr;
-  V_t arduino5V = refOf.arduinoRegularV;
-  A_t Iin = 0.0;
-  V_t cellV[LENGTH_OF(cells)] = { };
+  ReaderAnalogPin const Iin_pin       = { .pin_no = A6 };
+  WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
+  bool jobsDone                       = false;
+  bool measuredValuesAreFresh         = false;
+  LiquidCrystal_I2C *lcdHandle        = nullptr;
+  V_t arduino5V                       = refOf.arduinoRegularV;
+  A_t Iin                             = 0.00;
+  V_t cellV[LENGTH_OF(cells)]         = { };
 public:
   void initialize(ms_t timeLimit);
   void progress(ms_t timeLimit);
@@ -127,7 +118,7 @@ void BMS::progress(ms_t const given_time)
 }
 void BMS::controlSystem()
 {
-  constexpr V_t V_wanted = 3.6, overV_wanted = 3.6; // <- How to calculate these voltages? We must derive them!!!
+  constexpr V_t V_wanted = 3.60, overV_wanted = 3.60; // <- How to calculate these voltages? We must derive them!!!
 
   if (measuredValuesAreFresh)
   {
@@ -158,8 +149,8 @@ void BMS::controlSystem()
 void BMS::measureValues(bool const showValues)
 {
   constexpr ms_t measuring_time_for_one_sensor = 10;
-  V_t sensorV = 0.0;
-  V_t accumV = 0.0;
+  V_t sensorV = 0.00;
+  V_t accumV = 0.00;
   // Calculate the voltage of the pin `5V`
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
