@@ -11,10 +11,10 @@
 #ifndef VERSION
 #define VERSION 0.10
 
-#define SERIAL_PORT                         115200
-#define LCD_WIDTH                           16
-#define LCD_HEIGHT                          2
-#define LCD_SECTION_EA                      2
+#define SERIAL_PORT         115200
+#define LCD_WIDTH           16
+#define LCD_HEIGHT          2
+#define LCD_SECTION_EA      2
 
 /* History
 ** [2021-11-14]

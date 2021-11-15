@@ -16,9 +16,9 @@
 #include "version.h"
 
 // macro defns
-#define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
-#define LENGTH_OF(array)                    (sizeof(array) / sizeof(*(array)))
-#define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
+#define LCD_SECTION_LEN     (LCD_WIDTH / LCD_SECTION_EA)
+#define LENGTH_OF(array)    (sizeof(array) / sizeof(*(array)))
+#define round(val)          ((val) >= 0 ? (bigInt_t)((val) + 0.5) : (bigInt_t)((val) - 0.5))
 
 // type synonym defns
 typedef int long long ms_t;
