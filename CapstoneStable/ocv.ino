@@ -64,7 +64,7 @@ constexpr double ocvs[] =
 , 4.20280000000000 // 100%
 };
 
-V_t getOcvFromVcell(V_t const Vcell)
+V_t getOcvFromVcell(V_t const Vcell) // FIX ME!
 {
   return Vcell;
 }

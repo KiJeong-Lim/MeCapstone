@@ -13,27 +13,25 @@
 #define REVISION_NUMBER  0
 #include "header.hpp"
 
-constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70;
-constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10;
+constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
+constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
 constexpr ReferenceCollection refOf =
 { .analogSignalMax                  = 1024
 , .arduinoRegularV                  = 5.00
 , .zenerdiodeVfromRtoA              = 2.48
 , .sensitivityOfCurrentSensor       = 0.100 // The sensitivity of the current sensor `ACS712ELCTR-20A-T` is 100[mV/A].
 };
-constexpr V_t V_wanted = 3.60, overV_wanted = 3.60;
+constexpr V_t V_wanted = 3.60, overV_wanted = 3.60; // FIX ME!
 
-#if 0
+#if MODE == 1
 static
 CELL const cells[] =
-{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
-, { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } } // B2(7V4)
-, { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } } // B3(11V1)
+{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } }
 };
 
 class BMS {
-  ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
-  ReaderAnalogPin const Iin_pin       = { .pin_no = A6 };
+  ReaderAnalogPin const arduino5V_pin = { .pin_no = A1 };
+  ReaderAnalogPin const Iin_pin       = { .pin_no = A2 };
   WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
   bool jobsDone                       = false;
   bool measuredValuesAreFresh         = false;
@@ -53,12 +51,14 @@ private:
 #else
 static
 CELL const cells[] =
-{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } }
+{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
+, { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } } // B2(7V4)
+, { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } } // B3(11V1)
 };
 
 class BMS {
-  ReaderAnalogPin const arduino5V_pin = { .pin_no = A1 };
-  ReaderAnalogPin const Iin_pin       = { .pin_no = A2 };
+  ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
+  ReaderAnalogPin const Iin_pin       = { .pin_no = A6 };
   WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
   bool jobsDone                       = false;
   bool measuredValuesAreFresh         = false;
