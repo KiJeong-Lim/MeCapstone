@@ -197,7 +197,7 @@ void BMS::measureValues(bool const showValues)
 
       for (int i = 0; i < LENGTH_OF(cellV); i++)
       {
-        double ocv = cellV[i]; // FIX ME!
+        V_t ocv = getOcvFromVcell(cellV[i]); // FIX ME!
 
         lcd.print("B");
         lcd.print(i + 1);
