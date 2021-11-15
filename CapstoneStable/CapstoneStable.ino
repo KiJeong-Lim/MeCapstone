@@ -204,7 +204,7 @@ void BMS::measureValues(bool const showValues)
         lcd.print("=");
         lcd.println(cellV[i]);
         lcd.print(" ");
-        lcd.print(mySocOcvTable.get_x(ocv));
+        lcd.print(mySocOcvTable.get_x_from_y(ocv));
         lcd.println("%");
       }
       lcd.print("I");

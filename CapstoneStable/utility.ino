@@ -170,11 +170,11 @@ AscMap::AscMap(const double *const _ys, double const _left_bound_of_xs, size_t c
 AscMap::~AscMap()
 {
 }
-double AscMap::calc_x(double const param) const
+double AscMap::get_x_from_parameter(double const param) const
 {
   return ((right_bound_of_xs - left_bound_of_xs) / ((int)size_of_ys - 1.0) * param + left_bound_of_xs);
 }
-double AscMap::get_x(double const y) const
+double AscMap::get_x_from_y(double const y) const
 {
   int low = 0, high = size_of_ys - 1;
 
@@ -192,19 +192,19 @@ double AscMap::get_x(double const y) const
     }
     else
     {
-      return calc_x((double)mid);
+      return get_x_from_parameter((double)mid);
     }
   }
   if (low >= size_of_ys)
   {
-    return calc_x((int)size_of_ys - 1.0);
+    return get_x_from_parameter((int)size_of_ys - 1.0);
   }
   else if (high < 0)
   {
-    return calc_x(0.0);
+    return get_x_from_parameter(0.0);
   }
   else
   {
-    return calc_x(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
+    return get_x_from_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
   }
 }
