@@ -23,6 +23,7 @@ constexpr ReferenceCollection refOf =
 };
 constexpr V_t V_wanted = 3.60, overV_wanted = 3.60;
 
+#if 0
 static
 CELL const cells[] =
 { { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
@@ -49,6 +50,32 @@ private:
   void controlSystem();
   void goodbye(int timeLeftToQuit);
 } myBMS;
+#else
+static
+CELL const cells[] =
+{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } }
+};
+
+class BMS {
+  ReaderAnalogPin const arduino5V_pin = { .pin_no = A1 };
+  ReaderAnalogPin const Iin_pin       = { .pin_no = A2 };
+  WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
+  bool jobsDone                       = false;
+  bool measuredValuesAreFresh         = false;
+  LiquidCrystal_I2C *lcdHandle        = nullptr;
+  V_t arduino5V                       = refOf.arduinoRegularV;
+  A_t Iin                             = 0.00;
+  V_t cellV[LENGTH_OF(cells)]         = { };
+public:
+  void initialize(millis_t timeLimit);
+  void progress(millis_t timeLimit);
+private:
+  void measureValues(bool showValues);
+  bool checkSafety(bool reportsToSerial);
+  void controlSystem();
+  void goodbye(int timeLeftToQuit);
+} myBMS;
+#endif
 
 void setup()
 {
@@ -170,21 +197,20 @@ void BMS::measureValues(bool const showValues)
 
       for (int i = 0; i < LENGTH_OF(cellV); i++)
       {
+        double ocv = cellV[i]; // FIX ME!
+
         lcd.print("B");
         lcd.print(i + 1);
         lcd.print("=");
         lcd.println(cellV[i]);
+        lcd.print(" ");
+        lcd.print(mySocOcvTable.get_x(ocv));
+        lcd.println("%");
       }
       lcd.print("I");
       lcd.print("=");
       lcd.println(Iin);
-      // Here, the variable `lcd` is destructed,
-    } //       the LCD screen being updated.
-      //                                   A1234567B1234567
-      // One of the possible screens is:  ##################
-      //                                 0#B1=4.25 B2=4.17 #
-      //                                 1#B3=3.33 I=1.66  #
-      //                                  ##################
+    }
   }
 }
 bool BMS::checkSafety(bool const reportsToSerial)

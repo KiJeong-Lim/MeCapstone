@@ -19,7 +19,7 @@
 #define VERSION (0.00)
 #endif
 
-#define SERIAL_PORT         115200
+#define SERIAL_PORT         9600
 #define LCD_WIDTH           16
 #define LCD_HEIGHT          2
 #define LCD_SECTION_EA      2
@@ -43,7 +43,7 @@
 **      `CapstoneStable/header.hpp`.
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
-** Make new file `CapstoneStable/tables.ino`. -- For obtaining OCV by looking-up the soc-ocv table.
+** Make new file `CapstoneStable/tables.ino`. -- For deriving OCV by looking-up the soc-ocv table.
 */
 
 #endif
