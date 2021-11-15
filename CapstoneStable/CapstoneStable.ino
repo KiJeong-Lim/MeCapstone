@@ -10,8 +10,8 @@
 
 #include "header.h"
 
-static
-ReferenceCollection const refOf =
+constexpr
+ReferenceCollection refOf =
 { .analogSignalMax = 1024.0
 , .arduinoRegularV = 5.00
 , .zenerdiodeVfromRtoA = 2.48
@@ -62,10 +62,11 @@ void setup()
 #endif
   myBMS.initialize(2000);
 }
+
 void loop()
 {
 #if defined(SERIAL_PORT)
-  Serial.println("=========");
+  Serial.println("=======");
 #endif
   myBMS.progress(2000);
 }
@@ -91,7 +92,6 @@ void BMS::initialize(ms_t const given_time)
   }
   hourglass.wait(given_time);
 }
-
 void BMS::progress(ms_t const given_time)
 {
   Timer hourglass;
@@ -125,10 +125,9 @@ void BMS::progress(ms_t const given_time)
     }
   }
 }
-
 void BMS::controlSystem()
 {
-  V_t const V_wanted = 3.6, overV_wanted = 3.6; // <- How to calculate these voltages? We must derive them!!!
+  constexpr V_t V_wanted = 3.6, overV_wanted = 3.6; // <- How to calculate these voltages? We must derive them!!!
 
   if (measuredValuesAreFresh)
   {
@@ -156,30 +155,32 @@ void BMS::controlSystem()
   }
   measuredValuesAreFresh = false;
 }
-
 void BMS::measureValues(bool const showValues)
 {
-  ms_t const measuring_time_for_one_sensor = 10;
+  constexpr ms_t measuring_time_for_one_sensor = 10;
   V_t sensorV = 0.0;
   V_t accumV = 0.0;
-
+  // Calculate the voltage of the pin `5V`
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
+  // Calculate the voltage of the cells
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
-    Ohm_t const R1 = 18000.0, R2 = 2000.0;
+    constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
     sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
     cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
     accumV += cellV[i];
   }
+  // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V) + 0.04; // `0.04` is calibration.
+  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V) + 0.04; // `0.04` is a calibration.
+  // Guarantee the above values are fresh
   measuredValuesAreFresh = true;
 
   if (showValues)
   {
-    shell << "arduino5V = " << arduino5V << "[V].";
-    shell << "Iin = " << Iin << "[A].";
+    chan << "arduino5V = " << arduino5V << "[V].";
+    chan << "Iin = " << Iin << "[A].";
     if (lcdHandle)
     {
       LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
@@ -203,11 +204,10 @@ void BMS::measureValues(bool const showValues)
       //                                  ##################
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
-      shell << "cellV[" << i << "] = " << cellV[i] << "[V].";
+      chan << "cellV[" << i << "] = " << cellV[i] << "[V].";
     }
   }
 }
-
 bool BMS::checkSafety(bool const reportsToSerial)
 {
   V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US!!!
@@ -255,10 +255,10 @@ bool BMS::checkSafety(bool const reportsToSerial)
   measuredValuesAreFresh = false;
   return isBad;
 }
-
 void BMS::goodbye(int const countDown)
 {
   Timer hourglass;
+
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
@@ -288,7 +288,6 @@ void BMS::goodbye(int const countDown)
   powerIn_pin.turnOff();
   abort();
 }
-
 void BMS::hello()
 {
   if (lcdHandle)
@@ -303,14 +302,8 @@ void BMS::hello()
   }
 }
 
-SerialPrinter const cout =
-{ .prefix = "          "
-};
+SerialPrinter const cout = { .prefix = "       > " };
 
-SerialPrinter const cerr =
-{ .prefix = "[WARNING] "
-};
+SerialPrinter const cerr = { .prefix = "WARNING> " };
 
-SerialPrinter const shell =
-{ .prefix = "*Arduino> "
-};
+SerialPrinter const chan = { .prefix = "Arduino> " };

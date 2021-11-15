@@ -16,7 +16,7 @@
 template <size_t Capacity>
 class Formatter {
   int cnt = 0;
-  char buf[Capacity + 1] = { };
+  char buf[Capacity] = { };
 public:
   void clear()
   {
@@ -24,7 +24,6 @@ public:
     {
       buf[cnt] = ' ';
     }
-    buf[cnt] = '\0';
     cnt = 0;
   }
   void write(char *p_ch)
@@ -96,15 +95,18 @@ public:
   }
   void putString(char const *const printMe)
   {
-    for (char const *p_ch = printMe; *p_ch != '\0'; p_ch++)
+    if (printMe)
     {
-      if (cnt < Capacity)
+      for (char const *p_ch = printMe; *p_ch != '\0'; p_ch++)
       {
-        buf[cnt++] = *p_ch;
-      }
-      else
-      {
-        break;
+        if (cnt < Capacity)
+        {
+          buf[cnt++] = *p_ch;
+        }
+        else
+        {
+          break;
+        }
       }
     }
   }
