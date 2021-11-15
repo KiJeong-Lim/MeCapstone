@@ -34,7 +34,7 @@
 ** Move `CapstoneStable/header.h` to
 **      `CapstoneStable/header.hpp`.
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
-**                                                 with `mybuf[c][LCD_WIDTH] = '\0';`
+**                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
 */
 
 #endif
