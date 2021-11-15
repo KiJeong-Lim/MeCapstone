@@ -25,6 +25,10 @@
 ** Relace `BufferWithFormat` with
 **        `Formatter<LCD_SECTION_LEN>`.
 ** Set `VERSION` to be `0.10`.
+** [2021-11-15]
+** Insert `Wire.begin();` in `BMS::initialize`. -- This is a very important change.
+**                                              -- If `Wire.begin();` is missed,
+**                                                 the function `openLcdI2c` will not work.
 */
 
 #endif
