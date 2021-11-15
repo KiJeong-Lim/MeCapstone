@@ -11,14 +11,15 @@
 #include "header.hpp"
 
 constexpr double ocvs[] = { 2.7, 3.0, 4.2 };
-Graph const mySocOcvTable =
+
+AscMap const mySocOcvTable =
 { .ys = ocvs
 , .left_bound_of_xs = 0.0
-, .size_of_ys = sizeof(ocvs) / sizeof(*(ocvs))
+, .size_of_ys = LENGTH_OF(ocvs)
 , .right_bound_of_xs = 100.0
 };
 
-Graph::Graph(const double *const _ys, double const _left_bound_of_xs, size_t const _size_of_ys, double const _right_bound_of_xs)
+AscMap::AscMap(const double *const _ys, double const _left_bound_of_xs, size_t const _size_of_ys, double const _right_bound_of_xs)
   : left_bound_of_xs{ _left_bound_of_xs }
   , right_bound_of_xs{ _right_bound_of_xs }
   , ys{ _ys }
@@ -26,18 +27,24 @@ Graph::Graph(const double *const _ys, double const _left_bound_of_xs, size_t con
 {
 }
 
-Graph::~Graph()
+AscMap::~AscMap()
 {
 }
 
-double Graph::get_x(double const y) const
+double AscMap::calc_x(double const ratio) const
 {
-  size_t low = 0, high = size_of_ys - 1;
+  return ((right_bound_of_xs - left_bound_of_xs) / (size_of_ys - 1) * ratio + left_bound_of_xs);
+}
+
+double AscMap::get_x(double const y) const
+{
+  double ratio = 0.0;
+  int low = 0, high = size_of_ys - 1;
 
   while (low <= high)
   {
-    int mid = (low + high) / 2;
-    
+    int mid = low + ((high - low) / 2);
+
     if (ys[mid] > y)
     {
       high = mid - 1;
@@ -48,9 +55,8 @@ double Graph::get_x(double const y) const
     }
     else
     {
-      return ((right_bound_of_xs - left_bound_of_xs) / (size_of_ys - 1) * mid + left_bound_of_xs);
+      return calc_x((double)mid);
     }
   }
-
-  return ((right_bound_of_xs - left_bound_of_xs) / (size_of_ys - 1) * (((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high) + left_bound_of_xs);
+  return calc_x(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
 }

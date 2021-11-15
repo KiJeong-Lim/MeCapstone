@@ -134,17 +134,20 @@ public:
 };
 
 // implemented in "tables.cpp"
-class Graph {
+class AscMap {
   const double left_bound_of_xs;
   const double right_bound_of_xs;
   const double *const ys;
   size_t const size_of_ys;
 public:
-  Graph(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
-  ~Graph();
+  AscMap(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
+  ~AscMap();
+private:
+  double calc_x(double ratio) const;
+public:
   double get_x(double y) const;
 };
-extern Graph const mySocOcvTable;
+extern AscMap const mySocOcvTable;
 
 // implemented in "CapstoneStable.ino"
 struct ReferenceCollection {
