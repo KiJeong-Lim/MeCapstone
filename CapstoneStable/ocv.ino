@@ -71,7 +71,7 @@ AscMap const mySocOcvTable =
 , .right_bound_of_xs = 100.0
 };
 
-V_t getOcvFromVcell(V_t Vcell)
+V_t getOcvFromVcell(V_t const Vcell)
 {
   return Vcell;
 }

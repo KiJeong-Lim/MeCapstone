@@ -98,7 +98,7 @@ public:
   AscMap(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
   ~AscMap();
 private:
-  double calc_x(double ratio) const;
+  double calc_x(double param) const;
 public:
   double get_x(double y) const;
 };
