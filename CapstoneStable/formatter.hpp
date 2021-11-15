@@ -49,8 +49,8 @@ public:
   }
   void putInt(bigInt_t const printMe)
   {
-    bigInt_t val = printMe;
     int cn = 0;
+    bigInt_t val = printMe;
     if (val < 0)
     {
       putChar('-');
