@@ -16,7 +16,7 @@ constexpr ReferenceCollection refOf =
 { .analogSignalMax                  = 1024
 , .arduinoRegularV                  = 5.00
 , .zenerdiodeVfromRtoA              = 2.48
-, .conversionRatioOfCurrentSensor   = 1 / SENSITIVITY_OF_CURRENT_SENSOR
+, .sensitivityOfCurrentSensor       = 0.100 // The sensitivity of the current sensor `ACS712ELCTR-20A-T` is 100[mV/A].
 };
 constexpr V_t V_wanted = 3.60, overV_wanted = 3.60;
 
@@ -149,7 +149,7 @@ void BMS::measureValues(bool const showValues)
   }
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-  Iin = refOf.conversionRatioOfCurrentSensor * (sensorV - 0.5 * arduino5V) + 0.04; // `0.04` is a calibration.
+  Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) + 0.04; // `0.04` is a calibration.
   // Guarantee the above values are fresh
   measuredValuesAreFresh = true;
 

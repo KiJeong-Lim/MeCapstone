@@ -16,11 +16,7 @@
 #include "version.h"
 
 // macro defns
-#define LCD_WIDTH                           16
-#define LCD_HEIGHT                          2
-#define LCD_SECTION_EA                      2
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
-#define SENSITIVITY_OF_CURRENT_SENSOR       0.100
 #define LENGTH_OF(array)                    (sizeof(array) / sizeof(*(array)))
 #define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 
@@ -142,7 +138,7 @@ struct ReferenceCollection {
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;
   V_t const zenerdiodeVfromRtoA;
-  Ohm_t const conversionRatioOfCurrentSensor;
+  Ohm_t const sensitivityOfCurrentSensor;
 };
 extern SerialPrinter const cout, cerr, chan;
 
