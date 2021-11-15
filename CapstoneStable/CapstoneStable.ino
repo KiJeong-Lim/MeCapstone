@@ -10,8 +10,7 @@
 
 #include "header.h"
 
-constexpr
-ReferenceCollection refOf =
+constexpr ReferenceCollection refOf =
 { .analogSignalMax                = 1024
 , .arduinoRegularV                = 5.00
 , .zenerdiodeVfromRtoA            = 2.48
@@ -66,6 +65,7 @@ void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass;
 
+  Wire.begin();
   cout << "Run time started.";
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
