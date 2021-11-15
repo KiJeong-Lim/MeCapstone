@@ -20,7 +20,7 @@
 #define LCD_HEIGHT                          2
 #define LCD_SECTION_EA                      2
 #define LCD_SECTION_LEN                     (LCD_WIDTH / LCD_SECTION_EA)
-#define SENSITIVITY_OF_20A_CURRENT_SENSOR   0.100
+#define SENSITIVITY_OF_CURRENT_SENSOR       0.100
 #define LENGTH_OF(array)                    (sizeof(array) / sizeof(*(array)))
 #define round(x)                            ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
 

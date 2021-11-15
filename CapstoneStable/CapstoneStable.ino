@@ -10,12 +10,15 @@
 
 #include "header.h"
 
+constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70;
+constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10;
 constexpr ReferenceCollection refOf =
 { .analogSignalMax                  = 1024
 , .arduinoRegularV                  = 5.00
 , .zenerdiodeVfromRtoA              = 2.48
-, .conversionRatioOfCurrentSensor   = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR
+, .conversionRatioOfCurrentSensor   = 1 / SENSITIVITY_OF_CURRENT_SENSOR
 };
+constexpr V_t V_wanted = 3.60, overV_wanted = 3.60;
 
 static
 CELL const cells[] =
@@ -38,11 +41,10 @@ public:
   void initialize(ms_t timeLimit);
   void progress(ms_t timeLimit);
 private:
-  void controlSystem();
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
+  void controlSystem();
   void goodbye(int timeLeftToQuit);
-  void hello();
 } myBMS;
 
 void setup()
@@ -75,7 +77,13 @@ void BMS::initialize(ms_t const given_time)
   lcdHandle = openLcdI2C();
   if (lcdHandle)
   {
-    hello();
+    LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
+
+    lcd.println("> SYSTEM");
+    lcd.println(" ONLINE");
+    lcd.println("VERSION");
+    lcd.print("= ");
+    lcd.println(VERSION);
   }
   else
   {
@@ -88,10 +96,10 @@ void BMS::progress(ms_t const given_time)
   Timer hourglass;
 
   measureValues(true);
-  controlSystem();
   {
     bool system_is_okay = checkSafety(true);
 
+    controlSystem();
     if (system_is_okay and jobsDone)
     {
       cout << "CHARGING COMPLETED.";
@@ -109,42 +117,19 @@ void BMS::progress(ms_t const given_time)
       {
         if (not system_is_okay)
         {
-          delay(100);
+          for (int i = 0; i < LENGTH_OF(cells); i++)
+          {
+            if (cellV[i] > allowedV_max)
+            {
+              cells[i].balanceCircuit_pin.turnOn();
+            }
+          }
+          delay(500);
         }
         system_is_okay = checkSafety(false);
       }
     }
   }
-}
-void BMS::controlSystem()
-{
-  constexpr V_t V_wanted = 3.60, overV_wanted = 3.60; // <- How to calculate these voltages? We must derive them!!!
-
-  if (measuredValuesAreFresh)
-  {
-    measureValues(false);
-  }
-
-  jobsDone = true;
-
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
-    bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
-
-    jobsDone &= this_cell_charging_finished;
-
-    if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
-    {
-      cells[i].balanceCircuit_pin.turnOff();
-    }
-
-    if ((this_cell_charging_finished) and (this_cell_being_charged_now))
-    {
-      cells[i].balanceCircuit_pin.turnOn();
-    }
-  }
-  measuredValuesAreFresh = false;
 }
 void BMS::measureValues(bool const showValues)
 {
@@ -201,8 +186,6 @@ void BMS::measureValues(bool const showValues)
 }
 bool BMS::checkSafety(bool const reportsToSerial)
 {
-  V_t const allowedV_max = 4.20, allowedV_min =  2.70; // CONFIRM US!!!
-  A_t const allowedA_max = 2.00, allowedA_min = -0.10; // CONFIRM US!!!
   bool isBad = false;
 
   if (measuredValuesAreFresh)
@@ -246,6 +229,34 @@ bool BMS::checkSafety(bool const reportsToSerial)
   measuredValuesAreFresh = false;
   return isBad;
 }
+void BMS::controlSystem()
+{
+  if (measuredValuesAreFresh)
+  {
+    measureValues(false);
+  }
+
+  jobsDone = true;
+
+  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  {
+    bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
+    bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
+
+    jobsDone &= this_cell_charging_finished;
+
+    if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
+    {
+      cells[i].balanceCircuit_pin.turnOff();
+    }
+
+    if ((this_cell_charging_finished) and (this_cell_being_charged_now))
+    {
+      cells[i].balanceCircuit_pin.turnOn();
+    }
+  }
+  measuredValuesAreFresh = false;
+}
 void BMS::goodbye(int const countDown)
 {
   Timer hourglass;
@@ -279,22 +290,7 @@ void BMS::goodbye(int const countDown)
   powerIn_pin.turnOff();
   abort();
 }
-void BMS::hello()
-{
-  if (lcdHandle)
-  {
-    LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
-
-    lcd.println("> SYSTEM");
-    lcd.println(" ONLINE");
-    lcd.println("VERSION");
-    lcd.print("= ");
-    lcd.println(VERSION);
-  }
-}
 
 SerialPrinter const cout = { .prefix = "       > " };
-
 SerialPrinter const cerr = { .prefix = "WARNING> " };
-
 SerialPrinter const chan = { .prefix = "Arduino> " };
