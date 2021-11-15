@@ -9,7 +9,15 @@
 */
 
 #ifndef VERSION
-#define VERSION 0.10
+#if defined(MAJOR_VERSION) & defined(MINOR_VERSION) & defined(REVISION_NUMBER)
+#define VERSION (1.00 * (MAJOR_VERSION) + 0.10 * (MINOR_VERSION) + 0.01 * (REVISION_NUMBER))
+#elif defined(MAJOR_VERSION) & defined(MINOR_VERSION)
+#define VERSION (1.00 * (MAJOR_VERSION) + 0.10 * (MINOR_VERSION))
+#elif defined(MAJOR_VERSION)
+#define VERSION (1.00 * (MAJOR_VERSION))
+#else
+#define VERSION (0.00)
+#endif
 
 #define SERIAL_PORT         115200
 #define LCD_WIDTH           16
@@ -35,6 +43,7 @@
 **      `CapstoneStable/header.hpp`.
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
+** Make new file `CapstoneStable/tables.ino`. -- For obtaining OCV by looking-up the soc-ocv table.
 */
 
 #endif

@@ -8,6 +8,9 @@
 ** ===============================================================================
 */
 
+#define MAJOR_VERSION    0
+#define MINOR_VERSION    2
+#define REVISION_NUMBER  0
 #include "header.hpp"
 
 constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70;

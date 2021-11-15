@@ -133,6 +133,19 @@ public:
   SerialPrinter &&operator<<(double const &val);
 };
 
+// implemented in "tables.cpp"
+class Graph {
+  const double left_bound_of_xs;
+  const double right_bound_of_xs;
+  const double *const ys;
+  size_t const size_of_ys;
+public:
+  Graph(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
+  ~Graph();
+  double get_x(double y) const;
+};
+extern Graph const mySocOcvTable;
+
 // implemented in "CapstoneStable.ino"
 struct ReferenceCollection {
   Val_t const analogSignalMax;
