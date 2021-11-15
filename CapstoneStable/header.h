@@ -67,7 +67,7 @@ class WriterDigitalPin : public Pin {
 public:
   WriterDigitalPin() = delete;
   WriterDigitalPin(WriterDigitalPin const &other) = delete;
-  WriterDigitalPin(pinId_t const pin_no);
+  WriterDigitalPin(pinId_t pin_no);
   ~WriterDigitalPin();
 private:
   void syncPin();
@@ -105,7 +105,7 @@ class LcdPrettyPrinter {
 public:
   LcdPrettyPrinter() = delete;
   LcdPrettyPrinter(LcdPrettyPrinter const &other) = delete;
-  LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD);
+  LcdPrettyPrinter(LiquidCrystal_I2C *controllerOfLCD);
   ~LcdPrettyPrinter();
 private:
   void newline();
