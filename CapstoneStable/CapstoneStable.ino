@@ -11,10 +11,10 @@
 #include "header.h"
 
 constexpr ReferenceCollection refOf =
-{ .analogSignalMax                = 1024
-, .arduinoRegularV                = 5.00
-, .zenerdiodeVfromRtoA            = 2.48
-, .conversionRatioOfCurrentSensor = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR
+{ .analogSignalMax                  = 1024
+, .arduinoRegularV                  = 5.00
+, .zenerdiodeVfromRtoA              = 2.48
+, .conversionRatioOfCurrentSensor   = 1 / SENSITIVITY_OF_20A_CURRENT_SENSOR
 };
 
 static
@@ -172,6 +172,10 @@ void BMS::measureValues(bool const showValues)
   {
     chan << "arduino5V = " << arduino5V << "[V].";
     chan << "Iin = " << Iin << "[A].";
+    for (int i = 0; i < LENGTH_OF(cellV); i++)
+    {
+      chan << "cellV[" << i << "] = " << cellV[i] << "[V].";
+    }
     if (lcdHandle)
     {
       LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
@@ -193,10 +197,6 @@ void BMS::measureValues(bool const showValues)
       //                                 0#B1=4.25 B2=4.17 #
       //                                 1#B3=3.33 I=1.66  #
       //                                  ##################
-    for (int i = 0; i < LENGTH_OF(cellV); i++)
-    {
-      chan << "cellV[" << i << "] = " << cellV[i] << "[V].";
-    }
   }
 }
 bool BMS::checkSafety(bool const reportsToSerial)
