@@ -154,7 +154,7 @@ void BMS::measureValues(bool const showValues)
   // Calculate the voltage of the pin `5V`
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
-  // Calculate the voltage of the cells
+  // Calculate the voltages of every cell
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
