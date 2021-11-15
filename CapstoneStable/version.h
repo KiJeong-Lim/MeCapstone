@@ -43,7 +43,7 @@
 **      `CapstoneStable/header.hpp`.
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
-** Make new file `CapstoneStable/tables.ino`. -- For deriving OCV by looking-up the soc-ocv table.
+** Make new file `CapstoneStable/ocv.ino`. -- For deriving OCV by looking-up the soc-ocv table.
 */
 
 #endif

@@ -89,6 +89,19 @@ struct CELL {
   ReaderAnalogPin const voltageSensor_pin;
   WriterDigitalPin const balanceCircuit_pin;
 };
+class AscMap {
+  const double left_bound_of_xs;
+  const double right_bound_of_xs;
+  const double *const ys;
+  size_t const size_of_ys;
+public:
+  AscMap(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
+  ~AscMap();
+private:
+  double calc_x(double ratio) const;
+public:
+  double get_x(double y) const;
+};
 
 // implemented in "printer.ino"
 LiquidCrystal_I2C *openLcdI2C();
@@ -133,20 +146,8 @@ public:
   SerialPrinter &&operator<<(double const &val);
 };
 
-// implemented in "tables.cpp"
-class AscMap {
-  const double left_bound_of_xs;
-  const double right_bound_of_xs;
-  const double *const ys;
-  size_t const size_of_ys;
-public:
-  AscMap(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
-  ~AscMap();
-private:
-  double calc_x(double ratio) const;
-public:
-  double get_x(double y) const;
-};
+// implemented in "ocv.ino"
+V_t getOcvFromVcell(V_t Vcell);
 extern AscMap const mySocOcvTable;
 
 // implemented in "CapstoneStable.ino"
