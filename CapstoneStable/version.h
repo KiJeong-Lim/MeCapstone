@@ -9,10 +9,9 @@
 */
 
 #ifndef VERSION
-#define VERSION
+#define VERSION 0.10
 
 #define SERIAL_PORT   9600
-#define VERSION       0.10
 
 /* History
 ** [2021-11-14]
@@ -29,6 +28,8 @@
 ** Insert `Wire.begin();` in `BMS::initialize`. -- This is a very important change.
 **                                              -- If `Wire.begin();` is missed,
 **                                                 the function `openLcdI2c` will not work.
+** Move `CapstoneStable/header.h` to
+**      `CapstoneStable/header.hpp`.
 */
 
 #endif

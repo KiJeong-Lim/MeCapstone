@@ -11,7 +11,7 @@
 #ifndef FORMATTER
 #define FORMATTER
 
-#include "header.h"
+#include "header.hpp"
 
 template <size_t Capacity>
 class Formatter {
