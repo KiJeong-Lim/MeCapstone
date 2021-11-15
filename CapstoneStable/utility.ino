@@ -150,7 +150,12 @@ void PwmDigitalPin::init() const
   cout << "The pin " << pinId << " is initalized to " << "LOW.";
   analogWrite(pinId, LOW);
 }
-void PwmDigitalPin::setPwm(double const duty_ratio) const
+void PwmDigitalPin::set(double const duty_ratio) const
 {
+  setPWM(duty_ratio);
+}
+void PwmDigitalPin::initWith(double const duty_ratio) const
+{
+  init();
   setPWM(duty_ratio);
 }

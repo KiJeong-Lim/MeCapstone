@@ -54,13 +54,13 @@ class ReaderAnalogPin : public Pin {
 public:
   ReaderAnalogPin() = delete;
   ReaderAnalogPin(ReaderAnalogPin const &other) = delete;
-  ReaderAnalogPin(pinId_t const pin_no);
+  ReaderAnalogPin(pinId_t pin_no);
   ~ReaderAnalogPin();
 private:
   int read_once() const;
 public:
   Val_t readSignalOnce() const;
-  Val_t readSignal(ms_t const duration) const;
+  Val_t readSignal(ms_t duration) const;
 };
 class WriterDigitalPin : public Pin {
   bool is_high;
@@ -72,7 +72,7 @@ public:
 private:
   void syncPin();
 public:
-  void initWith(bool const on_is_true);
+  void initWith(bool on_is_true);
   void turnOn();
   void turnOff();
   bool isHigh() const;
@@ -81,12 +81,13 @@ class PwmDigitalPin : public Pin {
 public:
   PwmDigitalPin() = delete;
   PwmDigitalPin(PwmDigitalPin const &other) = delete;
-  PwmDigitalPin(pinId_t const pin_no);
+  PwmDigitalPin(pinId_t pin_no);
 private:
-  void setPWM(double const duty_ratio) const;
+  void setPWM(double duty_ratio) const;
 public:
   void init() const;
-  void setPwm(double const duty_ratio) const;
+  void set(double duty_ratio) const;
+  void initWith(double duty_ratio) const;
 };
 struct CELL {
   ReaderAnalogPin const voltageSensor_pin;
@@ -110,12 +111,12 @@ private:
   void newline();
 public:
   void flush();
-  void print(int const num);
-  void print(double const val);
-  void print(char const *const str);
-  void println(int const num);
-  void println(double const val);
-  void println(char const *const str);
+  void print(int num);
+  void print(double val);
+  void print(char const *str);
+  void println(int num);
+  void println(double val);
+  void println(char const *str);
 };
 class SerialPrinter {
   char const *const messenger;
@@ -132,7 +133,7 @@ private:
 public:
   SerialPrinter &&operator<<(byte const &hex);
   SerialPrinter &&operator<<(int const &num);
-  SerialPrinter &&operator<<(char const *const & str);
+  SerialPrinter &&operator<<(char const *const &str);
   SerialPrinter &&operator<<(double const &val);
 };
 

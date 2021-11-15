@@ -293,7 +293,7 @@ void BMS::hello()
   if (lcdHandle)
   {
     LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
-    
+
     lcd.println("> SYSTEM");
     lcd.println(" ONLINE");
     lcd.println("VERSION");

@@ -49,7 +49,6 @@ LiquidCrystal_I2C *openLcdI2C()
       lcdHandle->backlight();
     }
   }
-
   return lcdHandle;
 }
 
