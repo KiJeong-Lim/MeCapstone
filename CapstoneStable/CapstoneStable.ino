@@ -247,12 +247,18 @@ bool BMS::checkSafety(bool const reportsToSerial)
     if (cellV[i] > allowedV_max)
     {
       isBad = true;
-      cerr << "`cellV[" << i << "]`" << " too HIGH.";
+      if (reportsToSerial)
+      {
+        cerr << "`cellV[" << i << "]`" << " too HIGH.";
+      }
     }
     if (cellV[i] < allowedV_min)
     {
       isBad = true;
-      cerr << "`cellV[" << i << "]`" << " too LOW.";
+      if (reportsToSerial)
+      {
+        cerr << "`cellV[" << i << "]`" << " too LOW.";
+      }
     }
   }
 
@@ -274,7 +280,6 @@ void BMS::controlSystem()
     bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
 
     jobsDone &= this_cell_charging_finished;
-
     if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOff();
@@ -285,6 +290,7 @@ void BMS::controlSystem()
       cells[i].balanceCircuit_pin.turnOn();
     }
   }
+
   measuredValuesAreFresh = false;
 }
 void BMS::goodbye(int const countDown)
