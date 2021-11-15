@@ -24,8 +24,8 @@
 **                `CapstoneStable/printer.ino`,
 **                `CapstoneStable/utility.ino`,
 **                `CapstoneStable/CapstoneStable.ino`.
-** Relace `BufferWithFormat` with
-**        `Formatter<LCD_SECTION_LEN>`.
+** Relace `BufferWithFormat`
+**   with `Formatter<LCD_SECTION_LEN>`.
 ** Set `VERSION` to be `0.10`.
 ** [2021-11-15]
 ** Insert `Wire.begin();` in `BMS::initialize`. -- This is a very important change.
@@ -33,6 +33,8 @@
 **                                                 the function `openLcdI2c` will not work.
 ** Move `CapstoneStable/header.h` to
 **      `CapstoneStable/header.hpp`.
+** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
+**                                                 with `mybuf[c][LCD_WIDTH] = '\0';`
 */
 
 #endif

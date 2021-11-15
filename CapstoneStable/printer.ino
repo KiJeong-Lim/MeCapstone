@@ -75,7 +75,7 @@ LcdPrettyPrinter::~LcdPrettyPrinter()
     for (int c = 0; c < LCD_HEIGHT; c++)
     {
       lcdHandle->setCursor(0, c);
-      mybuf[c][LCD_WIDTH - 1] = '\0';
+      mybuf[c][LCD_WIDTH] = '\0';
       lcdHandle->print(mybuf[c]);
     }
   }
