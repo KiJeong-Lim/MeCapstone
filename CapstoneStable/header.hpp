@@ -13,6 +13,10 @@
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+
+#define MAJOR_VERSION    0
+#define MINOR_VERSION    2
+#define REVISION_NUMBER  0
 #include "version.h"
 
 // macro defns
