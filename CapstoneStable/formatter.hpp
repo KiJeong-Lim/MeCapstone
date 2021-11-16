@@ -75,9 +75,11 @@ public:
     }
     if (afters_dot > 0)
     {
-      bigInt_t valN = val;
-      bigInt_t valF = val * pow10(afters_dot);
       int cn = afters_dot;
+      bigInt_t pow10_afters_dot = pow10(afters_dot);
+      bigInt_t valN = round(val * pow10_afters_dot);
+      bigInt_t valF = valN % pow10_afters_dot;
+      valN /= pow10_afters_dot;
       putInt(valN);
       putChar('.');
       do

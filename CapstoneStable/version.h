@@ -46,7 +46,8 @@
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
 ** Make new file `CapstoneStable/ocv.ino`. -- For deriving OCV by looking-up the soc-ocv table.
 ** [2021-11-16]
-** Fix `SerialPrinter`.
+** Fix the class `SerialPrinter`.
+** Improve the function `Formatter::putDouble`.
 */
 
 #endif

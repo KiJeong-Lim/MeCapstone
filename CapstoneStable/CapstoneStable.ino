@@ -194,7 +194,7 @@ void BMS::measureValues(bool const showValues)
 
       for (int i = 0; i < LENGTH_OF(cellV); i++)
       {
-        V_t const ocv = getOcvFromVcell(cellV[i], Iin);
+        V_t const ocv = calcOCV(cellV[i], Iin);
         double const soc = mySocOcvTable.get_x_from_y(ocv); // 0.00 ~ 100.00
 
         lcd.print("B");
