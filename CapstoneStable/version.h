@@ -50,6 +50,8 @@
 ** Fix the class `SerialPrinter`.
 ** Improve the function `Formatter::putDouble`.
 ** Fix the class `Timer`.
+** Move `CapstoneStable/ocv.ino` to
+**      `CapstoneStable/soc.ino`.
 ** Set `VERSION` to be `0.30`.
 */
 

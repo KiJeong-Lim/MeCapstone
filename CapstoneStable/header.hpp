@@ -146,7 +146,7 @@ public:
   SerialPrinter operator<<(double const &val);
 };
 
-// implemented in "ocv.ino"
+// implemented in "soc.ino"
 extern AscMap const mySocVcellTable;
 
 // implemented in "CapstoneStable.ino"
