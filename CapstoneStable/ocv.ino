@@ -10,7 +10,8 @@
 
 #include "header.hpp"
 
-constexpr double ocvs[] =
+static
+double const ocvs[] =
 { 2.58503333333333 //   0%
 , 2.90561016666667 //   2%
 , 3.08249133333333 //   4%
@@ -65,8 +66,8 @@ constexpr double ocvs[] =
 };
 
 AscMap const mySocOcvTable =
-{ .ys = ocvs
-, .left_bound_of_xs = 0.0
-, .size_of_ys = LENGTH_OF(ocvs)
-, .right_bound_of_xs = 100.0
+{ .ys                 = ocvs
+, .left_bound_of_xs   = 0.0
+, .size_of_ys         = LENGTH_OF(ocvs)
+, .right_bound_of_xs  = 100.0
 };

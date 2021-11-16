@@ -10,6 +10,7 @@
 
 #include "header.hpp"
 
+// openLcdI2C
 LiquidCrystal_I2C *openLcdI2C()
 {
   LiquidCrystal_I2C *lcdHandle = nullptr;
@@ -46,6 +47,7 @@ LiquidCrystal_I2C *openLcdI2C()
   return lcdHandle;
 }
 
+// LcdPrettyPrinter
 LcdPrettyPrinter::LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD)
   : lcdHandle{ controllerOfLCD }
   , section_no{ 0 }
@@ -117,6 +119,7 @@ void LcdPrettyPrinter::println(char const *const str)
   newline();
 }
 
+// SerialPrinter
 SerialPrinter::SerialPrinter(SerialPrinter &&other)
   : messenger{ nullptr }
   , newline{ true }

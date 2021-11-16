@@ -20,44 +20,28 @@ constexpr ReferenceCollection refOf =
 constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
 constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
 
+static
+CELL const cells[] =
 #if MODE == 1
-static
-CELL const cells[] =
-{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } }
+{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
 };
-
-class BMS {
-  ReaderAnalogPin const arduino5V_pin = { .pin_no = A1 };
-  ReaderAnalogPin const Iin_pin       = { .pin_no = A2 };
-  WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
-  bool jobsDone                       = false;
-  bool measuredValuesAreFresh         = false;
-  LiquidCrystal_I2C *lcdHandle        = nullptr;
-  V_t arduino5V                       = refOf.arduinoRegularV;
-  A_t Iin                             = 0.00;
-  V_t cellV[LENGTH_OF(cells)]         = { };
-public:
-  void initialize(millis_t timeLimit);
-  void progress(millis_t timeLimit);
-private:
-  void measureValues(bool showValues);
-  bool checkSafety(bool reportsToSerial);
-  void controlSystem();
-  V_t calcOCV(int cell_no);
-  void goodbye(int timeLeftToQuit);
-} myBMS;
 #else
-static
-CELL const cells[] =
 { { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
 , { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } } // B2(7V4)
 , { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } } // B3(11V1)
 };
+#endif
 
 class BMS {
+#if MODE == 1
+  ReaderAnalogPin const arduino5V_pin = { .pin_no = A1 };
+  ReaderAnalogPin const Iin_pin       = { .pin_no = A2 };
+  WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
+#else
   ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
   ReaderAnalogPin const Iin_pin       = { .pin_no = A6 };
   WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
+#endif
   bool jobsDone                       = false;
   bool measuredValuesAreFresh         = false;
   LiquidCrystal_I2C *lcdHandle        = nullptr;
@@ -74,7 +58,6 @@ private:
   V_t calcOCV(int cell_no);
   void goodbye(int timeLeftToQuit);
 } myBMS;
-#endif
 
 void setup()
 {
