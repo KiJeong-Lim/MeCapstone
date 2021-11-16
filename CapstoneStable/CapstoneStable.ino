@@ -10,15 +10,15 @@
 
 #include "header.hpp"
 
-constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
-constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
+constexpr V_t V_wanted = 3.60, overV_wanted = 3.60; // FIX ME!
 constexpr ReferenceCollection refOf =
 { .analogSignalMax                  = 1024
 , .arduinoRegularV                  = 5.00
 , .zenerdiodeVfromRtoA              = 2.48 // is `Vref` of the zener-diode `TL431`.
 , .sensitivityOfCurrentSensor       = .100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
 };
-constexpr V_t V_wanted = 3.60, overV_wanted = 3.60; // FIX ME!
+constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
+constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
 
 #if MODE == 1
 static
@@ -43,6 +43,7 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
+  V_t calcOCV(int cell_no);
   void goodbye(int timeLeftToQuit);
 } myBMS;
 #else
@@ -70,6 +71,7 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
+  V_t calcOCV(int cell_no);
   void goodbye(int timeLeftToQuit);
 } myBMS;
 #endif
@@ -167,12 +169,12 @@ void BMS::measureValues(bool const showValues)
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
   // Calculate the voltages of every cell
-  for (int i = 0; i < LENGTH_OF(cells); i++)
+  for (int cell_no = 0; cell_no < LENGTH_OF(cells); cell_no++)
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
-    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-    cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
-    accumV += cellV[i];
+    sensorV = arduino5V * cells[cell_no].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+    cellV[cell_no] = (sensorV / (R2 / (R1 + R2))) - accumV;
+    accumV += cellV[cell_no];
   }
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
@@ -184,23 +186,23 @@ void BMS::measureValues(bool const showValues)
   {
     chan << "arduino5V = " << arduino5V << "[V].";
     chan << "Iin = " << Iin << "[A].";
-    for (int i = 0; i < LENGTH_OF(cellV); i++)
+    for (int cell_no = 0; cell_no < LENGTH_OF(cellV); cell_no++)
     {
-      chan << "cellV[" << i << "] = " << cellV[i] << "[V].";
+      chan << "cellV[" << cell_no << "] = " << cellV[cell_no] << "[V].";
     }
     if (lcdHandle)
     {
       LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
 
-      for (int i = 0; i < LENGTH_OF(cellV); i++)
+      for (int cell_no = 0; cell_no < LENGTH_OF(cellV); cell_no++)
       {
-        V_t const ocv = calcOCV(cellV[i], Iin);
+        V_t const ocv = calcOCV(cell_no);
         double const soc = mySocOcvTable.get_x_from_y(ocv); // 0.00 ~ 100.00
 
         lcd.print("B");
-        lcd.print(i + 1);
+        lcd.print(cell_no + 1);
         lcd.print("=");
-        lcd.println(cellV[i]);
+        lcd.println(cellV[cell_no]);
         lcd.print(" ");
         lcd.print(soc);
         lcd.println("%");
@@ -288,6 +290,10 @@ void BMS::controlSystem()
   }
 
   measuredValuesAreFresh = false;
+}
+V_t BMS::calcOCV(int const cell_no)
+{
+  return cellV[cell_no];
 }
 void BMS::goodbye(int const countDown)
 {

@@ -151,7 +151,6 @@ public:
 };
 
 // implemented in "ocv.ino"
-V_t calcOCV(V_t Vcell, A_t Iin);
 extern AscMap const mySocOcvTable;
 
 // implemented in "CapstoneStable.ino"

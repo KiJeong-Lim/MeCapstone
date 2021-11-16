@@ -64,11 +64,6 @@ constexpr double ocvs[] =
 , 4.20280000000000 // 100%
 };
 
-V_t calcOCV(V_t const Vcell, A_t const Iin) // FIX ME!
-{
-  return Vcell;
-}
-
 AscMap const mySocOcvTable =
 { .ys = ocvs
 , .left_bound_of_xs = 0.0
