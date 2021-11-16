@@ -55,7 +55,7 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
-  V_t calcOCV(int cell_no); // FIX ME!
+  V_t calcOCV(int cell_no) const; // FIX ME!
   void goodbye(int timeLeftToQuit);
 } myBMS;
 
@@ -152,12 +152,12 @@ void BMS::measureValues(bool const showValues)
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
   // Calculate the voltages of every cell
-  for (int cell_no = 0; cell_no < LENGTH_OF(cells); cell_no++)
+  for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
-    sensorV = arduino5V * cells[cell_no].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
-    cellV[cell_no] = (sensorV / (R2 / (R1 + R2))) - accumV;
-    accumV += cellV[cell_no];
+    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+    cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
+    accumV += cellV[i];
   }
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
@@ -169,23 +169,23 @@ void BMS::measureValues(bool const showValues)
   {
     chan << "arduino5V = " << arduino5V << "[V].";
     chan << "Iin = " << Iin << "[A].";
-    for (int cell_no = 0; cell_no < LENGTH_OF(cellV); cell_no++)
+    for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
-      chan << "cellV[" << cell_no << "] = " << cellV[cell_no] << "[V].";
+      chan << "cellV[" << i << "] = " << cellV[i] << "[V].";
     }
     if (lcdHandle)
     {
       LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
 
-      for (int cell_no = 0; cell_no < LENGTH_OF(cellV); cell_no++)
+      for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
       {
         V_t const ocv = calcOCV(cell_no);
         double const soc = mySocOcvTable.get_x_from_y(ocv); // 0.00 ~ 100.00
 
         lcd.print("B");
-        lcd.print(cell_no + 1);
+        lcd.print(cell_no);
         lcd.print("=");
-        lcd.println(cellV[cell_no]);
+        lcd.println(cellV[cell_no - 1]);
         lcd.print(" ");
         lcd.print(soc);
         lcd.println("%");
@@ -274,9 +274,12 @@ void BMS::controlSystem()
 
   measuredValuesAreFresh = false;
 }
-V_t BMS::calcOCV(int const cell_no)
+V_t BMS::calcOCV(int const cell_no) const
 {
-  return cellV[cell_no];
+  V_t const focused_cellV = cellV[cell_no - 1];
+  bool const focused_cell_is_being_charged = not cells[cell_no - 1].balanceCircuit_pin.isHigh();
+
+  return focused_cellV;
 }
 void BMS::goodbye(int const countDown)
 {
@@ -311,6 +314,6 @@ void BMS::goodbye(int const countDown)
   abort();
 }
 
-SerialPrinter cout = { .prefix = "       > " };
+SerialPrinter cout = { .prefix = "message> " };
 SerialPrinter cerr = { .prefix = "WARNING> " };
 SerialPrinter chan = { .prefix = "Arduino> " };
