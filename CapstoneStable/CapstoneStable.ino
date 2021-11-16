@@ -10,7 +10,7 @@
 
 #include "header.hpp"
 
-constexpr V_t V_wanted = 3.60, overV_wanted = 4.20; // FIX ME!
+constexpr V_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
 constexpr ReferenceCollection refOf =
 { .analogSignalMax                  = 1024
 , .arduinoRegularV                  = 5.00
@@ -55,7 +55,6 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
-  V_t calcOCV(int cell_no) const; // FIX ME!
   void goodbye(int timeLeftToQuit);
 } myBMS;
 
@@ -179,8 +178,7 @@ void BMS::measureValues(bool const showValues)
 
       for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
       {
-        V_t const ocv = calcOCV(cell_no);
-        double const soc = mySocOcvTable.get_x_from_y(ocv); // 0.00 ~ 100.00
+        double const soc = mySocVcellTable.get_x_from_y(cellV[cell_no - 1]); // 0.00 ~ 98.00
 
         lcd.print("B");
         lcd.print(cell_no);
@@ -273,13 +271,6 @@ void BMS::controlSystem()
   }
 
   measuredValuesAreFresh = false;
-}
-V_t BMS::calcOCV(int const cell_no) const
-{
-  V_t const focused_cellV = cellV[cell_no - 1];
-  bool const focused_cell_is_being_charged = not cells[cell_no - 1].balanceCircuit_pin.isHigh();
-
-  return focused_cellV;
 }
 void BMS::goodbye(int const countDown)
 {

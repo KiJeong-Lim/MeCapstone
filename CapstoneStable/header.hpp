@@ -147,7 +147,7 @@ public:
 };
 
 // implemented in "ocv.ino"
-extern AscMap const mySocOcvTable;
+extern AscMap const mySocVcellTable;
 
 // implemented in "CapstoneStable.ino"
 struct ReferenceCollection {
