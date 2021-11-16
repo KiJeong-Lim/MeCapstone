@@ -125,7 +125,7 @@ void BMS::progress(millis_t const given_time)
     }
     else
     {
-      for (millis_t remaining_time = given_time - hourglass.getDuration(); remaining_time > 0; remaining_time -= hourglass.getDuration())
+      while (hourglass.getDuration() < given_time)
       {
         if (not system_is_okay)
         {
@@ -280,8 +280,6 @@ V_t BMS::calcOCV(int const cell_no)
 }
 void BMS::goodbye(int const countDown)
 {
-  Timer hourglass;
-
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
@@ -293,6 +291,7 @@ void BMS::goodbye(int const countDown)
   }
   for (int i = countDown; i > 0; i--)
   {
+    Timer hourglass;
     if (lcdHandle)
     {
       lcdHandle->setCursor(0, 0);

@@ -45,9 +45,12 @@
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
 ** Make new file `CapstoneStable/ocv.ino`. -- For deriving OCV by looking-up the soc-ocv table.
+** Set `VERSION` to be `0.20`.
 ** [2021-11-16]
 ** Fix the class `SerialPrinter`.
 ** Improve the function `Formatter::putDouble`.
+** Fix the class `Timer`.
+** Set `VERSION` to be `0.30`.
 */
 
 #endif

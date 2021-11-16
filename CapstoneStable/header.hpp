@@ -15,7 +15,7 @@
 #include <LiquidCrystal_I2C.h>
 
 #define MAJOR_VERSION     0
-#define MINOR_VERSION     2
+#define MINOR_VERSION     3
 #define REVISION_NUMBER   0
 #include "version.h"
 
@@ -36,16 +36,12 @@ typedef int long long bigInt_t;
 // implemented in "utility.ino"
 bigInt_t pow10(int expn);
 class Timer {
-  millis_t curTime;
+  millis_t volatile begTime;
 public:
   Timer();
-  Timer(Timer const &other);
   ~Timer();
-private:
-  void syncTime();
-public:
-  millis_t &&getDuration();
-  bool wait(millis_t given_time);
+  millis_t getDuration() const;
+  void wait(millis_t duration) const;
 };
 struct Pin {
   pinId_t const pinId;

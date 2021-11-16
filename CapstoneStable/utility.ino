@@ -21,39 +21,22 @@ bigInt_t pow10(int const n)
 }
 
 Timer::Timer()
-  : curTime{ 0 }
+  : begTime{ 0 }
 {
-  curTime = millis();
-}
-Timer::Timer(Timer const &other)
-  : curTime{ other.curTime }
-{
+  begTime = millis();
 }
 Timer::~Timer()
 {
 }
-void Timer::syncTime()
+millis_t Timer::getDuration() const
 {
-  curTime = millis();
+  return millis() - begTime;
 }
-millis_t &&Timer::getDuration()
+void Timer::wait(millis_t const duration) const
 {
-  millis_t const beg_time = curTime;
-  syncTime();
-  return curTime - beg_time;
-}
-bool Timer::wait(millis_t given_time)
-{
-  given_time -= getDuration();
-  if (given_time >= 0)
+  while (getDuration() < duration)
   {
-    delay(given_time);
-    syncTime();
-    return true;
-  }
-  else
-  {
-    return false;
+    delay(1);
   }
 }
 
@@ -74,10 +57,11 @@ Val_t ReaderAnalogPin::readSignalOnce() const
 }
 Val_t ReaderAnalogPin::readSignal(millis_t const duration) const
 {
+  Timer hourglass;
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;
-  Timer hourglass;
-  for (millis_t remaining_time = duration; remaining_time >= 0; remaining_time -= hourglass.getDuration())
+
+  while (hourglass.getDuration() < duration)
   {
     sum_of_vals += read_once();
     cnt_of_vals++;
