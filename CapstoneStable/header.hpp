@@ -14,15 +14,15 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-#define MAJOR_VERSION    0
-#define MINOR_VERSION    2
-#define REVISION_NUMBER  0
+#define MAJOR_VERSION     0
+#define MINOR_VERSION     2
+#define REVISION_NUMBER   0
 #include "version.h"
 
 // macro defns
-#define LCD_SECTION_LEN     (LCD_WIDTH / LCD_SECTION_EA)
-#define LENGTH_OF(array)    (sizeof(array) / sizeof(*(array)))
-#define round(val)          ((val) >= 0 ? (bigInt_t)((val) + 0.5) : (bigInt_t)((val) - 0.5))
+#define LCD_SECTION_LEN   (LCD_WIDTH / LCD_SECTION_EA)
+#define LENGTH_OF(array)  (sizeof(array) / sizeof(*(array)))
+#define round(val)        ((bigInt_t)((val) + 0.5))
 
 // type synonym defns
 typedef int long long millis_t;
