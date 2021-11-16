@@ -1,6 +1,6 @@
 /* <CAPSTONE PROJECT>
 ** ===============================================================================
-** MEMBERS       | AFFILIATION                                                   |
+** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
 ** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
@@ -9,12 +9,6 @@
 */
 
 #include "header.hpp"
-
-static
-SerialPrinter &&SerialPrinter_trick()
-{
-  return { .prefix = nullptr, .lend = true };
-}
 
 LiquidCrystal_I2C *openLcdI2C()
 {
@@ -123,7 +117,12 @@ void LcdPrettyPrinter::println(char const *const str)
   newline();
 }
 
-#if defined(SERIAL_PORT)
+SerialPrinter::SerialPrinter(SerialPrinter &&other)
+  : messenger{ nullptr }
+  , newline{ true }
+{
+  other.newline = false;
+}
 SerialPrinter::SerialPrinter(char const *const prefix)
   : messenger{ prefix }
   , newline{ false }
@@ -136,76 +135,58 @@ SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
 }
 SerialPrinter::~SerialPrinter()
 {
+#if defined(SERIAL_PORT)
   if (newline)
   {
     Serial.println("");
     delay(5);
   }
+#endif
 }
 void SerialPrinter::print_messenger()
 {
   newline = false;
+#if defined(SERIAL_PORT)
   if (messenger)
   {
     Serial.print(messenger);
   }
+#endif
 }
-SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
+SerialPrinter SerialPrinter::operator<<(byte const &hex)
 {
   print_messenger();
+#if defined(SERIAL_PORT)
   Serial.print("0x");
   if (hex < 16)
   {
     Serial.print("0");
   }
   Serial.print(hex, HEX);
-  return SerialPrinter_trick();
-}
-SerialPrinter &&SerialPrinter::operator<<(int const &num)
-{
-  print_messenger();
-  Serial.print(num);
-  return SerialPrinter_trick();
-}
-SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
-{
-  print_messenger();
-  Serial.print(str);
-  return SerialPrinter_trick();
-}
-SerialPrinter &&SerialPrinter::operator<<(double const &val)
-{
-  print_messenger();
-  Serial.print(val);
-  return SerialPrinter_trick();
-}
-#else
-SerialPrinter::SerialPrinter(char const *const prefix)
-  : messenger{ prefix }
-  , newline{ false }
-{
-}
-SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
-  : messenger{ prefix }
-  , newline{ lend }
-{
-}
-SerialPrinter::~SerialPrinter()
-{
-}
-void SerialPrinter::print_messenger()
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(byte const &hex)
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(int const &num)
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(char const *const &str)
-{
-}
-SerialPrinter &&SerialPrinter::operator<<(double const &val)
-{
-}
 #endif
+  return { .prefix = nullptr, .lend = true };
+}
+SerialPrinter SerialPrinter::operator<<(int const &num)
+{
+  print_messenger();
+#if defined(SERIAL_PORT)
+  Serial.print(num);
+#endif
+  return { .prefix = nullptr, .lend = true };
+}
+SerialPrinter SerialPrinter::operator<<(char const *const &str)
+{
+  print_messenger();
+#if defined(SERIAL_PORT)
+  Serial.print(str);
+#endif
+  return { .prefix = nullptr, .lend = true };
+}
+SerialPrinter SerialPrinter::operator<<(double const &val)
+{
+  print_messenger();
+#if defined(SERIAL_PORT)
+  Serial.print(val);
+#endif
+  return { .prefix = nullptr, .lend = true };
+}

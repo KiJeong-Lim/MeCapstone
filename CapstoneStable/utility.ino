@@ -1,6 +1,6 @@
 /* <CAPSTONE PROJECT>
 ** ===============================================================================
-** MEMBERS       | AFFILIATION                                                   |
+** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
 ** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |

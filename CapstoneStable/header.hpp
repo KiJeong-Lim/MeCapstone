@@ -1,6 +1,6 @@
 /* <CAPSTONE PROJECT>
 ** ===============================================================================
-** MEMBERS       | AFFILIATION                                                   |
+** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
 ** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
@@ -137,21 +137,21 @@ class SerialPrinter {
 public:
   SerialPrinter() = delete;
   SerialPrinter(SerialPrinter const &other) = delete;
-  SerialPrinter(SerialPrinter &&other) = delete;
+  SerialPrinter(SerialPrinter &&other);
   SerialPrinter(char const *prefix);
   SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();
 private:
   void print_messenger();
 public:
-  SerialPrinter &&operator<<(byte const &hex);
-  SerialPrinter &&operator<<(int const &num);
-  SerialPrinter &&operator<<(char const *const &str);
-  SerialPrinter &&operator<<(double const &val);
+  SerialPrinter operator<<(byte const &hex);
+  SerialPrinter operator<<(int const &num);
+  SerialPrinter operator<<(char const *const &str);
+  SerialPrinter operator<<(double const &val);
 };
 
 // implemented in "ocv.ino"
-V_t getOcvFromVcell(V_t Vcell);
+V_t getOcvFromVcell(V_t Vcell, A_t Iin);
 extern AscMap const mySocOcvTable;
 
 // implemented in "CapstoneStable.ino"
@@ -161,6 +161,6 @@ struct ReferenceCollection {
   V_t const zenerdiodeVfromRtoA;
   Ohm_t const sensitivityOfCurrentSensor;
 };
-extern SerialPrinter const cout, cerr, chan;
+extern SerialPrinter cout, cerr, chan;
 
 #endif

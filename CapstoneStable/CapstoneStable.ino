@@ -1,6 +1,6 @@
 /* <CAPSTONE PROJECT>
 ** ===============================================================================
-** MEMBERS       | AFFILIATION                                                   |
+** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
 ** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
@@ -177,7 +177,7 @@ void BMS::measureValues(bool const showValues)
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
   Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) + 0.04; // `0.04` is a calibration.
-  // Guarantee the above values are fresh
+  // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
 
   if (showValues)
@@ -194,7 +194,7 @@ void BMS::measureValues(bool const showValues)
 
       for (int i = 0; i < LENGTH_OF(cellV); i++)
       {
-        V_t const ocv = getOcvFromVcell(cellV[i]);
+        V_t const ocv = getOcvFromVcell(cellV[i], Iin);
         double const soc = mySocOcvTable.get_x_from_y(ocv); // 0.00 ~ 100.00
 
         lcd.print("B");
@@ -270,18 +270,17 @@ void BMS::controlSystem()
   }
 
   jobsDone = true;
-
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
     bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
     bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
 
     jobsDone &= this_cell_charging_finished;
+
     if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOff();
     }
-
     if ((this_cell_charging_finished) and (this_cell_being_charged_now))
     {
       cells[i].balanceCircuit_pin.turnOn();
@@ -324,6 +323,6 @@ void BMS::goodbye(int const countDown)
   abort();
 }
 
-SerialPrinter const cout = { .prefix = "       > " };
-SerialPrinter const cerr = { .prefix = "WARNING> " };
-SerialPrinter const chan = { .prefix = "Arduino> " };
+SerialPrinter cout = { .prefix = "       > " };
+SerialPrinter cerr = { .prefix = "WARNING> " };
+SerialPrinter chan = { .prefix = "Arduino> " };

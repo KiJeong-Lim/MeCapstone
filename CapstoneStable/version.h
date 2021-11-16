@@ -1,6 +1,6 @@
 /* <CAPSTONE PROJECT>
 ** ===============================================================================
-** MEMBERS       | AFFILIATION                                                   |
+** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
 ** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
@@ -45,6 +45,8 @@
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
 ** Make new file `CapstoneStable/ocv.ino`. -- For deriving OCV by looking-up the soc-ocv table.
+** [2021-11-16]
+** Fix `SerialPrinter`.
 */
 
 #endif

@@ -1,6 +1,6 @@
 /* <CAPSTONE PROJECT>
 ** ===============================================================================
-** MEMBERS       | AFFILIATION                                                   |
+** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
 ** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
 ** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
@@ -64,7 +64,7 @@ constexpr double ocvs[] =
 , 4.20280000000000 // 100%
 };
 
-V_t getOcvFromVcell(V_t const Vcell) // FIX ME!
+V_t getOcvFromVcell(V_t const Vcell, A_t const Iin) // FIX ME!
 {
   return Vcell;
 }
