@@ -10,12 +10,12 @@
 
 #include "header.hpp"
 
-constexpr V_t V_wanted = 3.60, overV_wanted = 3.60; // FIX ME!
+constexpr V_t V_wanted = 3.60, overV_wanted = 4.20; // FIX ME!
 constexpr ReferenceCollection refOf =
 { .analogSignalMax                  = 1024
 , .arduinoRegularV                  = 5.00
-, .zenerdiodeVfromRtoA              = 2.48 // is `Vref` of the zener-diode `TL431`.
-, .sensitivityOfCurrentSensor       = .100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
+, .zenerdiodeVfromRtoA              = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
+, .sensitivityOfCurrentSensor       = 0.100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
 };
 constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
 constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
@@ -55,7 +55,7 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
-  V_t calcOCV(int cell_no);
+  V_t calcOCV(int cell_no); // FIX ME!
   void goodbye(int timeLeftToQuit);
 } myBMS;
 
