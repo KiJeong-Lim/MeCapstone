@@ -26,7 +26,7 @@ public:
     }
     cnt = 0;
   }
-  void write(char *p_ch)
+  void send(char *p_ch)
   {
     for (cnt = 0; cnt < Capacity; cnt++)
     {
@@ -77,7 +77,7 @@ public:
     {
       int cn = afters_dot;
       bigInt_t pow10_afters_dot = pow10(afters_dot);
-      bigInt_t valN = round(val * pow10_afters_dot);
+      bigInt_t valN = ROUND(val * pow10_afters_dot);
       bigInt_t valF = valN % pow10_afters_dot;
       valN /= pow10_afters_dot;
       putInt(valN);
@@ -90,7 +90,7 @@ public:
     else
     {
       bigInt_t valE = pow10(- afters_dot);
-      bigInt_t valN = round((double)val / (double)valE);
+      bigInt_t valN = ROUND(val / ((double)valE));
       valN *= valE;
       putInt(valN);
     }

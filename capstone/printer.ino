@@ -82,7 +82,7 @@ void LcdPrettyPrinter::flush()
   int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
   if (c < LCD_HEIGHT && r < LCD_WIDTH)
   {
-    fbuf.write(&mybuf[c][r]);
+    fbuf.send(&mybuf[c][r]);
   }
   fbuf.clear();
 }

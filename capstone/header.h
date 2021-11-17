@@ -22,7 +22,7 @@
 // macro defns
 #define LCD_SECTION_LEN   (LCD_WIDTH / LCD_SECTION_EA)
 #define LENGTH_OF(array)  (sizeof(array) / sizeof(*(array)))
-#define round(val)        ((bigInt_t)((val) + 0.5))
+#define ROUND(val)        ((bigInt_t)((val) + 0.5))
 
 // type synonym defns
 typedef int long long millis_t;
@@ -40,8 +40,8 @@ class Timer {
 public:
   Timer();
   ~Timer();
-  millis_t getDuration() const;
-  void wait(millis_t duration) const;
+  millis_t time() const;
+  void delay(millis_t duration) const;
 };
 struct Pin {
   pinId_t const pinId;

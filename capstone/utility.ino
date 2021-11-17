@@ -28,15 +28,15 @@ Timer::Timer()
 Timer::~Timer()
 {
 }
-millis_t Timer::getDuration() const
+millis_t Timer::time() const
 {
   return millis() - begTime;
 }
-void Timer::wait(millis_t const duration) const
+void Timer::delay(millis_t const duration) const
 {
-  while (getDuration() < duration)
+  while (time() < duration)
   {
-    delay(1);
+    ::delay(1);
   }
 }
 
@@ -61,7 +61,7 @@ Val_t ReaderAnalogPin::readSignal(millis_t const duration) const
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;
 
-  while (hourglass.getDuration() < duration)
+  while (hourglass.time() < duration)
   {
     sum_of_vals += read_once();
     cnt_of_vals++;

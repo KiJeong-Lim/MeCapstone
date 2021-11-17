@@ -100,7 +100,7 @@ void BMS::initialize(millis_t const given_time)
   {
     serr << "LCD not connected.";
   }
-  hourglass.wait(given_time);
+  hourglass.delay(given_time);
 }
 void BMS::progress(millis_t const given_time)
 {
@@ -124,7 +124,7 @@ void BMS::progress(millis_t const given_time)
     }
     else
     {
-      while (hourglass.getDuration() < given_time)
+      while (hourglass.time() < given_time)
       {
         if (not system_is_okay)
         {
@@ -292,7 +292,7 @@ void BMS::goodbye(int const countDown)
       lcdHandle->print(i - 1);
     }
     serr << "Your arduino will abort in " << i << " seconds.";
-    hourglass.wait(1000);
+    hourglass.delay(1000);
   }
   if (lcdHandle)
   {
