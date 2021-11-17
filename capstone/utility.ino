@@ -57,9 +57,9 @@ Val_t ReaderAnalogPin::readSignalOnce() const
 }
 Val_t ReaderAnalogPin::readSignal(millis_t const duration) const
 {
-  Timer hourglass;
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;
+  Timer hourglass;
 
   while (hourglass.time() < duration)
   {
