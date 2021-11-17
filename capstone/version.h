@@ -53,12 +53,27 @@
 ** Set `VERSION` to be `0.30`.
 ** [2021-11-17]
 ** Move `CapstoneStable/version.h`          -> `capstone/version.h`,
-**      `CapstoneStable/header.hpp`         -> `capstone/header.hpp`,
+**      `CapstoneStable/header.hpp`         -> `capstone/header.h`,
 **      `CapstoneStable/formatter.hpp`      -> `capstone/formatter.hpp`,
 **      `CapstoneStable/printer.ino`        -> `capstone/printer.ino`,
 **      `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
 **      `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
 **      `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
+*/
+
+/* <Schematics>
+** [2021-11-09]
+**                             +---< R
+**             +---------------|---< A
+**      5V >---|---< 1kOhm >---+---< K
+**     GND >---+               |   [TL431]
+**      A0 >---|---------------|---+
+**      A1 >---|---------------+   |
+** [Arudino]   |                   |
+**             |                   |
+**             +---< 18kOhm >------+---< 2 kOhm >---+
+**             |                                    |
+**             +---< (-) Cell (+) >-----------------+
 */
 
 #endif

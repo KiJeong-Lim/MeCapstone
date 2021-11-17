@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#include "header.hpp"
+#include "header.h"
 
 static
 double const Vcells[] =

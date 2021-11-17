@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#include "header.hpp"
+#include "header.h"
 
 constexpr V_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
 constexpr ReferenceCollection refOf =
@@ -305,6 +305,6 @@ void BMS::goodbye(int const countDown)
   abort();
 }
 
-SerialPrinter sout = { .prefix = "message> " };
+SerialPrinter sout = { .prefix = "arduino> " };
 SerialPrinter serr = { .prefix = "WARNING> " };
-SerialPrinter slog = { .prefix = "Arduino> " };
+SerialPrinter slog = { .prefix = "       > " };
