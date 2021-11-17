@@ -53,6 +53,14 @@
 ** Move `CapstoneStable/ocv.ino` to
 **      `CapstoneStable/soc.ino`.
 ** Set `VERSION` to be `0.30`.
+** [2021-11-17]
+** Move `CapstoneStable/version.h`          -> `capstone/version.h`,
+**      `CapstoneStable/header.hpp`         -> `capstone/header.hpp`,
+**      `CapstoneStable/formatter.hpp`      -> `capstone/formatter.hpp`,
+**      `CapstoneStable/printer.ino`        -> `capstone/printer.ino`,
+**      `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
+**      `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
+**      `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
 */
 
 #endif

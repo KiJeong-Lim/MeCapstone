@@ -149,7 +149,7 @@ public:
 // implemented in "soc.ino"
 extern AscMap const mySocVcellTable;
 
-// implemented in "CapstoneStable.ino"
+// implemented in "capstone.ino"
 struct ReferenceCollection {
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;
