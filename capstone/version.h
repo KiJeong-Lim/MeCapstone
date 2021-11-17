@@ -40,8 +40,7 @@
 ** Insert `Wire.begin();` in `BMS::initialize`. -- This is a very important change.
 **                                              -- If `Wire.begin();` is missed,
 **                                                 the function `openLcdI2c` will not work.
-** Move `CapstoneStable/header.h` to
-**      `CapstoneStable/header.hpp`.
+** Move `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
 ** Fix `LcdPrettyPrinter::~LcdPrettyPrinter`. -- Relace `mybuf[c][LCD_WIDTH - 1] = '\0';`
 **                                                 with `mybuf[c][LCD_WIDTH] = '\0';`.
 ** Make new file `CapstoneStable/ocv.ino`. -- For deriving OCV by looking-up the soc-ocv table.
@@ -50,8 +49,7 @@
 ** Fix the class `SerialPrinter`.
 ** Improve the function `Formatter::putDouble`.
 ** Fix the class `Timer`.
-** Move `CapstoneStable/ocv.ino` to
-**      `CapstoneStable/soc.ino`.
+** Move `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
 ** Set `VERSION` to be `0.30`.
 ** [2021-11-17]
 ** Move `CapstoneStable/version.h`          -> `capstone/version.h`,

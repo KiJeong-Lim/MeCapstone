@@ -2,9 +2,9 @@
 ** ===============================================================================
 ** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
-** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
-** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
-** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
+** Hwan-hee Jeon | School of Meslogical Engineering, Chonnam National University |
+** Hak-jung Im   | School of Meslogical Engineering, Chonnam National University |
+** Ki-jeong Lim  | School of Meslogical Engineering, Chonnam National University |
 ** ===============================================================================
 */
 
@@ -79,7 +79,7 @@ void BMS::initialize(millis_t const given_time)
   Timer hourglass;
 
   Wire.begin();
-  cout << "Run time started.";
+  sout << "Run time started.";
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.initWith(true);
@@ -98,7 +98,7 @@ void BMS::initialize(millis_t const given_time)
   }
   else
   {
-    cerr << "LCD not connected.";
+    serr << "LCD not connected.";
   }
   hourglass.wait(given_time);
 }
@@ -113,7 +113,7 @@ void BMS::progress(millis_t const given_time)
     controlSystem();
     if (system_is_okay and jobsDone)
     {
-      cout << "CHARGING COMPLETED.";
+      sout << "CHARGING COMPLETED.";
       if (lcdHandle)
       {
         lcdHandle->clear();
@@ -166,11 +166,11 @@ void BMS::measureValues(bool const showValues)
 
   if (showValues)
   {
-    chan << "arduino5V = " << arduino5V << "[V].";
-    chan << "Iin = " << Iin << "[A].";
+    slog << "arduino5V = " << arduino5V << "[V].";
+    slog << "Iin = " << Iin << "[A].";
     for (int i = 0; i < LENGTH_OF(cellV); i++)
     {
-      chan << "cellV[" << i << "] = " << cellV[i] << "[V].";
+      slog << "cellV[" << i << "] = " << cellV[i] << "[V].";
     }
     if (lcdHandle)
     {
@@ -209,7 +209,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
     isBad = true;
     if (reportsToSerial)
     {
-      cerr << "`Iin`" << " too HIGH.";
+      serr << "`Iin`" << " too HIGH.";
     }
   }
   if (Iin < allowedA_min)
@@ -217,7 +217,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
     isBad = true;
     if (reportsToSerial)
     {
-      cerr << "`Iin`" << " too LOW.";
+      serr << "`Iin`" << " too LOW.";
     }
   }
 
@@ -229,7 +229,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
       isBad = true;
       if (reportsToSerial)
       {
-        cerr << "`cellV[" << i << "]`" << " too HIGH.";
+        serr << "`cellV[" << i << "]`" << " too HIGH.";
       }
     }
     if (cellV[i] < allowedV_min)
@@ -237,7 +237,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
       isBad = true;
       if (reportsToSerial)
       {
-        cerr << "`cellV[" << i << "]`" << " too LOW.";
+        serr << "`cellV[" << i << "]`" << " too LOW.";
       }
     }
   }
@@ -291,7 +291,7 @@ void BMS::goodbye(int const countDown)
       lcdHandle->setCursor(0, 0);
       lcdHandle->print(i - 1);
     }
-    cerr << "Your arduino will abort in " << i << " seconds.";
+    serr << "Your arduino will abort in " << i << " seconds.";
     hourglass.wait(1000);
   }
   if (lcdHandle)
@@ -305,6 +305,6 @@ void BMS::goodbye(int const countDown)
   abort();
 }
 
-SerialPrinter cout = { .prefix = "message> " };
-SerialPrinter cerr = { .prefix = "WARNING> " };
-SerialPrinter chan = { .prefix = "Arduino> " };
+SerialPrinter sout = { .prefix = "message> " };
+SerialPrinter serr = { .prefix = "WARNING> " };
+SerialPrinter slog = { .prefix = "Arduino> " };
