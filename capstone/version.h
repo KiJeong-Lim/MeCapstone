@@ -60,6 +60,7 @@
 **      `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
 **      `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
 ** Fix the schematic of [2021-11-09].
+** Improve the class `SerialPrinter`.
 */
 
 /* Schematics

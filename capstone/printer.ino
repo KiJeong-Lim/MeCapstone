@@ -121,7 +121,7 @@ void LcdPrettyPrinter::println(char const *const str)
 
 // SerialPrinter
 SerialPrinter::SerialPrinter(SerialPrinter &&other)
-  : messenger{ nullptr }
+  : messenger{ other.messenger }
   , newline{ true }
 {
   other.newline = false;
