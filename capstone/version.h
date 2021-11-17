@@ -59,6 +59,7 @@
 **      `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
 **      `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
 **      `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
+** Fix the schematic of [2021-11-09].
 */
 
 /* Schematics
@@ -69,9 +70,10 @@
 **     GND >---+               |   [TL431]
 **      A0 >---|---+           |
 **      A1 >---|---|-----------+
-** [Arudino]   |   +------------+
-**             |                |
-**             +---< 18kOhm >---+---< 2kOhm >---+
+** [Arudino]   |   |
+**             |   +-----------+
+**             |               |
+**             +---< 2kOhm >---+---< 18kOhm >---+
 **             |                                |
 **             +---< (-) Cell (+) >-------------+
 */
