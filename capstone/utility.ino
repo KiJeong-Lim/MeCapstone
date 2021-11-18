@@ -10,6 +10,12 @@
 
 #include "header.h"
 
+inline
+void delay1ms()
+{
+  delay(1);
+}
+
 bigInt_t pow10(int const n)
 {
   bigInt_t res = 1;
@@ -36,7 +42,7 @@ void Timer::delay(millis_t const duration) const
 {
   while (time() < duration)
   {
-    ::delay(1);
+    delay1ms();
   }
 }
 

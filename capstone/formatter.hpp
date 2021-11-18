@@ -26,11 +26,16 @@ public:
     }
     cnt = 0;
   }
-  void send(char *p_ch)
+  void send(char *const target_address)
   {
-    for (cnt = 0; cnt < Capacity; cnt++)
+    if (target_address)
     {
-      *p_ch++ = buf[cnt];
+      char *p_ch = target_address; 
+
+      for (cnt = 0; cnt < Capacity; cnt++)
+      {
+        *p_ch++ = buf[cnt];
+      }
     }
   }
   void putChar(char const printMe)
