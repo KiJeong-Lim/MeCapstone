@@ -23,10 +23,10 @@ ReferenceCollection refOf =
 };
 
 static constexpr
-V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
+V_t allowedV_max = +4.20, allowedV_min = +2.70; // FIX ME!
 
 static constexpr
-A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
+A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 PinsOfCell const cells[] =
@@ -54,10 +54,10 @@ class BMS {
   bool measuredValuesAreFresh   = false;
   LiquidCrystal_I2C *lcdHandle  = nullptr;
   V_t arduino5V                 = refOf.arduinoRegularV;
+  millis_t lastUpdateTimeOfQs   = 0;
   A_t Iin                       = 0.00;
   V_t cellVs[LENGTH_OF(cells)]  = { };
   mAh_t Qs[LENGTH_OF(cells)]    = { };
-  millis_t lastUpdateTimeOfQs   = 0;
 public:
   void initialize(millis_t timeLimit);
   void progress(millis_t timeLimit);
