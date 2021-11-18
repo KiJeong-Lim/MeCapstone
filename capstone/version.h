@@ -70,7 +70,7 @@
 **      `capstone/printer.ino`   -> `capstone/printers.ino`,
 **      `capstone/soc.ino`       -> `capstone/data.ino`,
 **      `capstone/header.h`      -> `capstone/capstone.h`.
-** Make new class `BMS::CellManager`.
+** Improve the method to check SoC of cells.
 */
 
 /* Schematics
