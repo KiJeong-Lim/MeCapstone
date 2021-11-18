@@ -68,7 +68,7 @@ class BMS {
     ~CellManager()
     {
     }
-    void init(V_t (*const cellVs_adr)[LENGTH_OF(cellVs)], A_t const *const Iin_adr)
+    void coronate(V_t (*const cellVs_adr)[LENGTH_OF(cellVs)], A_t const *const Iin_adr)
     {
       cellVs_ref = *cellVs_adr;
       Iin_ref = Iin_ref;
@@ -153,7 +153,7 @@ void BMS::initialize(millis_t const given_time)
     cells[i].BalanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(true);
-  manager.init(&cellVs, &Iin);
+  manager.coronate(&cellVs, &Iin);
   lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcdHandle)
   {
