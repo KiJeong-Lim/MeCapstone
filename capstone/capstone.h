@@ -29,6 +29,7 @@ typedef int long long millis_t;
 typedef double A_t;
 typedef double V_t;
 typedef double Ohm_t;
+typedef double long mAh_t;
 typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
@@ -165,6 +166,7 @@ struct PinsOfCell {
 struct ReferenceCollection {
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;
+  mAh_t const batteryCapacity;
   V_t const zenerdiodeVfromRtoA;
   Ohm_t const sensitivityOfCurrentSensor;
 };

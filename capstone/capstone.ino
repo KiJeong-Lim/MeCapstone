@@ -17,6 +17,7 @@ static constexpr
 ReferenceCollection refOf =
 { .analogSignalMax            = 1024
 , .arduinoRegularV            = 5.00
+, .batteryCapacity            = 3317
 , .zenerdiodeVfromRtoA        = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
 , .sensitivityOfCurrentSensor = 0.100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
 };
@@ -54,7 +55,66 @@ class BMS {
   LiquidCrystal_I2C *lcdHandle  = nullptr;
   V_t arduino5V                 = refOf.arduinoRegularV;
   A_t Iin                       = 0.00;
-  V_t cellV[LENGTH_OF(cells)]   = { };
+  V_t cellVs[LENGTH_OF(cells)]  = { };
+  class CellManager {
+    millis_t lastUpdateTime         = 0;
+    V_t const *cellVs_ref           = nullptr;
+    A_t const *Iin_ref              = nullptr;
+    mAh_t charges[LENGTH_OF(cells)] = { };
+  public:
+    CellManager()
+    {
+    }
+    ~CellManager()
+    {
+    }
+    void init(V_t (*const cellVs_adr)[LENGTH_OF(cellVs)], A_t const *const Iin_adr)
+    {
+      cellVs_ref = *cellVs_adr;
+      Iin_ref = Iin_ref;
+      for (int i = 0; i < LENGTH_OF(charges); i++)
+      {
+        charges[i] = refOf.batteryCapacity * mySocOcvTable.get_x_from_y(cellVs_ref[i]) / 100;
+      }
+      lastUpdateTime = millis();
+    }
+    void startCharging(int const cell_no)
+    {
+      int count_of_batteries_being_charged = 0;
+      for (int i = 0; i < LENGTH_OF(cells); i++)
+      {
+        count_of_batteries_being_charged += not cells[i].BalanceCircuit_pin.isHigh();
+      }
+      for (int i = 0; i < LENGTH_OF(cells); i++)
+      {
+        charges[i] += (*Iin_ref / count_of_batteries_being_charged) * (millis() - lastUpdateTime) / 3600;
+      }
+      lastUpdateTime = millis();
+      cells[cell_no].BalanceCircuit_pin.turnOff();
+    }
+    void breakCharging(int const cell_no)
+    {
+      int count_of_batteries_being_charged = 0;
+      for (int i = 0; i < LENGTH_OF(cells); i++)
+      {
+        count_of_batteries_being_charged += not cells[i].BalanceCircuit_pin.isHigh();
+      }
+      for (int i = 0; i < LENGTH_OF(cells); i++)
+      {
+        charges[i] += (*Iin_ref / count_of_batteries_being_charged) * (millis() - lastUpdateTime) / 3600;
+      }
+      lastUpdateTime = millis();
+      cells[cell_no].BalanceCircuit_pin.turnOn();
+    }
+    double getSocOf(int const i)
+    {
+#if 0
+      return mySocVcellTable.get_x_from_y(cellVs_ref[i]);
+#else
+      return (charges[i] / refOf.batteryCapacity) * 100;
+#endif
+    }
+  } manager;
 public:
   void initialize(millis_t timeLimit);
   void progress(millis_t timeLimit);
@@ -62,7 +122,6 @@ private:
   void measureValues();
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
-  double getSoc(int cell_no);
   void printValues();
   void goodbye(int secsLeftToQuit);
 } myBMS;
@@ -94,6 +153,7 @@ void BMS::initialize(millis_t const given_time)
     cells[i].BalanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(true);
+  manager.init(&cellVs, &Iin);
   lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcdHandle)
   {
@@ -140,9 +200,9 @@ void BMS::progress(millis_t const given_time)
         {
           for (int i = 0; i < LENGTH_OF(cells); i++)
           {
-            if (cellV[i] > allowedV_max)
+            if (cellVs[i] > allowedV_max)
             {
-              cells[i].BalanceCircuit_pin.turnOn();
+              manager.breakCharging(i);
             }
           }
           delay(500);
@@ -165,8 +225,8 @@ void BMS::measureValues()
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
     sensorV = arduino5V * cells[i].voltage_sensor_pin.readSignal(measuring_time) / refOf.analogSignalMax;
-    cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
-    accumV += cellV[i];
+    cellVs[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
+    accumV += cellVs[i];
   }
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
@@ -174,38 +234,26 @@ void BMS::measureValues()
   // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
 }
-double BMS::getSoc(int const cell_no)
-{
-  V_t const &cellV_focused = cellV[cell_no - 1];
-  double soc = 0.0;
-
-#if MODE == 1
-  soc = mySocVcellTable.get_x_from_y(cellV_focused);
-#else
-  soc = mySocVcellTable.get_x_from_y(cellV_focused);
-#endif
-  return soc;
-}
 void BMS::printValues()
 {
   slog << "arduino5V = " << arduino5V << "[V].";
   slog << "Iin = " << Iin << "[A].";
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  for (int i = 0; i < LENGTH_OF(cellVs); i++)
   {
-    slog << "cellV[" << i << "] = " << cellV[i] << "[V].";
+    slog << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
   }
   if (lcdHandle)
   {
     LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
 
-    for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
+    for (int i = 0; i < LENGTH_OF(cellVs); i++)
     {
-      double const soc = getSoc(cell_no);
+      double const soc = manager.getSocOf(i);
 
       lcd.print("B");
-      lcd.print(cell_no);
+      lcd.print(i + 1);
       lcd.print("=");
-      lcd.println(cellV[cell_no - 1]);
+      lcd.println(cellVs[i]);
       lcd.print(" ");
       lcd.print(soc);
       lcd.println("%");
@@ -243,22 +291,22 @@ bool BMS::checkSafety(bool const reportsToSerial)
   }
 
   // Check voltages
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  for (int i = 0; i < LENGTH_OF(cellVs); i++)
   {
-    if (cellV[i] > allowedV_max)
+    if (cellVs[i] > allowedV_max)
     {
       isBad = true;
       if (reportsToSerial)
       {
-        serr << "`cellV[" << i << "]`" << " too HIGH.";
+        serr << "`cellVs[" << i << "]`" << " too HIGH.";
       }
     }
-    if (cellV[i] < allowedV_min)
+    if (cellVs[i] < allowedV_min)
     {
       isBad = true;
       if (reportsToSerial)
       {
-        serr << "`cellV[" << i << "]`" << " too LOW.";
+        serr << "`cellVs[" << i << "]`" << " too LOW.";
       }
     }
   }
@@ -274,20 +322,20 @@ void BMS::controlSystem()
   }
 
   jobsDone = true;
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  for (int i = 0; i < LENGTH_OF(cellVs); i++)
   {
     bool const is_this_cell_being_charged_now = not cells[i].BalanceCircuit_pin.isHigh();
-    bool const is_this_cell_fully_charged_now = cellV[i] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
+    bool const is_this_cell_fully_charged_now = cellVs[i] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
 
     jobsDone &= is_this_cell_fully_charged_now;
 
     if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
     {
-      cells[i].BalanceCircuit_pin.turnOff();
+      manager.startCharging(i);
     }
     if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
     {
-      cells[i].BalanceCircuit_pin.turnOn();
+      manager.breakCharging(i);
     }
   }
 
