@@ -81,6 +81,9 @@ PwmSetter::PwmSetter(pinId_t const pinId)
   : PinHandler{ .pin_to_handle = pinId }
 {
 }
+PwmSetter::~PwmSetter()
+{
+}
 void PwmSetter::openPin() const
 {
   pinMode(pin_to_handle, OUTPUT);

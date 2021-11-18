@@ -149,6 +149,7 @@ public:
   PwmSetter(PwmSetter const &other) = delete;
   PwmSetter(PwmSetter &&other) = delete;
   PwmSetter(pinId_t pinId);
+  ~PwmSetter();
 private:
   void openPin() const;
 public:
