@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#include "capstone.h"
+#include "capstone.hpp"
 
 static constexpr
 double const Ocvs[] =

@@ -8,7 +8,43 @@
 ** ===============================================================================
 */
 
-#include "capstone.h"
+#include "capstone.hpp"
+
+LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
+{
+  LiquidCrystal_I2C *lcdHandle = nullptr;
+
+  if (lcdWidth > 0 && lcdHeight > 0)
+  {
+    byte adr = 0xFF;
+
+    do
+    {
+      byte response = 4;
+
+      Wire.beginTransmission(adr);
+      response = Wire.endTransmission(adr);
+      if (response == 0)
+      {
+        sout << "I2C address found: address = " << adr << ".";
+        lcdHandle = new LiquidCrystal_I2C(adr, lcdWidth, lcdHeight);
+        if (lcdHandle)
+        {
+          sout << "I2C connected: address = " << adr << ".";
+          break;
+        }
+      }
+      adr--;
+    } while (adr != 0x00);
+
+    if (lcdHandle)
+    {
+      lcdHandle->init();
+      lcdHandle->backlight();
+    }
+  }
+  return lcdHandle;
+}
 
 LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const addressOfLcdI2C)
   : lcdHandle{ addressOfLcdI2C }

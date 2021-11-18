@@ -71,6 +71,9 @@
 **      `capstone/soc.ino`       -> `capstone/data.ino`,
 **      `capstone/header.h`      -> `capstone/capstone.h`.
 ** Improve the method to check SoC of cells.
+** [2021-11-19]
+** Remove `capstone/formatters.hpp`.
+** Move `capstone/capstone.h` -> `capstone/capstone.hpp`.
 */
 
 /* Schematics

@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#include "capstone.h"
+#include "capstone.hpp"
 
 static constexpr
 V_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
