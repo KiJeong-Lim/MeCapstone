@@ -105,7 +105,7 @@ public:
 
 // implemented in "printer.ino"
 #include "formatter.hpp"
-LiquidCrystal_I2C *openLcdI2C();
+LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 class LcdPrettyPrinter {
   LiquidCrystal_I2C *const lcdHandle;
   int section_no;
@@ -147,7 +147,7 @@ public:
 };
 
 // implemented in "soc.ino"
-extern AscMap const mySocVcellTable;
+extern AscMap const mySocVcellTable, mySocOcvTable;
 
 // implemented in "capstone.ino"
 struct ReferenceCollection {

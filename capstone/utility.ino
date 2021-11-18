@@ -66,7 +66,7 @@ Val_t ReaderAnalogPin::readSignal(millis_t const duration) const
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;
 
-  for (Timer hourglass; hourglass.time() < duration; cnt_of_vals++)
+  for (Timer hourglass = {}; hourglass.time() < duration; cnt_of_vals++)
   {
     sum_of_vals += read_once();
   }

@@ -83,7 +83,7 @@ void loop()
 
 void BMS::initialize(millis_t const given_time)
 {
-  Timer hourglass;
+  Timer hourglass = {};
 
   Wire.begin();
   sout << "Run time started.";
@@ -92,7 +92,7 @@ void BMS::initialize(millis_t const given_time)
     cells[i].balanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(true);
-  lcdHandle = openLcdI2C();
+  lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcdHandle)
   {
     LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
@@ -111,7 +111,7 @@ void BMS::initialize(millis_t const given_time)
 }
 void BMS::progress(millis_t const given_time)
 {
-  Timer hourglass;
+  Timer hourglass = {};
 
   measureValues(true);
   {
@@ -185,7 +185,7 @@ void BMS::measureValues(bool const showValues)
 
       for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
       {
-        double const soc = mySocVcellTable.get_x_from_y(cellV[cell_no - 1]); // 0.00 ~ 98.00
+        double const soc = mySocVcellTable.get_x_from_y(cellV[cell_no - 1]);
 
         lcd.print("B");
         lcd.print(cell_no);
@@ -292,7 +292,7 @@ void BMS::goodbye(int const countDown)
   }
   for (int i = countDown; i > 0; i--)
   {
-    Timer hourglass;
+    Timer hourglass = {};
     if (lcdHandle)
     {
       lcdHandle->setCursor(0, 0);

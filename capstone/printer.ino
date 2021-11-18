@@ -11,11 +11,11 @@
 #include "header.h"
 
 // openLcdI2C
-LiquidCrystal_I2C *openLcdI2C()
+LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
 {
   LiquidCrystal_I2C *lcdHandle = nullptr;
 
-  if (LCD_WIDTH > 0 && LCD_HEIGHT > 0)
+  if (lcdWidth > 0 && lcdHeight > 0)
   {
     byte adr = 0xFF;
 
@@ -28,7 +28,7 @@ LiquidCrystal_I2C *openLcdI2C()
       if (response == 0)
       {
         sout << "I2C address found: address = " << adr << ".";
-        lcdHandle = new LiquidCrystal_I2C(adr, LCD_WIDTH, LCD_HEIGHT);
+        lcdHandle = new LiquidCrystal_I2C(adr, lcdWidth, lcdHeight);
         if (lcdHandle)
         {
           sout << "I2C connected: address = " << adr << ".";
