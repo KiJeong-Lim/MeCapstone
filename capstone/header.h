@@ -66,17 +66,17 @@ public:
 
 // implemented in "printer.ino"
 #include "formatter.hpp"
-class LcdPrettyPrinter {
+class LcdPrinter {
   LiquidCrystal_I2C *const lcdHandle;
   int section_no;
   Formatter<LCD_SECTION_LEN> fbuf;
   char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
-  LcdPrettyPrinter() = delete;
-  LcdPrettyPrinter(LcdPrettyPrinter const &other) = delete;
-  LcdPrettyPrinter(LcdPrettyPrinter &&other) = delete;
-  LcdPrettyPrinter(LiquidCrystal_I2C *controllerOfLCD);
-  ~LcdPrettyPrinter();
+  LcdPrinter() = delete;
+  LcdPrinter(LcdPrinter const &other) = delete;
+  LcdPrinter(LcdPrinter &&other) = delete;
+  LcdPrinter(LiquidCrystal_I2C *addressOfLcdI2C);
+  ~LcdPrinter();
 private:
   void newline();
 public:

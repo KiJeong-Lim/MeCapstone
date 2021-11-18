@@ -10,8 +10,8 @@
 
 #include "header.h"
 
-LcdPrettyPrinter::LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD)
-  : lcdHandle{ controllerOfLCD }
+LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const addressOfLcdI2C)
+  : lcdHandle{ addressOfLcdI2C }
   , section_no{ 0 }
   , fbuf{ }
   , mybuf{ }
@@ -25,7 +25,7 @@ LcdPrettyPrinter::LcdPrettyPrinter(LiquidCrystal_I2C *const controllerOfLCD)
   }
   fbuf.clear();
 }
-LcdPrettyPrinter::~LcdPrettyPrinter()
+LcdPrinter::~LcdPrinter()
 {
   if (lcdHandle)
   {
@@ -38,7 +38,7 @@ LcdPrettyPrinter::~LcdPrettyPrinter()
     }
   }
 }
-void LcdPrettyPrinter::flush()
+void LcdPrinter::flush()
 {
   int const c = (section_no / LCD_SECTION_EA) * 1;
   int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
@@ -48,34 +48,34 @@ void LcdPrettyPrinter::flush()
   }
   fbuf.clear();
 }
-void LcdPrettyPrinter::newline()
+void LcdPrinter::newline()
 {
   flush();
   section_no++;
 }
-void LcdPrettyPrinter::print(int const num)
+void LcdPrinter::print(int const num)
 {
   fbuf.putInt(num, 10);
 }
-void LcdPrettyPrinter::print(double const val)
+void LcdPrinter::print(double const val)
 {
   fbuf.putDouble(val, 2);
 }
-void LcdPrettyPrinter::print(char const *const str)
+void LcdPrinter::print(char const *const str)
 {
   fbuf.putString(str);
 }
-void LcdPrettyPrinter::println(int const num)
+void LcdPrinter::println(int const num)
 {
   fbuf.putInt(num, 10);
   newline();
 }
-void LcdPrettyPrinter::println(double const val)
+void LcdPrinter::println(double const val)
 {
   fbuf.putDouble(val, 2);
   newline();
 }
-void LcdPrettyPrinter::println(char const *const str)
+void LcdPrinter::println(char const *const str)
 {
   fbuf.putString(str);
   newline();

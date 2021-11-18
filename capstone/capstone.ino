@@ -95,7 +95,7 @@ void BMS::initialize(millis_t const given_time)
   lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcdHandle)
   {
-    LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
+    LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
 
     lcd.println("> SYSTEM");
     lcd.println(" ONLINE");
@@ -181,7 +181,7 @@ void BMS::measureValues(bool const showValues)
     }
     if (lcdHandle)
     {
-      LcdPrettyPrinter lcd = { .controllerOfLCD = lcdHandle };
+      LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
 
       for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
       {
