@@ -41,7 +41,7 @@ class Timer {
 public:
   Timer();
   ~Timer();
-  void init();
+  void reset();
   millis_t time() const;
   void delay(millis_t duration) const;
 };

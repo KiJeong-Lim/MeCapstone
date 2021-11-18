@@ -72,7 +72,7 @@ Timer::Timer()
 Timer::~Timer()
 {
 }
-void Timer::init()
+void Timer::reset()
 {
   begTime = millis();
 }
