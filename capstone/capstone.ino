@@ -194,6 +194,7 @@ void BMS::initQs()
     Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
   }
   lastUpdateTimeOfQs = millis();
+  measuredValuesAreFresh = false;
 }
 void BMS::updateQs()
 {
@@ -211,6 +212,7 @@ void BMS::updateQs()
     Qs[i] += (Iin / count_of_batteries_being_charged) * (millis() - lastUpdateTimeOfQs) / 3600;
   }
   lastUpdateTimeOfQs = millis();
+  measuredValuesAreFresh = false;
 }
 double BMS::checkSocOf(int const cell_no) const
 {
