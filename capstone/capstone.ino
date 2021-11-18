@@ -63,9 +63,10 @@ public:
   void progress(millis_t timeLimit);
 private:
   void measureValues();
+  void initQs();
+  void updateQs();
   double checkSocOf(int cell_no) const;
   void printValues() const;
-  void updateQs();
   void startCharging(int cell_no);
   void breakCharging(int cell_no);
   bool checkSafety(bool reportsToSerial);
@@ -78,7 +79,7 @@ void setup()
 #if defined(SERIAL_PORT)
   Serial.begin(SERIAL_PORT);
 #endif
-  myBMS.initialize(2000);
+  myBMS.initialize(3000);
 }
 
 void loop()
@@ -86,7 +87,7 @@ void loop()
 #if defined(SERIAL_PORT)
   Serial.println("=======");
 #endif
-  myBMS.progress(2000);
+  myBMS.progress(3000);
 }
 
 void BMS::initialize(millis_t const given_time)
@@ -115,20 +116,14 @@ void BMS::initialize(millis_t const given_time)
   {
     serr << "LCD not connected.";
   }
-  measureValues();
-  for (int i = 0; i < LENGTH_OF(Qs); i++)
-  {
-    Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
-  }
   hourglass.delay(given_time);
-  lastUpdateTimeOfQs = millis();
+  initQs();
 }
 void BMS::progress(millis_t const given_time)
 {
   Timer hourglass;
 
   measureValues();
-  updateQs();
   printValues();
   {
     bool system_is_okay = checkSafety(true);
@@ -158,12 +153,13 @@ void BMS::progress(millis_t const given_time)
               breakCharging(i);
             }
           }
-          delay(500);
+          delay(100);
         }
         system_is_okay = checkSafety(false);
       }
     }
   }
+  updateQs();
 }
 void BMS::measureValues()
 {
@@ -187,17 +183,25 @@ void BMS::measureValues()
   // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
 }
-double BMS::checkSocOf(int const cell_no) const
+void BMS::initQs()
 {
-#if 0
-  return mySocVcellTable.get_x_from_y(cellVs[cell_no]);
-#else
-  return (Qs[cell_no] / refOf.batteryCapacity) * 100;
-#endif
+  if (not measuredValuesAreFresh)
+  {
+    measureValues();
+  }
+  for (int i = 0; i < LENGTH_OF(Qs); i++)
+  {
+    Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
+  }
+  lastUpdateTimeOfQs = millis();
 }
 void BMS::updateQs()
 {
   int count_of_batteries_being_charged = 0;
+  if (not measuredValuesAreFresh)
+  {
+    measureValues();
+  }
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     count_of_batteries_being_charged += not cells[i].BalanceCircuit_pin.isHigh();
@@ -207,6 +211,14 @@ void BMS::updateQs()
     Qs[i] += (Iin / count_of_batteries_being_charged) * (millis() - lastUpdateTimeOfQs) / 3600;
   }
   lastUpdateTimeOfQs = millis();
+}
+double BMS::checkSocOf(int const cell_no) const
+{
+#if 0
+  return mySocVcellTable.get_x_from_y(cellVs[cell_no]);
+#else
+  return (Qs[cell_no] / refOf.batteryCapacity) * 100;
+#endif
 }
 void BMS::printValues() const
 {
@@ -251,7 +263,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
 {
   bool isBad = false;
 
-  if (measuredValuesAreFresh)
+  if (not measuredValuesAreFresh)
   {
     measureValues();
   }
@@ -300,7 +312,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
 }
 void BMS::controlSystem()
 {
-  if (measuredValuesAreFresh)
+  if (not measuredValuesAreFresh)
   {
     measureValues();
   }
