@@ -154,3 +154,7 @@ SerialPrinter SerialPrinter::operator<<(double const &val)
 #endif
   return { .prefix = nullptr, .lend = true };
 }
+
+SerialPrinter sout = { .prefix = "arduino> " };
+SerialPrinter serr = { .prefix = "WARNING> " };
+SerialPrinter slog = { .prefix = "       > " };

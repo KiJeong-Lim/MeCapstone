@@ -18,8 +18,8 @@ ReferenceCollection refOf =
 { .analogSignalMax            = 1024
 , .arduinoRegularV            = 5.00
 , .batteryCapacity            = 3317
+, .sensitivityOfCurrentSensor = .100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
 , .zenerdiodeVfromRtoA        = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
-, .sensitivityOfCurrentSensor = 0.100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
 };
 
 static constexpr
@@ -44,11 +44,11 @@ class BMS {
 #if MODE == 1
   PinReader const arduino5V_pin = { .pinId = A1 };
   PinReader const Iin_pin       = { .pinId = A2 };
-  PinSetter const powerIn_pin   = { .pinId = 5 };
+  PinSetter const powerIn_pin   = { .pinId = 5  };
 #else
   PinReader const arduino5V_pin = { .pinId = A3 };
   PinReader const Iin_pin       = { .pinId = A6 };
-  PinSetter const powerIn_pin   = { .pinId = 5 };
+  PinSetter const powerIn_pin   = { .pinId = 5  };
 #endif
   bool jobsDone                 = false;
   bool measuredValuesAreFresh   = false;
@@ -63,8 +63,8 @@ public:
   void progress(millis_t timeLimit);
 private:
   void measureValues();
-  double checkSocOf(int const cell_no) const;
-  void printValues();
+  double checkSocOf(int cell_no) const;
+  void printValues() const;
   void startCharging(int cell_no);
   void breakCharging(int cell_no);
   bool checkSafety(bool reportsToSerial);
@@ -192,7 +192,7 @@ double BMS::checkSocOf(int const cell_no) const
   return (Qs[cell_no] / refOf.batteryCapacity) * 100;
 #endif
 }
-void BMS::printValues()
+void BMS::printValues() const
 {
   slog << "arduino5V = " << arduino5V << "[V].";
   slog << "Iin = " << Iin << "[A].";
@@ -361,7 +361,3 @@ void BMS::goodbye(int const countDown)
   powerIn_pin.turnOff();
   abort();
 }
-
-SerialPrinter sout = { .prefix = "arduino> " };
-SerialPrinter serr = { .prefix = "WARNING> " };
-SerialPrinter slog = { .prefix = "       > " };

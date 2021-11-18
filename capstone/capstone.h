@@ -107,6 +107,7 @@ public:
   SerialPrinter operator<<(char const *const &str);
   SerialPrinter operator<<(double const &val);
 };
+extern SerialPrinter sout, serr, slog;
 
 // implemented in "pinhandlers.ino"
 struct PinHandler {
@@ -167,9 +168,8 @@ struct ReferenceCollection {
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;
   mAh_t const batteryCapacity;
-  V_t const zenerdiodeVfromRtoA;
   Ohm_t const sensitivityOfCurrentSensor;
+  V_t const zenerdiodeVfromRtoA;
 };
-extern SerialPrinter sout, serr, slog;
 
 #endif
