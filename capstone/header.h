@@ -96,7 +96,7 @@ class AscMap {
   double const *const ys;
   size_t const size_of_ys;
 public:
-  AscMap(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
+  AscMap(double const *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
   ~AscMap();
 private:
   double get_x_from_parameter(double param) const;
