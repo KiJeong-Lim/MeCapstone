@@ -30,11 +30,9 @@ public:
   {
     if (target_address)
     {
-      char *p_ch = target_address; 
-
       for (cnt = 0; cnt < Capacity; cnt++)
       {
-        *p_ch++ = buf[cnt];
+        target_address[cnt] = buf[cnt];
       }
     }
   }
