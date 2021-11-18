@@ -49,12 +49,12 @@ class BMS {
   PinReader const Iin_pin       = { .pinId = A6 };
   PinSetter const powerIn_pin   = { .pinId = 5 };
 #endif
-  bool jobsDone                       = false;
-  bool measuredValuesAreFresh         = false;
-  LiquidCrystal_I2C *lcdHandle        = nullptr;
-  V_t arduino5V                       = refOf.arduinoRegularV;
-  A_t Iin                             = 0.00;
-  V_t cellV[LENGTH_OF(cells)]         = { };
+  bool jobsDone                 = false;
+  bool measuredValuesAreFresh   = false;
+  LiquidCrystal_I2C *lcdHandle  = nullptr;
+  V_t arduino5V                 = refOf.arduinoRegularV;
+  A_t Iin                       = 0.00;
+  V_t cellV[LENGTH_OF(cells)]   = { };
 public:
   void initialize(millis_t timeLimit);
   void progress(millis_t timeLimit);

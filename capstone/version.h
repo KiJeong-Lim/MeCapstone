@@ -64,7 +64,7 @@
 ** Improve the class `Formatter`.
 ** Set `VERSION` to be `0.40`.
 ** [2021-11-18]
-** Make new file `capstone/pinhandlers.ino`.
+** Make new files `capstone/pinhandlers.ino`, `capstone/cells.ino`.
 ** Move `capstone/utility.ino`   -> `capstone/utilities.ino`,
 **      `capstone/formatter.hpp` -> `capstone/formatters.hpp`,
 **      `capstone/printer.ino`   -> `capstone/printers.ino`,
