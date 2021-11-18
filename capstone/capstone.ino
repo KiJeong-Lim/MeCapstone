@@ -56,16 +56,16 @@ class BMS {
   V_t arduino5V                 = refOf.arduinoRegularV;
   A_t Iin                       = 0.00;
   V_t cellVs[LENGTH_OF(cells)]  = { };
-  class CellManager {
+  class CellChief {
     millis_t lastUpdateTime         = 0;
     V_t const *cellVs_ref           = nullptr;
     A_t const *Iin_ref              = nullptr;
     mAh_t charges[LENGTH_OF(cells)] = { };
   public:
-    CellManager()
+    CellChief()
     {
     }
-    ~CellManager()
+    ~CellChief()
     {
     }
     void coronate(V_t (*const cellVs_adr)[LENGTH_OF(cellVs)], A_t const *const Iin_adr)
@@ -106,7 +106,7 @@ class BMS {
       lastUpdateTime = millis();
       cells[cell_no].BalanceCircuit_pin.turnOn();
     }
-    double getSocOf(int const i)
+    double checkSocOf(int const i)
     {
 #if 0
       return mySocVcellTable.get_x_from_y(cellVs_ref[i]);
@@ -114,7 +114,7 @@ class BMS {
       return (charges[i] / refOf.batteryCapacity) * 100;
 #endif
     }
-  } manager;
+  } chief;
 public:
   void initialize(millis_t timeLimit);
   void progress(millis_t timeLimit);
@@ -153,7 +153,7 @@ void BMS::initialize(millis_t const given_time)
     cells[i].BalanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(true);
-  manager.coronate(&cellVs, &Iin);
+  chief.coronate(&cellVs, &Iin);
   lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcdHandle)
   {
@@ -202,7 +202,7 @@ void BMS::progress(millis_t const given_time)
           {
             if (cellVs[i] > allowedV_max)
             {
-              manager.breakCharging(i);
+              chief.breakCharging(i);
             }
           }
           delay(500);
@@ -248,7 +248,7 @@ void BMS::printValues()
 
     for (int i = 0; i < LENGTH_OF(cellVs); i++)
     {
-      double const soc = manager.getSocOf(i);
+      double const soc = chief.checkSocOf(i);
 
       lcd.print("B");
       lcd.print(i + 1);
@@ -331,11 +331,11 @@ void BMS::controlSystem()
 
     if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
     {
-      manager.startCharging(i);
+      chief.startCharging(i);
     }
     if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
     {
-      manager.breakCharging(i);
+      chief.breakCharging(i);
     }
   }
 
