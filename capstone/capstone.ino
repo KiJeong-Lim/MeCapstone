@@ -31,24 +31,24 @@ A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 static
 PinsOfCell const cells[] =
 #if MODE == 1
-{ { .voltage_sensor_pin = { .pinId = A0 }, .BalanceCircuit_pin = { .pinId = 2 } } // B1(3V7)
+{ { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
 };
 #else
-{ { .voltage_sensor_pin = { .pinId = A0 }, .BalanceCircuit_pin = { .pinId = 2 } } // B1(3V7)
-, { .voltage_sensor_pin = { .pinId = A1 }, .BalanceCircuit_pin = { .pinId = 3 } } // B2(7V4)
-, { .voltage_sensor_pin = { .pinId = A2 }, .BalanceCircuit_pin = { .pinId = 4 } } // B3(11V1)
+{ { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
+, { .voltage_sensor_pin = { .pinId = Apin(1) }, .BalanceCircuit_pin = { .pinId = Dpin(3) } } // B2(7V4)
+, { .voltage_sensor_pin = { .pinId = Apin(2) }, .BalanceCircuit_pin = { .pinId = Dpin(4) } } // B3(11V1)
 };
 #endif
 
 class BMS {
 #if MODE == 1
-  PinReader const arduino5V_pin = { .pinId = A1 };
-  PinReader const Iin_pin       = { .pinId = A2 };
-  PinSetter const powerIn_pin   = { .pinId = 5  };
+  PinReader const arduino5V_pin = { .pinId = Apin(1) };
+  PinReader const Iin_pin       = { .pinId = Apin(2) };
+  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
 #else
-  PinReader const arduino5V_pin = { .pinId = A3 };
-  PinReader const Iin_pin       = { .pinId = A6 };
-  PinSetter const powerIn_pin   = { .pinId = 5  };
+  PinReader const arduino5V_pin = { .pinId = Apin(3) };
+  PinReader const Iin_pin       = { .pinId = Apin(6) };
+  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
 #endif
   bool jobsDone                 = false;
   bool measuredValuesAreFresh   = false;

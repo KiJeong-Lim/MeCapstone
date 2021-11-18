@@ -62,7 +62,7 @@ public:
     }
     do
     {
-      putDigit(((base * val) / pown(base, cn)) % base);
+      putDigit(((base * val) / POW(base, cn)) % base);
     } while (--cn > 0);
   }
   void putDouble(double const printMe, int const afters_dot)
@@ -77,7 +77,7 @@ public:
     if (afters_dot > 0)
     {
       int cn = afters_dot;
-      bigInt_t pow10_afters_dot = pown(base, afters_dot);
+      bigInt_t pow10_afters_dot = POW(base, afters_dot);
       bigInt_t valN = ROUND(val * pow10_afters_dot);
       bigInt_t valF = valN % pow10_afters_dot;
       valN /= pow10_afters_dot;
@@ -85,12 +85,12 @@ public:
       putChar('.');
       do
       {
-        putDigit(((base * valF) / pown(base, cn)) % base);
+        putDigit(((base * valF) / POW(base, cn)) % base);
       } while (--cn > 0);
     }
     else
     {
-      bigInt_t valE = pown(base, - afters_dot);
+      bigInt_t valE = POW(base, - afters_dot);
       bigInt_t valN = ROUND(val / ((double)valE));
       valN *= valE;
       putInt(valN, base);

@@ -23,6 +23,8 @@
 #define LCD_SECTION_LEN   (LCD_WIDTH / LCD_SECTION_EA)
 #define LENGTH_OF(array)  (sizeof(array) / sizeof(*(array)))
 #define ROUND(val)        ((bigInt_t)((val) + 0.5))
+#define Apin(pin_no)      (A##pin_no)
+#define Dpin(pin_no)      (pin_no)
 
 // type synonym defns
 typedef int long long millis_t;
@@ -35,7 +37,7 @@ typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
 
 // implemented in "utilities.ino"
-bigInt_t pown(bigInt_t base, int expn);
+bigInt_t POW(bigInt_t base, int expn);
 LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 class Timer {
   millis_t volatile begTime;
