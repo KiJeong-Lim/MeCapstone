@@ -71,7 +71,6 @@ AscMap const mySocVcellTable =
 , .right_bound_of_xs  = 98.00
 };
 
-#if 0
 static
 double const ocvs[] =
 { 2.58503333333333 //   0%
@@ -133,4 +132,3 @@ AscMap const mySocOcvTable =
 , .size_of_ys         = LENGTH_OF(ocvs)
 , .right_bound_of_xs  = 100.0
 };
-#endif

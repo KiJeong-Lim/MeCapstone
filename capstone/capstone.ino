@@ -10,15 +10,22 @@
 
 #include "header.h"
 
-constexpr V_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
-constexpr ReferenceCollection refOf =
-{ .analogSignalMax                  = 1024
-, .arduinoRegularV                  = 5.00
-, .zenerdiodeVfromRtoA              = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
-, .sensitivityOfCurrentSensor       = 0.100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
+static constexpr
+V_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
+
+static constexpr
+ReferenceCollection refOf =
+{ .analogSignalMax            = 1024
+, .arduinoRegularV            = 5.00
+, .zenerdiodeVfromRtoA        = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
+, .sensitivityOfCurrentSensor = 0.100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
 };
-constexpr V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
-constexpr A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
+
+static constexpr
+V_t allowedV_max = 4.20, allowedV_min =  2.70; // FIX ME!
+
+static constexpr
+A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 CELL const cells[] =

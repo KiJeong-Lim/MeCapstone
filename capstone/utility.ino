@@ -10,7 +10,7 @@
 
 #include "header.h"
 
-inline
+static inline
 void delay1ms()
 {
   delay(1);
