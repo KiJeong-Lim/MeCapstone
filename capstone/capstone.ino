@@ -62,7 +62,7 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
-  void goodbye(int timeLeftToQuit);
+  void goodbye(int secsLeftToQuit);
 } myBMS;
 
 void setup()
@@ -83,7 +83,7 @@ void loop()
 
 void BMS::initialize(millis_t const given_time)
 {
-  Timer hourglass = {};
+  Timer hourglass;
 
   Wire.begin();
   sout << "Run time started.";
@@ -111,7 +111,7 @@ void BMS::initialize(millis_t const given_time)
 }
 void BMS::progress(millis_t const given_time)
 {
-  Timer hourglass = {};
+  Timer hourglass;
 
   measureValues(true);
   {
@@ -281,6 +281,8 @@ void BMS::controlSystem()
 }
 void BMS::goodbye(int const countDown)
 {
+  Timer hourglass;
+
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].balanceCircuit_pin.turnOn();
@@ -292,7 +294,6 @@ void BMS::goodbye(int const countDown)
   }
   for (int i = countDown; i > 0; i--)
   {
-    Timer hourglass = {};
     if (lcdHandle)
     {
       lcdHandle->setCursor(0, 0);
@@ -300,6 +301,7 @@ void BMS::goodbye(int const countDown)
     }
     serr << "Your arduino will abort in " << i << " seconds.";
     hourglass.delay(1000);
+    hourglass.reset();
   }
   if (lcdHandle)
   {
