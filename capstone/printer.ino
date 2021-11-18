@@ -83,7 +83,7 @@ void LcdPrettyPrinter::println(char const *const str)
 
 SerialPrinter::SerialPrinter(SerialPrinter &&other)
   : messenger{ other.messenger }
-  , newline{ true }
+  , newline{ other.newline }
 {
   other.newline = false;
 }
