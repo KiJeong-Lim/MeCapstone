@@ -72,6 +72,10 @@ Timer::Timer()
 Timer::~Timer()
 {
 }
+void Timer::init()
+{
+  begTime = millis();
+}
 millis_t Timer::time() const
 {
   return millis() - begTime;
