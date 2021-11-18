@@ -66,9 +66,7 @@ public:
     , number_of_intervals{ static_cast<int>(size_of_data_sheet) - 1 }
   {
   }
-  ~AscMap()
-  {
-  }
+  ~AscMap();
 private:
   double get_x_from_parameter(double param) const;
 public:

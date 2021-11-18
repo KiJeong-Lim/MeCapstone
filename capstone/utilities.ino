@@ -52,6 +52,9 @@ void Timer::delay(ms_t const duration) const
   }
 }
 
+AscMap::~AscMap()
+{
+}
 double AscMap::get_x_from_parameter(double const param) const
 {
   return ((param * (right_bound_of_xs - left_bound_of_xs) / number_of_intervals) + left_bound_of_xs);
