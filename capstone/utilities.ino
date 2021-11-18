@@ -90,7 +90,7 @@ void Timer::delay(ms_t const duration) const
 
 double AscMap::get_x_from_parameter(double const param) const
 {
-  return ((right_bound_of_xs - left_bound_of_xs) / ((int)size_of_ys - 1.0) * param + left_bound_of_xs);
+  return ((right_bound_of_xs - left_bound_of_xs) / (size_of_ys - 1.0) * param + left_bound_of_xs);
 }
 double AscMap::get_x_from_y(double const y) const
 {
@@ -115,7 +115,7 @@ double AscMap::get_x_from_y(double const y) const
   }
   if (low >= size_of_ys)
   {
-    return get_x_from_parameter((int)size_of_ys - 1.0);
+    return get_x_from_parameter(size_of_ys - 1.0);
   }
   else if (high < 0)
   {

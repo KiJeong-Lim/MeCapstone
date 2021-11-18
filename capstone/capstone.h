@@ -54,7 +54,7 @@ class AscMap {
   double const left_bound_of_xs;
   double const right_bound_of_xs;
   double const *const ys;
-  size_t const size_of_ys;
+  int const size_of_ys;
 public:
   AscMap() = delete;
   AscMap(AscMap const &other) = delete;
