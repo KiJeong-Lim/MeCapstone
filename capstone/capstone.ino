@@ -62,6 +62,8 @@ private:
   void measureValues(bool showValues);
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
+  double getSoc(int cell_no);
+  void printValues();
   void goodbye(int secsLeftToQuit);
 } myBMS;
 
@@ -173,32 +175,7 @@ void BMS::measureValues(bool const showValues)
 
   if (showValues)
   {
-    slog << "arduino5V = " << arduino5V << "[V].";
-    slog << "Iin = " << Iin << "[A].";
-    for (int i = 0; i < LENGTH_OF(cellV); i++)
-    {
-      slog << "cellV[" << i << "] = " << cellV[i] << "[V].";
-    }
-    if (lcdHandle)
-    {
-      LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
-
-      for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
-      {
-        double const soc = mySocVcellTable.get_x_from_y(cellV[cell_no - 1]);
-
-        lcd.print("B");
-        lcd.print(cell_no);
-        lcd.print("=");
-        lcd.println(cellV[cell_no - 1]);
-        lcd.print(" ");
-        lcd.print(soc);
-        lcd.println("%");
-      }
-      lcd.print("I");
-      lcd.print("=");
-      lcd.println(Iin);
-    }
+    printValues();
   }
 }
 bool BMS::checkSafety(bool const reportsToSerial)
@@ -278,6 +255,47 @@ void BMS::controlSystem()
   }
 
   measuredValuesAreFresh = false;
+}
+void BMS::printValues()
+{
+  slog << "arduino5V = " << arduino5V << "[V].";
+  slog << "Iin = " << Iin << "[A].";
+  for (int i = 0; i < LENGTH_OF(cellV); i++)
+  {
+    slog << "cellV[" << i << "] = " << cellV[i] << "[V].";
+  }
+  if (lcdHandle)
+  {
+    LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
+
+    for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
+    {
+      double const soc = getSoc(cell_no);
+
+      lcd.print("B");
+      lcd.print(cell_no);
+      lcd.print("=");
+      lcd.println(cellV[cell_no - 1]);
+      lcd.print(" ");
+      lcd.print(soc);
+      lcd.println("%");
+    }
+    lcd.print("I");
+    lcd.print("=");
+    lcd.println(Iin);
+  }
+}
+double BMS::getSoc(int const cell_no)
+{
+  double soc = 0.0;
+  V_t const &cellV_focused = cellV[cell_no - 1];
+
+#if MODE == 1
+  soc = mySocVcellTable.get_x_from_y(cellV_focused);
+#else
+  soc = mySocVcellTable.get_x_from_y(cellV_focused);
+#endif
+  return soc;
 }
 void BMS::goodbye(int const countDown)
 {

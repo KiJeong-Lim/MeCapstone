@@ -82,18 +82,18 @@ void LcdPrinter::println(char const *const str)
 }
 
 SerialPrinter::SerialPrinter(SerialPrinter &&other)
-  : messenger{ other.messenger }
+  : prefix_of_message{ other.prefix_of_message }
   , newline{ other.newline }
 {
   other.newline = false;
 }
 SerialPrinter::SerialPrinter(char const *const prefix)
-  : messenger{ prefix }
+  : prefix_of_message{ prefix }
   , newline{ false }
 {
 }
 SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
-  : messenger{ prefix }
+  : prefix_of_message{ prefix }
   , newline{ lend }
 {
 }
@@ -107,19 +107,19 @@ SerialPrinter::~SerialPrinter()
   }
 #endif
 }
-void SerialPrinter::print_messenger()
+void SerialPrinter::trick()
 {
   newline = false;
 #if defined(SERIAL_PORT)
-  if (messenger)
+  if (prefix_of_message)
   {
-    Serial.print(messenger);
+    Serial.print(prefix_of_message);
   }
 #endif
 }
 SerialPrinter SerialPrinter::operator<<(byte const &hex)
 {
-  print_messenger();
+  trick();
 #if defined(SERIAL_PORT)
   Serial.print("0x");
   if (hex < 16)
@@ -132,7 +132,7 @@ SerialPrinter SerialPrinter::operator<<(byte const &hex)
 }
 SerialPrinter SerialPrinter::operator<<(int const &num)
 {
-  print_messenger();
+  trick();
 #if defined(SERIAL_PORT)
   Serial.print(num);
 #endif
@@ -140,7 +140,7 @@ SerialPrinter SerialPrinter::operator<<(int const &num)
 }
 SerialPrinter SerialPrinter::operator<<(char const *const &str)
 {
-  print_messenger();
+  trick();
 #if defined(SERIAL_PORT)
   Serial.print(str);
 #endif
@@ -148,7 +148,7 @@ SerialPrinter SerialPrinter::operator<<(char const *const &str)
 }
 SerialPrinter SerialPrinter::operator<<(double const &val)
 {
-  print_messenger();
+  trick();
 #if defined(SERIAL_PORT)
   Serial.print(val);
 #endif

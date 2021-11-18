@@ -89,7 +89,7 @@ public:
   void println(char const *str);
 };
 class SerialPrinter {
-  char const *const messenger;
+  char const *const prefix_of_message;
   bool newline;
 public:
   SerialPrinter() = delete;
@@ -99,7 +99,7 @@ public:
   SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();
 private:
-  void print_messenger();
+  void trick();
 public:
   SerialPrinter operator<<(byte const &hex);
   SerialPrinter operator<<(int const &num);
