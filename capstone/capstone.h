@@ -59,8 +59,17 @@ public:
   AscMap() = delete;
   AscMap(AscMap const &other) = delete;
   AscMap(AscMap &&other) = delete;
-  AscMap(double const *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
-  ~AscMap();
+  template <size_t size_of_y_data>
+  AscMap(double const (*const y_data_ref)[size_of_y_data], double const left_bound, double const right_bound)
+    : left_bound_of_xs{ left_bound }
+    , right_bound_of_xs{ right_bound }
+    , ys{ *y_data_ref }
+    , size_of_ys{ size_of_y_data }
+  {
+  }
+  ~AscMap()
+  {
+  }
 private:
   double get_x_from_parameter(double param) const;
 public:
@@ -160,7 +169,7 @@ public:
 };
 
 // implemented in "data.ino"
-extern AscMap const mySocVcellTable, mySocOcvTable;
+extern AscMap const mySocOcvTable, mySocVcellTable;
 
 // implemented in "capstone.ino"
 struct PinsOfCell {

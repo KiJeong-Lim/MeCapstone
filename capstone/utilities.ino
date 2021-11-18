@@ -88,16 +88,6 @@ void Timer::delay(ms_t const duration) const
   }
 }
 
-AscMap::AscMap(double const *const _ys, double const _left_bound_of_xs, size_t const _size_of_ys, double const _right_bound_of_xs)
-  : left_bound_of_xs{ _left_bound_of_xs }
-  , right_bound_of_xs{ _right_bound_of_xs }
-  , ys{ _ys }
-  , size_of_ys{ _size_of_ys }
-{
-}
-AscMap::~AscMap()
-{
-}
 double AscMap::get_x_from_parameter(double const param) const
 {
   return ((right_bound_of_xs - left_bound_of_xs) / ((int)size_of_ys - 1.0) * param + left_bound_of_xs);

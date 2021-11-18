@@ -120,15 +120,13 @@ double const Vcells[] =
 };
 
 AscMap const mySocOcvTable =
-{ .ys                 = ocvs
+{ .ys                 = &ocvs
 , .left_bound_of_xs   = 0.00
-, .size_of_ys         = LENGTH_OF(ocvs)
 , .right_bound_of_xs  = 100.00
 };
 
 AscMap const mySocVcellTable =
-{ .ys                 = Vcells
+{ .ys                 = &Vcells
 , .left_bound_of_xs   = 0.00
-, .size_of_ys         = LENGTH_OF(Vcells)
 , .right_bound_of_xs  = 98.00
 };
