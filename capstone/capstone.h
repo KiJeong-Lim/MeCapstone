@@ -54,7 +54,7 @@ class AscMap {
   double const left_bound_of_xs;
   double const right_bound_of_xs;
   double const *const ys;
-  int const size_of_ys;
+  int const number_of_intervals;
 public:
   AscMap() = delete;
   AscMap(AscMap const &other) = delete;
@@ -64,7 +64,7 @@ public:
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , ys{ *data_sheet_ref }
-    , size_of_ys{ size_of_data_sheet }
+    , number_of_intervals{ static_cast<int>(size_of_data_sheet) - 1 }
   {
   }
   ~AscMap()
