@@ -27,7 +27,7 @@
 #define Dpin(pin_no)      (pin_no)
 
 // type synonym defns
-typedef int long long millis_t;
+typedef int long long ms_t;
 typedef double A_t;
 typedef double V_t;
 typedef double Ohm_t;
@@ -40,15 +40,15 @@ typedef int long long bigInt_t;
 bigInt_t POW(bigInt_t base, int expn);
 LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 class Timer {
-  millis_t volatile begTime;
+  ms_t volatile begTime;
 public:
   Timer();
   Timer(Timer const &other) = delete;
   Timer(Timer &&other) = delete;
   ~Timer();
   void reset();
-  millis_t time() const;
-  void delay(millis_t duration) const;
+  ms_t time() const;
+  void delay(ms_t duration) const;
 };
 class AscMap {
   double const left_bound_of_xs;
@@ -126,10 +126,10 @@ private:
   int read_once() const;
 public:
   Val_t readSignalOnce() const;
-  Val_t readSignal(millis_t duration) const;
+  Val_t readSignal(ms_t duration) const;
 };
 class PinSetter : public PinHandler {
-  bool is_high;
+  bool volatile is_high;
 public:
   PinSetter() = delete;
   PinSetter(PinSetter const &other) = delete;

@@ -25,7 +25,7 @@ Val_t PinReader::readSignalOnce() const
 {
   return read_once();
 }
-Val_t PinReader::readSignal(millis_t const duration) const
+Val_t PinReader::readSignal(ms_t const duration) const
 {
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;

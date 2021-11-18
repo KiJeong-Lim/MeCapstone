@@ -30,7 +30,7 @@ A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 PinsOfCell const cells[] =
-#if MODE == 1
+#if (MODE == 1)
 { { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
 };
 #else
@@ -41,7 +41,7 @@ PinsOfCell const cells[] =
 #endif
 
 class BMS {
-#if MODE == 1
+#if (MODE == 1)
   PinReader const arduino5V_pin = { .pinId = Apin(1) };
   PinReader const Iin_pin       = { .pinId = Apin(2) };
   PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
@@ -52,15 +52,15 @@ class BMS {
 #endif
   bool jobsDone                 = false;
   bool measuredValuesAreFresh   = false;
-  LiquidCrystal_I2C *lcdHandle  = nullptr;
+  ms_t Qs_lastUpdatedTime       = 0;
   V_t arduino5V                 = refOf.arduinoRegularV;
-  millis_t lastUpdateTimeOfQs   = 0;
   A_t Iin                       = 0.00;
   V_t cellVs[LENGTH_OF(cells)]  = { };
   mAh_t Qs[LENGTH_OF(cells)]    = { };
+  LiquidCrystal_I2C *lcdHandle  = nullptr;
 public:
-  void initialize(millis_t timeLimit);
-  void progress(millis_t timeLimit);
+  void initialize(ms_t timeLimit);
+  void progress(ms_t timeLimit);
 private:
   void measureValues();
   void initQs();
@@ -90,7 +90,7 @@ void loop()
   myBMS.progress(3000);
 }
 
-void BMS::initialize(millis_t const given_time)
+void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass;
 
@@ -119,7 +119,7 @@ void BMS::initialize(millis_t const given_time)
   hourglass.delay(given_time);
   initQs();
 }
-void BMS::progress(millis_t const given_time)
+void BMS::progress(ms_t const given_time)
 {
   Timer hourglass;
 
@@ -163,7 +163,7 @@ void BMS::progress(millis_t const given_time)
 }
 void BMS::measureValues()
 {
-  constexpr millis_t measuring_time = 10;
+  constexpr ms_t measuring_time = 10;
   V_t sensorV = 0.00;
   V_t accumV = 0.00;
   // Calculate the voltage of the pin `5V`
@@ -193,7 +193,7 @@ void BMS::initQs()
   {
     Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
   }
-  lastUpdateTimeOfQs = millis();
+  Qs_lastUpdatedTime = millis();
 }
 void BMS::updateQs()
 {
@@ -208,13 +208,13 @@ void BMS::updateQs()
   }
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
-    Qs[i] += (Iin / count_of_batteries_being_charged) * (millis() - lastUpdateTimeOfQs) / 3600;
+    Qs[i] += (Iin / count_of_batteries_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;
   }
-  lastUpdateTimeOfQs = millis();
+  Qs_lastUpdatedTime = millis();
 }
 double BMS::checkSocOf(int const cell_no) const
 {
-#if 0
+#if (0)
   return mySocVcellTable.get_x_from_y(cellVs[cell_no]);
 #else
   return (Qs[cell_no] / refOf.batteryCapacity) * 100;

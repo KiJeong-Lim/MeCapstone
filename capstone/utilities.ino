@@ -76,11 +76,11 @@ void Timer::reset()
 {
   begTime = millis();
 }
-millis_t Timer::time() const
+ms_t Timer::time() const
 {
   return millis() - begTime;
 }
-void Timer::delay(millis_t const duration) const
+void Timer::delay(ms_t const duration) const
 {
   while (time() < duration)
   {
