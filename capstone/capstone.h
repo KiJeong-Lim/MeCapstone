@@ -8,8 +8,8 @@
 ** ===============================================================================
 */
 
-#ifndef HEADER
-#define HEADER
+#ifndef CAPSTONE
+#define CAPSTONE
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
@@ -64,12 +64,12 @@ public:
   double get_x_from_y(double y) const;
 };
 
-// implemented in "printer.ino"
-#include "formatter.hpp"
+// implemented in "printers.ino"
+#include "formatters.hpp"
 class LcdPrinter {
   LiquidCrystal_I2C *const lcdHandle;
   int section_no;
-  Formatter<LCD_SECTION_LEN> fbuf;
+  SizedFormatter<LCD_SECTION_LEN> fbuf;
   char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
   LcdPrinter() = delete;
@@ -154,7 +154,7 @@ public:
   void set(double duty_ratio) const;
 };
 
-// implemented in "soc.ino"
+// implemented in "data.ino"
 extern AscMap const mySocVcellTable, mySocOcvTable;
 
 // implemented in "capstone.ino"

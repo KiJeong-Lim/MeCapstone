@@ -8,9 +8,9 @@
 ** ===============================================================================
 */
 
-#include "header.h"
+#include "capstone.h"
 
-static
+static constexpr
 double const Vcells[] =
 { 2.66267511813557
 , 2.97909231310534
@@ -64,7 +64,7 @@ double const Vcells[] =
 , 4.20300118506630
 };
 
-static
+static constexpr
 double const ocvs[] =
 { 2.58503333333333
 , 2.90561016666667

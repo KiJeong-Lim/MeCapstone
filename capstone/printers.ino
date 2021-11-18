@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#include "header.h"
+#include "capstone.h"
 
 LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const addressOfLcdI2C)
   : lcdHandle{ addressOfLcdI2C }

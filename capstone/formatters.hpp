@@ -8,13 +8,13 @@
 ** ===============================================================================
 */
 
-#ifndef FORMATTER
-#define FORMATTER
+#ifndef FORMATTERS
+#define FORMATTERS
 
-#include "header.h"
+#include "capstone.h"
 
 template <size_t Capacity>
-class Formatter {
+class SizedFormatter {
   int cnt = 0;
   char buf[Capacity] = { };
 public:

@@ -8,7 +8,7 @@
 ** ===============================================================================
 */
 
-#include "header.h"
+#include "capstone.h"
 
 PinReader::PinReader(pinId_t const pinId)
   : PinHandler{ .pin_to_handle = pinId }
