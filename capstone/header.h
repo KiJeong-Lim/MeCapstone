@@ -90,9 +90,9 @@ struct CELL {
   WriterDigitalPin const balanceCircuit_pin;
 };
 class AscMap {
-  const double left_bound_of_xs;
-  const double right_bound_of_xs;
-  const double *const ys;
+  double const left_bound_of_xs;
+  double const right_bound_of_xs;
+  double const *const ys;
   size_t const size_of_ys;
 public:
   AscMap(const double *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);

@@ -59,12 +59,10 @@ Val_t ReaderAnalogPin::readSignal(millis_t const duration) const
 {
   bigInt_t sum_of_vals = 0;
   bigInt_t cnt_of_vals = 0;
-  Timer hourglass;
 
-  while (hourglass.time() < duration)
+  for (Timer hourglass; hourglass.time() < duration; cnt_of_vals++)
   {
     sum_of_vals += read_once();
-    cnt_of_vals++;
   }
   return ((double)sum_of_vals) / ((double)cnt_of_vals);
 }
@@ -144,7 +142,7 @@ void PwmDigitalPin::initWith(double const duty_ratio) const
   setPWM(duty_ratio);
 }
 
-AscMap::AscMap(const double *const _ys, double const _left_bound_of_xs, size_t const _size_of_ys, double const _right_bound_of_xs)
+AscMap::AscMap(double const *const _ys, double const _left_bound_of_xs, size_t const _size_of_ys, double const _right_bound_of_xs)
   : left_bound_of_xs{ _left_bound_of_xs }
   , right_bound_of_xs{ _right_bound_of_xs }
   , ys{ _ys }
