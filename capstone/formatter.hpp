@@ -30,10 +30,7 @@ public:
   {
     if (target_address)
     {
-      for (cnt = 0; cnt < Capacity; cnt++)
-      {
-        target_address[cnt] = buf[cnt];
-      }
+      memcpy(target_address, &buf[0], Capacity);
     }
   }
   void putChar(char const printMe)
