@@ -11,7 +11,7 @@
 #include "capstone.h"
 
 static constexpr
-double const ocvs[] =
+double const Ocvs[] =
 { 2.58503333333333
 , 2.90561016666667
 , 3.08249133333333
@@ -120,7 +120,7 @@ double const Vcells[] =
 };
 
 AscMap const mySocOcvTable =
-{ .data_sheet_ref = &ocvs
+{ .data_sheet_ref = &Ocvs
 , .left_bound     = 0.00
 , .right_bound    = 100.00
 };
