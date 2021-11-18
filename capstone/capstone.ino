@@ -30,18 +30,17 @@ A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 PinsOfCell const cells[] =
-#if (MODE == 1)
+#if( MODE == 1 )
 { { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
-};
 #else
 { { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
 , { .voltage_sensor_pin = { .pinId = Apin(1) }, .BalanceCircuit_pin = { .pinId = Dpin(3) } } // B2(7V4)
 , { .voltage_sensor_pin = { .pinId = Apin(2) }, .BalanceCircuit_pin = { .pinId = Dpin(4) } } // B3(11V1)
-};
 #endif
+};
 
 class BMS {
-#if (MODE == 1)
+#if( MODE == 1 )
   PinReader const arduino5V_pin = { .pinId = Apin(1) };
   PinReader const Iin_pin       = { .pinId = Apin(2) };
   PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
@@ -214,7 +213,7 @@ void BMS::updateQs()
 }
 double BMS::checkSocOf(int const cell_no) const
 {
-#if (0)
+#if( 0 )
   return mySocVcellTable.get_x_from_y(cellVs[cell_no]);
 #else
   return (Qs[cell_no] / refOf.batteryCapacity) * 100;
