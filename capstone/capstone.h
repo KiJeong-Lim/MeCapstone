@@ -59,12 +59,12 @@ public:
   AscMap() = delete;
   AscMap(AscMap const &other) = delete;
   AscMap(AscMap &&other) = delete;
-  template <size_t size_of_y_data>
-  AscMap(double const (*const y_data_ref)[size_of_y_data], double const left_bound, double const right_bound)
+  template <size_t size_of_data_sheet>
+  AscMap(double const (*const data_sheet_ref)[size_of_data_sheet], double const left_bound, double const right_bound)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
-    , ys{ *y_data_ref }
-    , size_of_ys{ size_of_y_data }
+    , ys{ *data_sheet_ref }
+    , size_of_ys{ size_of_data_sheet }
   {
   }
   ~AscMap()
