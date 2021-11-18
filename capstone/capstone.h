@@ -21,7 +21,7 @@
 
 // macro defns
 #define LCD_SECTION_LEN   (LCD_WIDTH / LCD_SECTION_EA)
-#define LENGTH_OF(array)  (sizeof(array) / sizeof(*(array)))
+#define LENGTH_OF(ary)    (sizeof(ary) / sizeof(*(ary)))
 #define ROUND(val)        ((bigInt_t)((val) + 0.5))
 #define Apin(pin_no)      (A##pin_no)
 #define Dpin(pin_no)      (pin_no)

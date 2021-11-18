@@ -119,7 +119,7 @@ double AscMap::get_x_from_y(double const y) const
   }
   else if (high < 0)
   {
-    return get_x_from_parameter(0.0);
+    return get_x_from_parameter(0);
   }
   else
   {
