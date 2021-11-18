@@ -34,7 +34,8 @@ typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
 
 // implemented in "utility.ino"
-bigInt_t pow10(int expn);
+bigInt_t pown(bigInt_t base, int expn);
+LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 class Timer {
   millis_t volatile begTime;
 public:
@@ -105,7 +106,6 @@ public:
 
 // implemented in "printer.ino"
 #include "formatter.hpp"
-LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 class LcdPrettyPrinter {
   LiquidCrystal_I2C *const lcdHandle;
   int section_no;

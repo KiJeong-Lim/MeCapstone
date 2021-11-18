@@ -47,7 +47,7 @@ public:
       putChar("0123456789ABCDEF"[printMe]);
     }
   }
-  void putInt(bigInt_t const printMe)
+  void putInt(bigInt_t const printMe, int const base)
   {
     int cn = 0;
     bigInt_t val = printMe;
@@ -56,17 +56,18 @@ public:
       putChar('-');
       val *= -1;
     }
-    for (bigInt_t _val = 1; _val <= val; _val *= 10)
+    for (bigInt_t _val = 1; _val <= val; _val *= base)
     {
       cn++;
     }
     do
     {
-      putDigit(((10 * val) / pow10(cn)) % 10);
+      putDigit(((base * val) / pown(base, cn)) % base);
     } while (--cn > 0);
   }
   void putDouble(double const printMe, int const afters_dot)
   {
+    constexpr int base = 10;
     double val = printMe;
     if (printMe < 0.0)
     {
@@ -76,23 +77,23 @@ public:
     if (afters_dot > 0)
     {
       int cn = afters_dot;
-      bigInt_t pow10_afters_dot = pow10(afters_dot);
+      bigInt_t pow10_afters_dot = pown(base, afters_dot);
       bigInt_t valN = ROUND(val * pow10_afters_dot);
       bigInt_t valF = valN % pow10_afters_dot;
       valN /= pow10_afters_dot;
-      putInt(valN);
+      putInt(valN, base);
       putChar('.');
       do
       {
-        putDigit(((10 * valF) / pow10(cn)) % 10);
+        putDigit(((base * valF) / pown(base, cn)) % base);
       } while (--cn > 0);
     }
     else
     {
-      bigInt_t valE = pow10(- afters_dot);
+      bigInt_t valE = pown(base, - afters_dot);
       bigInt_t valN = ROUND(val / ((double)valE));
       valN *= valE;
-      putInt(valN);
+      putInt(valN, base);
     }
   }
   void putString(char const *const printMe)

@@ -16,14 +16,52 @@ void delay1ms()
   delay(1);
 }
 
-bigInt_t pow10(int const n)
+bigInt_t pown(bigInt_t base, int expn)
 {
-  bigInt_t res = 1;
-  for (int i = 0; i < n; i++)
+  bigInt_t result = 1;
+  
+  for (int i = 0; i < expn; i++)
   {
-    res *= 10;
+    result *= base;
   }
-  return res;
+
+  return result;
+}
+
+LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
+{
+  LiquidCrystal_I2C *lcdHandle = nullptr;
+
+  if (lcdWidth > 0 && lcdHeight > 0)
+  {
+    byte adr = 0xFF;
+
+    do
+    {
+      byte response = 4;
+
+      Wire.beginTransmission(adr);
+      response = Wire.endTransmission(adr);
+      if (response == 0)
+      {
+        sout << "I2C address found: address = " << adr << ".";
+        lcdHandle = new LiquidCrystal_I2C(adr, lcdWidth, lcdHeight);
+        if (lcdHandle)
+        {
+          sout << "I2C connected: address = " << adr << ".";
+          break;
+        }
+      }
+      adr--;
+    } while (adr != 0x00);
+
+    if (lcdHandle)
+    {
+      lcdHandle->init();
+      lcdHandle->backlight();
+    }
+  }
+  return lcdHandle;
 }
 
 Timer::Timer()
