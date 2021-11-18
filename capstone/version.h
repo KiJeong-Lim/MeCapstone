@@ -63,6 +63,9 @@
 ** Improve the class `SerialPrinter`.
 ** Improve the class `Formatter`.
 ** Set `VERSION` to be `0.40`.
+** [2021-11-18]
+** Make new file `capstone/pinhandlers.ino`.
+** Move `capstone/utility` -> `capstone/utilities`.
 */
 
 /* Schematics

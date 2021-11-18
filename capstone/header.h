@@ -33,63 +33,19 @@ typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
 
-// implemented in "utility.ino"
+// implemented in "utilities.ino"
 bigInt_t pown(bigInt_t base, int expn);
 LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 class Timer {
   millis_t volatile begTime;
 public:
   Timer();
+  Timer(Timer const &other) = delete;
+  Timer(Timer &&other) = delete;
   ~Timer();
   void reset();
   millis_t time() const;
   void delay(millis_t duration) const;
-};
-struct Pin {
-  pinId_t const pinId;
-};
-class ReaderAnalogPin : public Pin {
-public:
-  ReaderAnalogPin() = delete;
-  ReaderAnalogPin(ReaderAnalogPin const &other) = delete;
-  ReaderAnalogPin(pinId_t pin_no);
-  ~ReaderAnalogPin();
-private:
-  int read_once() const;
-public:
-  Val_t readSignalOnce() const;
-  Val_t readSignal(millis_t duration) const;
-};
-class WriterDigitalPin : public Pin {
-  bool is_high;
-public:
-  WriterDigitalPin() = delete;
-  WriterDigitalPin(WriterDigitalPin const &other) = delete;
-  WriterDigitalPin(pinId_t pin_no);
-  ~WriterDigitalPin();
-private:
-  void syncPin();
-public:
-  void initWith(bool on_is_true);
-  void turnOn();
-  void turnOff();
-  bool isHigh() const;
-};
-class PwmDigitalPin : public Pin {
-public:
-  PwmDigitalPin() = delete;
-  PwmDigitalPin(PwmDigitalPin const &other) = delete;
-  PwmDigitalPin(pinId_t pin_no);
-private:
-  void setPWM(double duty_ratio) const;
-public:
-  void init() const;
-  void set(double duty_ratio) const;
-  void initWith(double duty_ratio) const;
-};
-struct CELL {
-  ReaderAnalogPin const voltageSensor_pin;
-  WriterDigitalPin const balanceCircuit_pin;
 };
 class AscMap {
   double const left_bound_of_xs;
@@ -97,6 +53,9 @@ class AscMap {
   double const *const ys;
   size_t const size_of_ys;
 public:
+  AscMap() = delete;
+  AscMap(AscMap const &other) = delete;
+  AscMap(AscMap &&other) = delete;
   AscMap(double const *ys, double left_bound_of_xs, size_t size_of_ys, double right_bound_of_xs);
   ~AscMap();
 private:
@@ -115,6 +74,7 @@ class LcdPrettyPrinter {
 public:
   LcdPrettyPrinter() = delete;
   LcdPrettyPrinter(LcdPrettyPrinter const &other) = delete;
+  LcdPrettyPrinter(LcdPrettyPrinter &&other) = delete;
   LcdPrettyPrinter(LiquidCrystal_I2C *controllerOfLCD);
   ~LcdPrettyPrinter();
 private:
@@ -147,10 +107,61 @@ public:
   SerialPrinter operator<<(double const &val);
 };
 
+// implemented in "pinhandlers.ino"
+struct PinHandler {
+  pinId_t const pin_to_handle;
+};
+class PinReader : public PinHandler {
+public:
+  PinReader() = delete;
+  PinReader(PinReader const &other) = delete;
+  PinReader(PinReader &&other) = delete;
+  PinReader(pinId_t pinId);
+  ~PinReader();
+private:
+  int read_once() const;
+public:
+  Val_t readSignalOnce() const;
+  Val_t readSignal(millis_t duration) const;
+};
+class PinSetter : public PinHandler {
+  bool is_high;
+public:
+  PinSetter() = delete;
+  PinSetter(PinSetter const &other) = delete;
+  PinSetter(PinSetter &&other) = delete;
+  PinSetter(pinId_t pinId);
+  ~PinSetter();
+private:
+  void openPin() const;
+  void syncPin();
+public:
+  void initWith(bool is_high);
+  void turnOn();
+  void turnOff();
+  bool isHigh() const;
+};
+class PwmSetter : public PinHandler {
+public:
+  PwmSetter() = delete;
+  PwmSetter(PwmSetter const &other) = delete;
+  PwmSetter(PwmSetter &&other) = delete;
+  PwmSetter(pinId_t pinId);
+private:
+  void openPin() const;
+public:
+  void init() const;
+  void set(double duty_ratio) const;
+};
+
 // implemented in "soc.ino"
 extern AscMap const mySocVcellTable, mySocOcvTable;
 
 // implemented in "capstone.ino"
+struct PinsOfCell {
+  PinReader const voltage_sensor_pin;
+  PinSetter const BalanceCircuit_pin;
+};
 struct ReferenceCollection {
   Val_t const analogSignalMax;
   V_t const arduinoRegularV;

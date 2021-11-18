@@ -28,26 +28,26 @@ static constexpr
 A_t allowedA_max = 2.00, allowedA_min = -0.10; // FIX ME!
 
 static
-CELL const cells[] =
+PinsOfCell const cells[] =
 #if MODE == 1
-{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
+{ { .voltage_sensor_pin = { .pinId = A0 }, .BalanceCircuit_pin = { .pinId = 2 } } // B1(3V7)
 };
 #else
-{ { .voltageSensor_pin = { .pin_no = A0 }, .balanceCircuit_pin = { .pin_no = 2 } } // B1(3V7)
-, { .voltageSensor_pin = { .pin_no = A1 }, .balanceCircuit_pin = { .pin_no = 3 } } // B2(7V4)
-, { .voltageSensor_pin = { .pin_no = A2 }, .balanceCircuit_pin = { .pin_no = 4 } } // B3(11V1)
+{ { .voltage_sensor_pin = { .pinId = A0 }, .BalanceCircuit_pin = { .pinId = 2 } } // B1(3V7)
+, { .voltage_sensor_pin = { .pinId = A1 }, .BalanceCircuit_pin = { .pinId = 3 } } // B2(7V4)
+, { .voltage_sensor_pin = { .pinId = A2 }, .BalanceCircuit_pin = { .pinId = 4 } } // B3(11V1)
 };
 #endif
 
 class BMS {
 #if MODE == 1
-  ReaderAnalogPin const arduino5V_pin = { .pin_no = A1 };
-  ReaderAnalogPin const Iin_pin       = { .pin_no = A2 };
-  WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
+  PinReader const arduino5V_pin = { .pinId = A1 };
+  PinReader const Iin_pin       = { .pinId = A2 };
+  PinSetter const powerIn_pin   = { .pinId = 5 };
 #else
-  ReaderAnalogPin const arduino5V_pin = { .pin_no = A3 };
-  ReaderAnalogPin const Iin_pin       = { .pin_no = A6 };
-  WriterDigitalPin const powerIn_pin  = { .pin_no = 5 };
+  PinReader const arduino5V_pin = { .pinId = A3 };
+  PinReader const Iin_pin       = { .pinId = A6 };
+  PinSetter const powerIn_pin   = { .pinId = 5 };
 #endif
   bool jobsDone                       = false;
   bool measuredValuesAreFresh         = false;
@@ -89,7 +89,7 @@ void BMS::initialize(millis_t const given_time)
   sout << "Run time started.";
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
-    cells[i].balanceCircuit_pin.initWith(true);
+    cells[i].BalanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(true);
   lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
@@ -139,7 +139,7 @@ void BMS::progress(millis_t const given_time)
           {
             if (cellV[i] > allowedV_max)
             {
-              cells[i].balanceCircuit_pin.turnOn();
+              cells[i].BalanceCircuit_pin.turnOn();
             }
           }
           delay(500);
@@ -151,22 +151,22 @@ void BMS::progress(millis_t const given_time)
 }
 void BMS::measureValues(bool const showValues)
 {
-  constexpr millis_t measuring_time_for_one_sensor = 10;
+  constexpr millis_t measuring_time = 10;
   V_t sensorV = 0.00;
   V_t accumV = 0.00;
   // Calculate the voltage of the pin `5V`
-  sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+  sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
   // Calculate the voltages of every cell
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
-    sensorV = arduino5V * cells[i].voltageSensor_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+    sensorV = arduino5V * cells[i].voltage_sensor_pin.readSignal(measuring_time) / refOf.analogSignalMax;
     cellV[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
     accumV += cellV[i];
   }
   // Calculate the main current
-  sensorV = arduino5V * Iin_pin.readSignal(measuring_time_for_one_sensor) / refOf.analogSignalMax;
+  sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) + 0.04; // `0.04` is a calibration.
   // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
@@ -262,18 +262,18 @@ void BMS::controlSystem()
   jobsDone = true;
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    bool const this_cell_being_charged_now = not cells[i].balanceCircuit_pin.isHigh();
+    bool const this_cell_being_charged_now = not cells[i].BalanceCircuit_pin.isHigh();
     bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
 
     jobsDone &= this_cell_charging_finished;
 
     if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
     {
-      cells[i].balanceCircuit_pin.turnOff();
+      cells[i].BalanceCircuit_pin.turnOff();
     }
     if ((this_cell_charging_finished) and (this_cell_being_charged_now))
     {
-      cells[i].balanceCircuit_pin.turnOn();
+      cells[i].BalanceCircuit_pin.turnOn();
     }
   }
 
@@ -285,7 +285,7 @@ void BMS::goodbye(int const countDown)
 
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
-    cells[i].balanceCircuit_pin.turnOn();
+    cells[i].BalanceCircuit_pin.turnOn();
   }
   if (lcdHandle)
   {
