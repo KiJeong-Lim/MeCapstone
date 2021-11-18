@@ -59,7 +59,7 @@ public:
   void initialize(millis_t timeLimit);
   void progress(millis_t timeLimit);
 private:
-  void measureValues(bool showValues);
+  void measureValues();
   bool checkSafety(bool reportsToSerial);
   void controlSystem();
   double getSoc(int cell_no);
@@ -115,7 +115,8 @@ void BMS::progress(millis_t const given_time)
 {
   Timer hourglass;
 
-  measureValues(true);
+  measureValues();
+  printValues();
   {
     bool system_is_okay = checkSafety(true);
 
@@ -151,7 +152,7 @@ void BMS::progress(millis_t const given_time)
     }
   }
 }
-void BMS::measureValues(bool const showValues)
+void BMS::measureValues()
 {
   constexpr millis_t measuring_time = 10;
   V_t sensorV = 0.00;
@@ -172,10 +173,46 @@ void BMS::measureValues(bool const showValues)
   Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) + 0.04; // `0.04` is a calibration.
   // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
+}
+double BMS::getSoc(int const cell_no)
+{
+  V_t const &cellV_focused = cellV[cell_no - 1];
+  double soc = 0.0;
 
-  if (showValues)
+#if MODE == 1
+  soc = mySocVcellTable.get_x_from_y(cellV_focused);
+#else
+  soc = mySocVcellTable.get_x_from_y(cellV_focused);
+#endif
+  return soc;
+}
+void BMS::printValues()
+{
+  slog << "arduino5V = " << arduino5V << "[V].";
+  slog << "Iin = " << Iin << "[A].";
+  for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    printValues();
+    slog << "cellV[" << i << "] = " << cellV[i] << "[V].";
+  }
+  if (lcdHandle)
+  {
+    LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
+
+    for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
+    {
+      double const soc = getSoc(cell_no);
+
+      lcd.print("B");
+      lcd.print(cell_no);
+      lcd.print("=");
+      lcd.println(cellV[cell_no - 1]);
+      lcd.print(" ");
+      lcd.print(soc);
+      lcd.println("%");
+    }
+    lcd.print("I");
+    lcd.print("=");
+    lcd.println(Iin);
   }
 }
 bool BMS::checkSafety(bool const reportsToSerial)
@@ -184,7 +221,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
 
   if (measuredValuesAreFresh)
   {
-    measureValues(false);
+    measureValues();
   }
 
   // Check current
@@ -233,69 +270,28 @@ void BMS::controlSystem()
 {
   if (measuredValuesAreFresh)
   {
-    measureValues(false);
+    measureValues();
   }
 
   jobsDone = true;
   for (int i = 0; i < LENGTH_OF(cellV); i++)
   {
-    bool const this_cell_being_charged_now = not cells[i].BalanceCircuit_pin.isHigh();
-    bool const this_cell_charging_finished = cellV[i] >= (this_cell_being_charged_now ? overV_wanted : V_wanted);
+    bool const is_this_cell_being_charged_now = not cells[i].BalanceCircuit_pin.isHigh();
+    bool const is_this_cell_fully_charged_now = cellV[i] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
 
-    jobsDone &= this_cell_charging_finished;
+    jobsDone &= is_this_cell_fully_charged_now;
 
-    if ((not this_cell_charging_finished) and (not this_cell_being_charged_now))
+    if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
     {
       cells[i].BalanceCircuit_pin.turnOff();
     }
-    if ((this_cell_charging_finished) and (this_cell_being_charged_now))
+    if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
     {
       cells[i].BalanceCircuit_pin.turnOn();
     }
   }
 
   measuredValuesAreFresh = false;
-}
-void BMS::printValues()
-{
-  slog << "arduino5V = " << arduino5V << "[V].";
-  slog << "Iin = " << Iin << "[A].";
-  for (int i = 0; i < LENGTH_OF(cellV); i++)
-  {
-    slog << "cellV[" << i << "] = " << cellV[i] << "[V].";
-  }
-  if (lcdHandle)
-  {
-    LcdPrinter lcd = { .addressOfLcdI2C = lcdHandle };
-
-    for (int cell_no = 1; cell_no <= LENGTH_OF(cellV); cell_no++)
-    {
-      double const soc = getSoc(cell_no);
-
-      lcd.print("B");
-      lcd.print(cell_no);
-      lcd.print("=");
-      lcd.println(cellV[cell_no - 1]);
-      lcd.print(" ");
-      lcd.print(soc);
-      lcd.println("%");
-    }
-    lcd.print("I");
-    lcd.print("=");
-    lcd.println(Iin);
-  }
-}
-double BMS::getSoc(int const cell_no)
-{
-  double soc = 0.0;
-  V_t const &cellV_focused = cellV[cell_no - 1];
-
-#if MODE == 1
-  soc = mySocVcellTable.get_x_from_y(cellV_focused);
-#else
-  soc = mySocVcellTable.get_x_from_y(cellV_focused);
-#endif
-  return soc;
 }
 void BMS::goodbye(int const countDown)
 {
