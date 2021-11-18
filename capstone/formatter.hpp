@@ -30,7 +30,7 @@ public:
   {
     if (target_address)
     {
-      memcpy(target_address, &buf[0], Capacity);
+      memcpy(target_address, &buf[0], sizeof(buf));
     }
   }
   void putChar(char const printMe)

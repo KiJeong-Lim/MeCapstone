@@ -62,6 +62,7 @@
 ** Fix the schematic of [2021-11-09].
 ** Improve the class `SerialPrinter`.
 ** Improve the class `Formatter`.
+** Set `VERSION` to be `0.40`.
 */
 
 /* Schematics
