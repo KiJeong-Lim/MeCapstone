@@ -61,7 +61,6 @@ class BMS {
 public:
   void initialize(ms_t timeLimit);
   void progress(ms_t timeLimit);
-private:
   Amp_t getCalibrationOfIin() const;
   void measureValues();
   void initQs();
@@ -179,8 +178,7 @@ Amp_t BMS::getCalibrationOfIin() const
 void BMS::measureValues()
 {
   constexpr ms_t measuring_time = 10;
-  Vol_t sensorV = 0.00;
-  Vol_t accumV = 0.00;
+  Vol_t sensorV = 0.00, accumV = 0.00;
   // Calculate the voltage of the pin `5V`
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
