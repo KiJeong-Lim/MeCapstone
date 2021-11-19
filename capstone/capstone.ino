@@ -208,7 +208,6 @@ void BMS::initQs()
 }
 void BMS::updateQs()
 {
-  int number_of_batteries_being_charged = 0;
   if (not measuredValuesAreFresh)
   {
     measureValues();
