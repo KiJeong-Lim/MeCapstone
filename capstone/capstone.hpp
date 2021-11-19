@@ -254,15 +254,15 @@ extern SerialPrinter sout, serr, slog;
 **     + lcd_screen_width > 0
 **     + lcd_screen_height > 0
 **     + If the arduino board is Uno,
-**       then: I2C::SDA pin must be connected Uno::A4,
-**             I2C::SCL pin must be connected Uno::A5,
-**             I2C::VCC pin must be connected Uno::5V, and
-**             I2C::GND pin must be connected Uno::GND.
+**       then: I2C::SDA must be connected Uno::A4,
+**             I2C::SCL must be connected Uno::A5,
+**             I2C::VCC must be connected Uno::5V, and
+**             I2C::GND must be connected Uno::GND.
 **     + If the arduino board is Nano,
-**       then: I2C::SDA pin must be connected Nano::A4,
-**             I2C::SCL pin must be connected Nano::A5,
-**             I2C::VCC pin must be connected Nano::5V, and
-**             I2C::GND pin must be connected Nano::GND.
+**       then: I2C::SDA must be connected Nano::A4,
+**             I2C::SCL must be connected Nano::A5,
+**             I2C::VCC must be connected Nano::5V, and
+**             I2C::GND must be connected Nano::GND.
 **   - Guarantees
 **     + If lcdHandle is not a null-pointer,
 **       the screen of an LCD is initialized,
