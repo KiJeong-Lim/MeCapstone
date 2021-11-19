@@ -31,29 +31,30 @@ A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 static
 PinsOfCell const cells[] =
 #if( MODE == 1 )
-{ { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
+{ { .voltage_sensor_pin = Apin(0), .BalanceCircuit_pin = Dpin(2) } // B1(3V7)
 #else
-{ { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
-, { .voltage_sensor_pin = { .pinId = Apin(1) }, .BalanceCircuit_pin = { .pinId = Dpin(3) } } // B2(7V4)
-, { .voltage_sensor_pin = { .pinId = Apin(2) }, .BalanceCircuit_pin = { .pinId = Dpin(4) } } // B3(11V1)
+{ { .voltage_sensor_pin = Apin(0), .BalanceCircuit_pin = Dpin(2) } // B1(3V7)
+, { .voltage_sensor_pin = Apin(1), .BalanceCircuit_pin = Dpin(3) } // B2(7V4)
+, { .voltage_sensor_pin = Apin(2), .BalanceCircuit_pin = Dpin(4) } // B3(11V1)
 #endif
 };
 
 class BMS {
 #if( MODE == 1 )
-  PinReader const arduino5V_pin = { .pinId = Apin(1) };
-  PinReader const Iin_pin       = { .pinId = Apin(2) };
-  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
+  PinReader const arduino5V_pin = Apin(1);
+  PinReader const Iin_pin       = Apin(2);
+  PinSetter const powerIn_pin   = Dpin(5);
 #else
-  PinReader const arduino5V_pin = { .pinId = Apin(3) };
-  PinReader const Iin_pin       = { .pinId = Apin(6) };
-  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
+  PinReader const arduino5V_pin = Apin(3);
+  PinReader const Iin_pin       = Apin(6);
+  PinSetter const powerIn_pin   = Dpin(5);
 #endif
   bool jobsDone                 = false;
   bool measuredValuesAreFresh   = false;
   ms_t Qs_lastUpdatedTime       = 0;
   V_t arduino5V                 = refOf.arduinoRegularV;
   A_t Iin                       = 0.00;
+  A_t Iin_calibration           = 0.00;
   V_t cellVs[LENGTH_OF(cells)]  = { };
   mAh_t Qs[LENGTH_OF(cells)]    = { };
   LiquidCrystal_I2C *lcdHandle  = nullptr;
@@ -61,6 +62,7 @@ public:
   void initialize(ms_t timeLimit);
   void progress(ms_t timeLimit);
 private:
+  A_t getCalibrationOfIin() const;
   void measureValues();
   void initQs();
   void updateQs();
@@ -95,6 +97,7 @@ void BMS::initialize(ms_t const given_time)
 
   Wire.begin();
   sout << "Run time started.";
+  Iin_calibration = getCalibrationOfIin();
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].BalanceCircuit_pin.initWith(true);
@@ -160,6 +163,14 @@ void BMS::progress(ms_t const given_time)
   }
   updateQs();
 }
+A_t BMS::getCalibrationOfIin() const
+{
+  constexpr ms_t measuring_time = 10;
+  V_t const Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+  V_t const Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
+  V_t const Iin_sensorV = Vref * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+  return ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor);
+}
 void BMS::measureValues()
 {
   constexpr ms_t measuring_time = 10;
@@ -178,7 +189,7 @@ void BMS::measureValues()
   }
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
-  Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) + 0.04; // `0.04` is a calibration.
+  Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) - Iin_calibration;
   // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
 }
