@@ -27,8 +27,8 @@
 #define LCD_SECTION_LEN   ((LCD_WIDTH) / (LCD_SECTION_EA))
 #define LENGTH_OF(ary)    (sizeof(ary) / sizeof(*(ary)))
 #define ROUND(val)        ((BigInt_t)((val) + 0.5))
-#define Apin(pin_no)      { .pinId = A##pin_no }
-#define Dpin(pin_no)      { .pinId = pin_no }
+#define Apin(pin_no)      A##pin_no
+#define Dpin(pin_no)      pin_no
 /* Comments
 ** [LCD_SECTION_LEN]
 ** `LCD_SECTION_LEN` returns the length of sections.
