@@ -20,20 +20,20 @@
 // version information
 #define MAJOR_VERSION     0
 #define MINOR_VERSION     4
-#define REVISION_NUMBER   0
+#define REVISION_NUMBER   1
 #include "version.h"
 
 // macro defns
 #define LCD_SECTION_LEN   ((LCD_WIDTH) / (LCD_SECTION_EA))
-#define LENGTH_OF(ary)    (sizeof(ary) / sizeof(*(ary)))
+#define LENGTH(ary)       (sizeof(ary) / sizeof(*(ary)))
 #define ROUND(val)        ((BigInt_t)((val) + 0.5))
 #define Apin(pin_no)      A##pin_no
 #define Dpin(pin_no)      pin_no
 /* Comments
 ** [LCD_SECTION_LEN]
 ** `LCD_SECTION_LEN` returns the length of sections.
-** [LENGTH_OF]
-** `LENGTH_OF(ary)` returns the number of elements of `ary`.
+** [LENGTH]
+** `LENGTH(ary)` returns the number of elements of `ary`.
 ** [ROUND]
 ** `ROUND(val)` returns the rounding of `val`.
 ** [Apin]
@@ -53,6 +53,7 @@ typedef double long mAh_t;
 typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int64_t BigInt_t;
+typedef LiquidCrystal_I2C *LcdHandle_t;
 /* Comments
 ** [ms_t]
 ** `ms_t` stands for the type of milliseconds.
@@ -70,6 +71,8 @@ typedef int64_t BigInt_t;
 ** `pinId_t` stands for the type of pins.
 ** [BigInt_t]
 ** `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
+** [ptrOfLcdI2C_t]
+** `ptrOfLcdI2C_t` stands for 
 */
 
 // implemented in "utilities.cpp"
@@ -120,7 +123,7 @@ public:
 */
 
 // implemented in "printers.cpp"
-LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
+LcdHandle_t openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 template <size_t Capacity>
 class SizedFormatter {
   int cnt = 0;
@@ -223,7 +226,7 @@ public:
   }
 };
 class LcdPrinter {
-  LiquidCrystal_I2C *const lcdHandle;
+  LcdHandle_t const lcdHandle;
   int section_no;
   SizedFormatter<LCD_SECTION_LEN> fbuf;
   char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
@@ -231,7 +234,7 @@ public:
   LcdPrinter() = delete;
   LcdPrinter(LcdPrinter const &other) = delete;
   LcdPrinter(LcdPrinter &&other) = delete;
-  LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef);
+  LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
 private:
   void newline();
@@ -266,7 +269,7 @@ extern SerialPrinter sout, serr, slog;
 /* Comments
 ** [openLcdI2C]
 ** - Usage:
-**   LiquidCrystal_I2C *lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
+**   LcdHandle_t lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
 **   * Requirements:
 **     + `Wire.begin();` must be executed before calling this function.
 **     + lcd_screen_width > 0

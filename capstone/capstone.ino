@@ -41,23 +41,23 @@ PinsOfCell const cells[] =
 
 class BMS {
 #if( OPERATING_MODE == 1 )
-  PinReader const arduino5V_pin   = { .pinId = Apin(1) };
-  PinReader const Iin_pin         = { .pinId = Apin(2) };
-  PinSetter const powerIn_pin     = { .pinId = Dpin(5) };
+  PinReader const arduino5V_pin = { .pinId = Apin(1) };
+  PinReader const Iin_pin       = { .pinId = Apin(2) };
+  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
 #else
-  PinReader const arduino5V_pin   = { .pinId = Apin(3) };
-  PinReader const Iin_pin         = { .pinId = Apin(6) };
-  PinSetter const powerIn_pin     = { .pinId = Dpin(5) };
+  PinReader const arduino5V_pin = { .pinId = Apin(3) };
+  PinReader const Iin_pin       = { .pinId = Apin(6) };
+  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
 #endif
-  bool jobsDone                   = false;
-  bool measuredValuesAreFresh     = false;
-  ms_t Qs_lastUpdatedTime         = 0;
-  Vol_t arduino5V                 = refOf.arduinoRegularV;
-  Amp_t Iin                       = 0.00;
-  Amp_t Iin_calibration           = 0.00;
-  Vol_t cellVs[LENGTH_OF(cells)]  = { };
-  mAh_t Qs[LENGTH_OF(cells)]      = { };
-  LiquidCrystal_I2C *lcdHandle    = nullptr;
+  bool jobsDone                 = false;
+  bool measuredValuesAreFresh   = false;
+  ms_t Qs_lastUpdatedTime       = 0;
+  LcdHandle_t lcd_handle        = nullptr;
+  Vol_t arduino5V               = refOf.arduinoRegularV;
+  Amp_t Iin                     = 0.00;
+  Amp_t Iin_calibration         = 0.00;
+  Vol_t cellVs[LENGTH(cells)]   = { };
+  mAh_t Qs[LENGTH(cells)]       = { };
 public:
   void initialize(ms_t timeLimit);
   void progress(ms_t timeLimit);
@@ -93,22 +93,22 @@ void loop()
 
 void BMS::initialize(ms_t const given_time)
 {
-  Timer hourglass;
+  Timer hourglass = {};
 
   Wire.begin();
   sout << "Run time started.";
-  sout << "Iin_calibration = " << Iin_calibration << "[A].";
-  for (int i = 0; i < LENGTH_OF(cells); i++)
+  for (int i = 0; i < LENGTH(cells); i++)
   {
     cells[i].BalanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(false);
   Iin_calibration = getCalibrationOfIin();
+  sout << "Iin_calibration = " << Iin_calibration << "[A].";
   powerIn_pin.turnOn();
-  lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
-  if (lcdHandle)
+  lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
+  if (lcd_handle)
   {
-    LcdPrinter lcd = { .lcdHandleRef = lcdHandle };
+    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
 
     lcd.println("> SYSTEM");
     lcd.println(" ONLINE");
@@ -125,7 +125,7 @@ void BMS::initialize(ms_t const given_time)
 }
 void BMS::progress(ms_t const given_time)
 {
-  Timer hourglass;
+  Timer hourglass = {};
 
   measureValues();
   printValues();
@@ -136,11 +136,11 @@ void BMS::progress(ms_t const given_time)
     if (system_is_okay and jobsDone)
     {
       sout << "CHARGING COMPLETED.";
-      if (lcdHandle)
+      if (lcd_handle)
       {
-        lcdHandle->clear();
-        lcdHandle->setCursor(0, 1);
-        lcdHandle->print("JOBS FINISHED");
+        lcd_handle->clear();
+        lcd_handle->setCursor(0, 1);
+        lcd_handle->print("JOBS FINISHED");
       }
       goodbye(10);
     }
@@ -150,7 +150,7 @@ void BMS::progress(ms_t const given_time)
       {
         if (not system_is_okay)
         {
-          for (int i = 0; i < LENGTH_OF(cells); i++)
+          for (int i = 0; i < LENGTH(cells); i++)
           {
             if (cellVs[i] > allowedV_max)
             {
@@ -185,7 +185,7 @@ void BMS::measureValues()
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;
   // Calculate the voltages of every cell
-  for (int i = 0; i < LENGTH_OF(cells); i++)
+  for (int i = 0; i < LENGTH(cells); i++)
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
     sensorV = arduino5V * cells[i].voltage_sensor_pin.readSignal(measuring_time) / refOf.analogSignalMax;
@@ -204,7 +204,7 @@ void BMS::initQs()
   {
     measureValues();
   }
-  for (int i = 0; i < LENGTH_OF(Qs); i++)
+  for (int i = 0; i < LENGTH(Qs); i++)
   {
     Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
   }
@@ -216,7 +216,7 @@ void BMS::updateQs()
   {
     measureValues();
   }
-  for (int i = 0; i < LENGTH_OF(cells); i++)
+  for (int i = 0; i < LENGTH(cells); i++)
   {
     Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;
   }
@@ -234,15 +234,15 @@ void BMS::printValues() const
 {
   slog << "arduino5V = " << arduino5V << "[V].";
   slog << "Iin = " << Iin << "[A].";
-  for (int i = 0; i < LENGTH_OF(cellVs); i++)
+  for (int i = 0; i < LENGTH(cellVs); i++)
   {
     slog << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
   }
-  if (lcdHandle)
+  if (lcd_handle)
   {
-    LcdPrinter lcd = { .lcdHandleRef = lcdHandle };
+    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
 
-    for (int i = 0; i < LENGTH_OF(cellVs); i++)
+    for (int i = 0; i < LENGTH(cellVs); i++)
     {
       double const soc = checkSocOf(i);
 
@@ -297,7 +297,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
   }
 
   // Check voltages
-  for (int i = 0; i < LENGTH_OF(cellVs); i++)
+  for (int i = 0; i < LENGTH(cellVs); i++)
   {
     if (cellVs[i] > allowedV_max)
     {
@@ -328,7 +328,7 @@ void BMS::controlSystem()
   }
 
   jobsDone = true;
-  for (int i = 0; i < LENGTH_OF(cellVs); i++)
+  for (int i = 0; i < LENGTH(cellVs); i++)
   {
     bool const is_this_cell_being_charged_now = not cells[i].BalanceCircuit_pin.isHigh();
     bool const is_this_cell_fully_charged_now = cellVs[i] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
@@ -349,34 +349,34 @@ void BMS::controlSystem()
 }
 void BMS::goodbye(int const countDown)
 {
-  Timer hourglass;
+  Timer hourglass= {};
 
-  for (int i = 0; i < LENGTH_OF(cells); i++)
+  for (int i = 0; i < LENGTH(cells); i++)
   {
     cells[i].BalanceCircuit_pin.turnOn();
   }
-  if (lcdHandle)
+  if (lcd_handle)
   {
-    lcdHandle->setCursor(1, 0);
-    lcdHandle->print(" SECS LEFT");
+    lcd_handle->setCursor(1, 0);
+    lcd_handle->print(" SECS LEFT");
   }
   for (int i = countDown; i > 0; i--)
   {
-    if (lcdHandle)
+    if (lcd_handle)
     {
-      lcdHandle->setCursor(0, 0);
-      lcdHandle->print(i - 1);
+      lcd_handle->setCursor(0, 0);
+      lcd_handle->print(i - 1);
     }
     serr << "Your arduino will abort in " << i << " seconds.";
     hourglass.delay(1000);
     hourglass.reset();
   }
-  if (lcdHandle)
+  if (lcd_handle)
   {
-    lcdHandle->clear();
-    lcdHandle->noBacklight();
-    delete lcdHandle;
-    lcdHandle = nullptr;
+    lcd_handle->clear();
+    lcd_handle->noBacklight();
+    delete lcd_handle;
+    lcd_handle = nullptr;
   }
   powerIn_pin.turnOff();
   abort();

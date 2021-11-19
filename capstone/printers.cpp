@@ -10,9 +10,9 @@
 
 #include "capstone.hpp"
 
-LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
+LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
 {
-  LiquidCrystal_I2C *lcdHandle = nullptr;
+  LcdHandle_t lcdHandle = nullptr;
 
   if (lcdWidth > 0 && lcdHeight > 0)
   {
@@ -46,15 +46,15 @@ LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
   return lcdHandle;
 }
 
-LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef)
+LcdPrinter::LcdPrinter(LcdHandle_t const &lcdHandleRef)
   : lcdHandle{ lcdHandleRef }
   , section_no{ 0 }
   , fbuf{ }
   , mybuf{ }
 {
-  for (int c = 0; c < LENGTH_OF(mybuf); c++)
+  for (int c = 0; c < LENGTH(mybuf); c++)
   {
-    for (int r = 0; r < LENGTH_OF(*mybuf); r++)
+    for (int r = 0; r < LENGTH(*mybuf); r++)
     {
       mybuf[c][r] = '\0';
     }
