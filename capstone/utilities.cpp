@@ -16,9 +16,9 @@ void delay1ms()
   delay(1);
 }
 
-bigInt_t POW(bigInt_t base, int expn)
+BigInt_t POW(BigInt_t base, int expn)
 {
-  bigInt_t result = 1;
+  BigInt_t result = 1;
   
   for (int i = 0; i < expn; i++)
   {

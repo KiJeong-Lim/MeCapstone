@@ -24,11 +24,18 @@
 #include "version.h"
 
 // macro defns
-#define LCD_SECTION_LEN   (LCD_WIDTH / LCD_SECTION_EA)
+#define LCD_SECTION_LEN   ((LCD_WIDTH) / (LCD_SECTION_EA))
 #define LENGTH_OF(ary)    (sizeof(ary) / sizeof(*(ary)))
-#define ROUND(val)        ((bigInt_t)((val) + 0.5))
+#define ROUND(val)        ((BigInt_t)((val) + 0.5))
 #define Apin(pin_no)      { .pinId = A##pin_no }
 #define Dpin(pin_no)      { .pinId = pin_no }
+/* [Notes]
+** `LCD_SECTION_LEN` returns the length of sections.
+** `LENGTH_OF(ary)` returns the number of elements of `ary`.
+** `ROUND(val)` returns the rounding of `val`.
+** `Apin` stands for analog pin.
+** `Dpin` stands for digital pin.
+*/
 
 // type synonym defns
 typedef int long long ms_t;
@@ -38,10 +45,20 @@ typedef double Ohm_t;
 typedef double long mAh_t;
 typedef double Val_t;
 typedef uint8_t pinId_t;
-typedef int long long bigInt_t;
+typedef int64_t BigInt_t;
+/* [Notes]
+** `ms_t` stands for the type of milliseconds.
+** `Amp_t` stands for the type of ampere.
+** `Vol_t` stands for the type of voltage.
+** `Ohm_t` stands for the type of ohm.
+** `mAh_t` stands for the type of milliampere hours.
+** `Val_t` stands for the type of the real numbers.
+** `pinId_t` stands for the type of pins.
+** `BigInt_t` stands for the integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
+*/
 
 // implemented in "utilities.cpp"
-bigInt_t POW(bigInt_t base, int expn);
+BigInt_t POW(BigInt_t base, int expn);
 class Timer {
   ms_t volatile begTime;
 public:
@@ -113,16 +130,16 @@ public:
       putChar("0123456789ABCDEF"[printMe]);
     }
   }
-  void putInt(bigInt_t const printMe, int const base)
+  void putInt(BigInt_t const printMe, int const base)
   {
     int cn = 0;
-    bigInt_t val = printMe;
+    BigInt_t val = printMe;
     if (val < 0)
     {
       putChar('-');
       val *= -1;
     }
-    for (bigInt_t _val = 1; _val <= val; _val *= base)
+    for (BigInt_t _val = 1; _val <= val; _val *= base)
     {
       cn++;
     }
@@ -143,9 +160,9 @@ public:
     if (afters_dot > 0)
     {
       int cn = afters_dot;
-      bigInt_t pow10_afters_dot = POW(base, afters_dot);
-      bigInt_t valN = ROUND(val * pow10_afters_dot);
-      bigInt_t valF = valN % pow10_afters_dot;
+      BigInt_t pow10_afters_dot = POW(base, afters_dot);
+      BigInt_t valN = ROUND(val * pow10_afters_dot);
+      BigInt_t valF = valN % pow10_afters_dot;
       valN /= pow10_afters_dot;
       putInt(valN, base);
       putChar('.');
@@ -156,8 +173,8 @@ public:
     }
     else
     {
-      bigInt_t valE = POW(base, - afters_dot);
-      bigInt_t valN = ROUND(val / ((double)valE));
+      BigInt_t valE = POW(base, - afters_dot);
+      BigInt_t valN = ROUND(val / ((double)valE));
       valN *= valE;
       putInt(valN, base);
     }

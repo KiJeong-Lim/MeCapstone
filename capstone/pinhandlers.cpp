@@ -27,8 +27,8 @@ Val_t PinReader::readSignalOnce() const
 }
 Val_t PinReader::readSignal(ms_t const duration) const
 {
-  bigInt_t sum_of_vals = 0;
-  bigInt_t cnt_of_vals = 0;
+  BigInt_t sum_of_vals = 0;
+  BigInt_t cnt_of_vals = 0;
 
   for (Timer hourglass = {}; hourglass.time() < duration; cnt_of_vals++)
   {
