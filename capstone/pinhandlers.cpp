@@ -53,9 +53,9 @@ void PinSetter::syncPin()
 {
   digitalWrite(pin_to_handle, is_high ? HIGH : LOW);
 }
-void PinSetter::initWith(bool const on_is_true)
+void PinSetter::initWith(bool const be_high)
 {
-  is_high = on_is_true;
+  is_high = be_high;
   sout << "The pin " << pin_to_handle << " is initalized to " << (is_high ? "HIGH." : "LOW.");
   openPin();
   syncPin();

@@ -268,7 +268,7 @@ private:
   void openPin() const;
   void syncPin();
 public:
-  void initWith(bool is_high);
+  void initWith(bool be_high);
   void turnOn();
   void turnOff();
   bool isHigh() const;

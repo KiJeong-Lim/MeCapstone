@@ -97,13 +97,14 @@ void BMS::initialize(ms_t const given_time)
 
   Wire.begin();
   sout << "Run time started.";
-  Iin_calibration = getCalibrationOfIin();
   sout << "Iin_calibration = " << Iin_calibration << "[A].";
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].BalanceCircuit_pin.initWith(true);
   }
-  powerIn_pin.initWith(true);
+  powerIn_pin.initWith(false);
+  Iin_calibration = getCalibrationOfIin();
+  powerIn_pin.turnOn();
   lcdHandle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcdHandle)
   {
@@ -166,10 +167,13 @@ void BMS::progress(ms_t const given_time)
 }
 Amp_t BMS::getCalibrationOfIin() const
 {
-  constexpr ms_t measuring_time = 10;
-  Vol_t const Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
-  Vol_t const Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
-  Vol_t const Iin_sensorV = Vref * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+  Vol_t Vref_sensorV, Vref, Iin_sensorV;
+
+  delay(10);
+  Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(10) / refOf.analogSignalMax;
+  Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
+  Iin_sensorV = Vref * Iin_pin.readSignal(10) / refOf.analogSignalMax;
+
   return ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor);
 }
 void BMS::measureValues()
