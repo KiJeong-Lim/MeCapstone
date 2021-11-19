@@ -30,16 +30,16 @@
 #define Apin(pin_no)      A##pin_no
 #define Dpin(pin_no)      pin_no
 /* Comments
-** <LCD_SECTION_LEN>
+** [LCD_SECTION_LEN]
 ** 1. `LCD_SECTION_LEN` returns the length of sections.
-** <LENGTH>
+** [LENGTH]
 ** 1. `LENGTH(ary)` returns the number of elements of `ary`.
-** <ROUND>
+** [ROUND]
 ** 1. `ROUND(val)` returns the rounding of `val`.
-** <Apin>
+** [Apin]
 ** 1. `Apin` stands for analog pin.
 ** 2. For example, `Apin(0)` refers to the analog pin `A0`.
-** <Dpin>
+** [Dpin]
 ** 1. `Dpin` stands for digital pin.
 ** 2. For example, `Dpin(2)` refers to the digital pin `2`.
 */
@@ -55,23 +55,23 @@ typedef uint8_t pinId_t;
 typedef int64_t BigInt_t;
 typedef LiquidCrystal_I2C *LcdHandle_t;
 /* Comments
-** <ms_t>
+** [ms_t]
 ** 1. `ms_t` stands for the type of milliseconds.
-** <Amp_t>
+** [Amp_t]
 ** 1. `Amp_t` stands for the type of ampere.
-** <Vol_t>
+** [Vol_t]
 ** 1. `Vol_t` stands for the type of voltage.
-** <Ohm_t>
+** [Ohm_t]
 ** 1. `Ohm_t` stands for the type of ohm.
-** <mAh_t>
+** [mAh_t]
 ** 1. `mAh_t` stands for the type of milliampere hours.
-** <Val_t>
+** [Val_t]
 ** 1. `Val_t` stands for the type of the real numbers.
-** <pinId_t>
+** [pinId_t]
 ** 1. `pinId_t` stands for the type of pins.
-** <BigInt_t>
+** [BigInt_t]
 ** 1. `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
-** <LcdHandle_t>
+** [LcdHandle_t]
 ** 1. `LcdHandle_t` stands for the type of pointers of `LiquidCrystal_I2C`.
 */
 
@@ -112,16 +112,16 @@ public:
   double get_x_from_y(double y) const;
 };
 /* Comments
-** <POW>
+** [POW]
 ** 1. Usage
-**    y = POW(x, n)
+**    > y = POW(x, n);
 **    - Requirements
 **      [A] x > 0
 **      [B] n >= 0
 **    - Guarantees
 **      [A] y = x^n provided by x^n =< 9223372036854775807
-** <Timer>
-** <AscMap>
+** [Timer]
+** [AscMap]
 */
 
 // implemented in "printers.cpp"
@@ -269,9 +269,9 @@ public:
 };
 extern SerialPrinter sout, serr, slog;
 /* Comments
-** <openLcdI2C>
+** [openLcdI2C]
 ** 1. Usage
-**    lcdHandle = openLcdI2C(lcd_screen_width, lcd_screen_height)
+**    > lcdHandle = openLcdI2C(lcd_screen_width, lcd_screen_height);
 **    - Requirements
 **      [A] `Wire.begin();` must be executed before calling this function.
 **      [B] lcd_screen_width > 0
@@ -293,14 +293,14 @@ extern SerialPrinter sout, serr, slog;
 ** 2. References
 **    [1] https://codingrun.com/119
 **    [2] https://m.blog.naver.com/hy10101010/221562445464
-** <SizedFormatter>
-** <LcdPrinter>
-** <SerialPrinter>
-** <sout>
+** [SizedFormatter]
+** [LcdPrinter]
+** [SerialPrinter]
+** [sout]
 ** 1. `sout` stands for serial output.
-** <serr>
+** [serr]
 ** 1. `serr` stands for serial error.
-** <slog>
+** [slog]
 ** 1. `slog` stands for serial logger.
 */
 
@@ -352,23 +352,27 @@ public:
   void set(double duty_ratio) const;
 };
 /* Comments
+** [PinHandler]
+** [PinReader]
+** [PinSetter]
+** [PwmSetter]
 */
 
 // implemented in "data.cpp"
 extern AscMap const mySocOcvTable, mySocVcellTable;
 /* Comments
-** <mySocOcvTable>
-** 1. A table which maps `soc` to `ocv`;
+** [mySocOcvTable]
+** 1. A table which maps `soc` to `ocv`,
 **    where `0.00 =< soc =< 100.00`.
 ** 2. Usage
-**    soc = mySocOcvTable.get_x_from_y(ocv)
+**    > soc = mySocOcvTable.get_x_from_y(ocv);
 **    - Guarantees
 **      [A] 0.00 =< soc =< 100.00
-** <mySocVcellTable>
-** 1. A table which maps `soc` to `Vcell`;
+** [mySocVcellTable]
+** 1. A table which maps `soc` to `Vcell`,
 **    where `0.00 =< soc =< 98.00`.
 ** 2. Usage
-**    soc = mySocVcellTable.get_x_from_y(Vcell)
+**    > soc = mySocVcellTable.get_x_from_y(Vcell);
 **    - Guarantees
 **      [A] 0.00 =< soc =< 98.00
 */
@@ -386,9 +390,9 @@ struct ReferenceCollection {
   Vol_t const zenerdiodeVfromRtoA;
 };
 /* Comments
-** <PinsOfCell>
+** [PinsOfCell]
 ** 1. A class whose instances consist of pins associated with a cell.
-** <ReferenceCollection>
+** [ReferenceCollection]
 ** 1. A class, each instance of which is a collection of value references.
 */
 
