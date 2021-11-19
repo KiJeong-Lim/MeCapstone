@@ -46,7 +46,7 @@ LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
   return lcdHandle;
 }
 
-LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const lcdHandleRef)
+LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef)
   : lcdHandle{ lcdHandleRef }
   , section_no{ 0 }
   , fbuf{ }
