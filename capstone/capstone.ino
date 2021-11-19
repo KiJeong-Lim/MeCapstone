@@ -167,7 +167,7 @@ void BMS::progress(ms_t const given_time)
 }
 Amp_t BMS::getCalibrationOfIin() const
 {
-  Vol_t Vref_sensorV, Vref, Iin_sensorV;
+  Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
 
   delay(10);
   Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(10) / refOf.analogSignalMax;
