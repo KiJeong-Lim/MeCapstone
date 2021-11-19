@@ -114,13 +114,13 @@ public:
 /* Comments
 ** [POW]
 ** 1. Usage
-**    > y = POW(x, n);
-**    - Requirements
-**      [A] x > 0
-**      [B] n >= 0
-**      [C] x^n =< 9223372036854775807
-**    - Guarantees
-**      [A] y = x^n
+** > y = POW(x, n);
+** - Requirements
+**   [A] x > 0
+**   [B] n >= 0
+**   [C] x^n =< 9223372036854775807
+** - Guarantees
+**   [A] y = x^n
 ** [Timer]
 ** 1. A class, which imitates hourglass.
 ** [AscMap]
@@ -274,25 +274,25 @@ extern SerialPrinter sout, serr, slog;
 /* Comments
 ** [openLcdI2C]
 ** 1. Usage
-**    > lcdHandle = openLcdI2C(lcd_screen_width, lcd_screen_height);
-**    - Requirements
-**      [A] `Wire.begin();` must be executed before calling this function.
-**      [B] lcd_screen_width > 0
-**      [C] lcd_screen_height > 0
-**      [D] If the arduino board is Uno,
-**          then: I2C::SDA must be connected Uno::A4;
-**                I2C::SCL must be connected Uno::A5;
-**                I2C::VCC must be connected Uno::5V; and
-**                I2C::GND must be connected Uno::GND.
-**      [E] If the arduino board is Nano,
-**          then: I2C::SDA must be connected Nano::A4;
-**                I2C::SCL must be connected Nano::A5;
-**                I2C::VCC must be connected Nano::5V; and
-**                I2C::GND must be connected Nano::GND.
-**   - Guarantees
-**     [A] If `lcdHandle` is not a null-pointer,
-**         the screen of an LCD is initialized,
-**         which is being handled by `lcdHandle`.
+** > lcdHandle = openLcdI2C(lcd_screen_width, lcd_screen_height);
+** - Requirements
+**   [A] `Wire.begin();` must be executed before calling this function.
+**   [B] lcd_screen_width > 0
+**   [C] lcd_screen_height > 0
+**   [D] If the arduino board is Uno,
+**       then: I2C::SDA must be connected Uno::A4;
+**             I2C::SCL must be connected Uno::A5;
+**             I2C::VCC must be connected Uno::5V; and
+**             I2C::GND must be connected Uno::GND.
+**   [E] If the arduino board is Nano,
+**       then: I2C::SDA must be connected Nano::A4;
+**             I2C::SCL must be connected Nano::A5;
+**             I2C::VCC must be connected Nano::5V; and
+**             I2C::GND must be connected Nano::GND.
+** - Guarantees
+**   [A] If `lcdHandle` is not a null-pointer,
+**       the screen of an LCD is initialized,
+**       which is being handled by `lcdHandle`.
 ** 2. References
 **    [1] https://codingrun.com/119
 **    [2] https://m.blog.naver.com/hy10101010/221562445464
@@ -303,7 +303,7 @@ extern SerialPrinter sout, serr, slog;
 ** [SerialPrinter]
 ** 1. A class, which is similar to std::ostream.
 ** 2. But the major difference is that line breaks in this class become `;`.
-** 3. That feature is carried out by `SerialPrinter::~SerialPrinter`.
+** 3. That feature is carried out by `SerialPrinter::~SerialPrinter` and `SerialPrinter::trick`.
 ** [sout]
 ** 1. `sout` stands for serial output.
 ** [serr]
@@ -378,16 +378,16 @@ extern AscMap const mySocOcvTable, mySocVcellTable;
 ** 1. A table which maps `soc` to `ocv`,
 **    where `0.00 =< soc =< 100.00`.
 ** 2. Usage
-**    > soc = mySocOcvTable.get_x_from_y(ocv);
-**    - Guarantees
-**      [A] 0.00 =< soc =< 100.00
+** > soc = mySocOcvTable.get_x_from_y(ocv);
+** - Guarantees
+**   [A] 0.00 =< soc =< 100.00
 ** [mySocVcellTable]
 ** 1. A table which maps `soc` to `Vcell`,
 **    where `0.00 =< soc =< 98.00`.
 ** 2. Usage
-**    > soc = mySocVcellTable.get_x_from_y(Vcell);
-**    - Guarantees
-**      [A] 0.00 =< soc =< 98.00
+** > soc = mySocVcellTable.get_x_from_y(Vcell);
+** - Guarantees
+**   [A] 0.00 =< soc =< 98.00
 */
 
 // implemented in "capstone.ino"
