@@ -30,11 +30,11 @@ Val_t PinReader::readSignal(ms_t const duration) const
   BigInt_t sum_of_vals = 0;
   BigInt_t cnt_of_vals = 0;
 
-  for (Timer hourglass = {}; hourglass.time() < duration; cnt_of_vals++)
+  for (Timer hourglass = { }; hourglass.time() < duration; cnt_of_vals++)
   {
     sum_of_vals += read_once();
   }
-  return (static_cast<double>(sum_of_vals)) / (static_cast<double>(cnt_of_vals));
+  return (static_cast<Val_t>(sum_of_vals)) / (static_cast<Val_t>(cnt_of_vals));
 }
 
 PinSetter::PinSetter(pinId_t const pinId)
