@@ -87,7 +87,6 @@
 ** - Logic changed,
 **   from `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
 **   to   `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
-** Start implementing the plan: Adding comments.
 ** Fix the method `BMS::initialize`.
 */
 

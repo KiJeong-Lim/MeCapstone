@@ -93,7 +93,7 @@ void loop()
 
 void BMS::initialize(ms_t const given_time)
 {
-  Timer hourglass = {};
+  Timer hourglass = { };
 
   Wire.begin();
   sout << "Run time started.";
@@ -125,7 +125,7 @@ void BMS::initialize(ms_t const given_time)
 }
 void BMS::progress(ms_t const given_time)
 {
-  Timer hourglass = {};
+  Timer hourglass = { };
 
   measureValues();
   printValues();
@@ -349,7 +349,7 @@ void BMS::controlSystem()
 }
 void BMS::goodbye(int const countDown)
 {
-  Timer hourglass = {};
+  Timer hourglass = { };
 
   for (int i = 0; i < LENGTH(cells); i++)
   {
