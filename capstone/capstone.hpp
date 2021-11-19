@@ -118,8 +118,9 @@ public:
 **    - Requirements
 **      [A] x > 0
 **      [B] n >= 0
+**      [C] x^n =< 9223372036854775807
 **    - Guarantees
-**      [A] y = x^n provided by x^n =< 9223372036854775807
+**      [A] y = x^n
 ** [Timer]
 ** [AscMap]
 */
