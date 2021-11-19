@@ -11,7 +11,7 @@
 #include "capstone.hpp"
 
 static constexpr
-V_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
+Vol_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
 
 static constexpr
 ReferenceCollection refOf =
@@ -23,10 +23,10 @@ ReferenceCollection refOf =
 };
 
 static constexpr
-V_t allowedV_max = +4.20, allowedV_min = +2.70; // FIX ME!
+Vol_t allowedV_max = +4.20, allowedV_min = +2.70; // FIX ME!
 
 static constexpr
-A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
+Amp_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 PinsOfCell const cells[] =
@@ -41,28 +41,28 @@ PinsOfCell const cells[] =
 
 class BMS {
 #if( OPERATING_MODE == 1 )
-  PinReader const arduino5V_pin = Apin(1);
-  PinReader const Iin_pin       = Apin(2);
-  PinSetter const powerIn_pin   = Dpin(5);
+  PinReader const arduino5V_pin   = Apin(1);
+  PinReader const Iin_pin         = Apin(2);
+  PinSetter const powerIn_pin     = Dpin(5);
 #else
-  PinReader const arduino5V_pin = Apin(3);
-  PinReader const Iin_pin       = Apin(6);
-  PinSetter const powerIn_pin   = Dpin(5);
+  PinReader const arduino5V_pin   = Apin(3);
+  PinReader const Iin_pin         = Apin(6);
+  PinSetter const powerIn_pin     = Dpin(5);
 #endif
-  bool jobsDone                 = false;
-  bool measuredValuesAreFresh   = false;
-  ms_t Qs_lastUpdatedTime       = 0;
-  V_t arduino5V                 = refOf.arduinoRegularV;
-  A_t Iin                       = 0.00;
-  A_t Iin_calibration           = 0.00;
-  V_t cellVs[LENGTH_OF(cells)]  = { };
-  mAh_t Qs[LENGTH_OF(cells)]    = { };
-  LiquidCrystal_I2C *lcdHandle  = nullptr;
+  bool jobsDone                   = false;
+  bool measuredValuesAreFresh     = false;
+  ms_t Qs_lastUpdatedTime         = 0;
+  Vol_t arduino5V                 = refOf.arduinoRegularV;
+  Amp_t Iin                       = 0.00;
+  Amp_t Iin_calibration           = 0.00;
+  Vol_t cellVs[LENGTH_OF(cells)]  = { };
+  mAh_t Qs[LENGTH_OF(cells)]      = { };
+  LiquidCrystal_I2C *lcdHandle    = nullptr;
 public:
   void initialize(ms_t timeLimit);
   void progress(ms_t timeLimit);
 private:
-  A_t getCalibrationOfIin() const;
+  Amp_t getCalibrationOfIin() const;
   void measureValues();
   void initQs();
   void updateQs();
@@ -164,19 +164,19 @@ void BMS::progress(ms_t const given_time)
   }
   updateQs();
 }
-A_t BMS::getCalibrationOfIin() const
+Amp_t BMS::getCalibrationOfIin() const
 {
   constexpr ms_t measuring_time = 10;
-  V_t const Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
-  V_t const Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
-  V_t const Iin_sensorV = Vref * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+  Vol_t const Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
+  Vol_t const Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
+  Vol_t const Iin_sensorV = Vref * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   return ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor);
 }
 void BMS::measureValues()
 {
   constexpr ms_t measuring_time = 10;
-  V_t sensorV = 0.00;
-  V_t accumV = 0.00;
+  Vol_t sensorV = 0.00;
+  Vol_t accumV = 0.00;
   // Calculate the voltage of the pin `5V`
   sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   arduino5V = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / sensorV;

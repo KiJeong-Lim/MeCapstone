@@ -32,8 +32,8 @@
 
 // type synonym defns
 typedef int long long ms_t;
-typedef double A_t;
-typedef double V_t;
+typedef double Amp_t;
+typedef double Vol_t;
 typedef double Ohm_t;
 typedef double long mAh_t;
 typedef double Val_t;
@@ -280,10 +280,10 @@ struct PinsOfCell {
 };
 struct ReferenceCollection {
   Val_t const analogSignalMax;
-  V_t const arduinoRegularV;
+  Vol_t const arduinoRegularV;
   mAh_t const batteryCapacity;
   Ohm_t const sensitivityOfCurrentSensor;
-  V_t const zenerdiodeVfromRtoA;
+  Vol_t const zenerdiodeVfromRtoA;
 };
 
 #endif
