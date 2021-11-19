@@ -189,18 +189,18 @@ public:
   LcdPrinter() = delete;
   LcdPrinter(LcdPrinter const &other) = delete;
   LcdPrinter(LcdPrinter &&other) = delete;
-  LcdPrinter(LiquidCrystal_I2C *addressOfLcdI2C);
+  LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef);
   ~LcdPrinter();
 private:
   void newline();
 public:
-  void flush();
-  void print(int num);
-  void print(double val);
+  void print(int num, int base = 10);
+  void println(int num, int base = 10);
+  void print(double val, int afters_dot = 2);
+  void println(double val, int afters_dot = 2);
   void print(char const *str);
-  void println(int num);
-  void println(double val);
   void println(char const *str);
+  void flush();
 };
 class SerialPrinter {
   char const *const prefix_of_message;

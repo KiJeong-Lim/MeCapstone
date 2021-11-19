@@ -19,7 +19,7 @@
 #define VERSION (0.00)
 #endif
 
-// Manipulate me!
+// Manipulate these:
 #define SERIAL_PORT         9600
 #define OPERATING_MODE      1
 #define LCD_WIDTH           16

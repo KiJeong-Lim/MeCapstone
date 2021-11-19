@@ -46,8 +46,8 @@ LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
   return lcdHandle;
 }
 
-LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const addressOfLcdI2C)
-  : lcdHandle{ addressOfLcdI2C }
+LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef)
+  : lcdHandle{ lcdHandleRef }
   , section_no{ 0 }
   , fbuf{ }
   , mybuf{ }
@@ -89,31 +89,34 @@ void LcdPrinter::newline()
   flush();
   section_no++;
 }
-void LcdPrinter::print(int const num)
+void LcdPrinter::print(int const num, int const base)
 {
-  fbuf.putInt(num, 10);
+  if (base > 0 && base <= 16)
+  {
+    fbuf.putInt(num, base);
+  }
 }
-void LcdPrinter::print(double const val)
+void LcdPrinter::print(double const val, int const afters_dot)
 {
-  fbuf.putDouble(val, 2);
+  fbuf.putDouble(val, afters_dot);
 }
 void LcdPrinter::print(char const *const str)
 {
   fbuf.putString(str);
 }
-void LcdPrinter::println(int const num)
+void LcdPrinter::println(int const num, int const base)
 {
-  fbuf.putInt(num, 10);
+  print(num, base);
   newline();
 }
-void LcdPrinter::println(double const val)
+void LcdPrinter::println(double const val, int const afters_dot)
 {
-  fbuf.putDouble(val, 2);
+  print(val, afters_dot);
   newline();
 }
 void LcdPrinter::println(char const *const str)
 {
-  fbuf.putString(str);
+  print(str);
   newline();
 }
 
