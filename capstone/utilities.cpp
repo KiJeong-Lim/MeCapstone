@@ -33,12 +33,20 @@ Timer::Timer()
 {
   begTime = millis();
 }
+Timer::Timer(ms_t &&beg_time)
+  : begTime{ beg_time }
+{
+}
 Timer::~Timer()
 {
 }
 void Timer::reset()
 {
   begTime = millis();
+}
+ms_t Timer::getDuration() const
+{
+  return millis() - begTime;
 }
 ms_t Timer::time() const
 {

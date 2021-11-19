@@ -51,7 +51,7 @@ class BMS {
 #endif
   bool jobsDone                 = false;
   bool measuredValuesAreFresh   = false;
-  ms_t Qs_lastUpdatedTime       = 0;
+  Timer Qs_lastUpdatedTime      = { .init_time = 0 };
   LcdHandle_t lcd_handle        = nullptr;
   Vol_t arduino5V               = refOf.arduinoRegularV;
   Amp_t Iin                     = 0.00;
@@ -101,9 +101,9 @@ void BMS::initialize(ms_t const given_time)
     cells[i].BalanceCircuit_pin.initWith(true);
   }
   powerIn_pin.initWith(false);
+  delay(5);
   Iin_calibration = getCalibrationOfIin();
   sout << "Iin_calibration = " << Iin_calibration << "[A].";
-  powerIn_pin.turnOn();
   lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcd_handle)
   {
@@ -121,6 +121,7 @@ void BMS::initialize(ms_t const given_time)
   }
   hourglass.delay(given_time);
   initQs();
+  powerIn_pin.turnOn();
 }
 void BMS::progress(ms_t const given_time)
 {
@@ -168,7 +169,6 @@ Amp_t BMS::getCalibrationOfIin() const
 {
   Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
 
-  delay(10);
   Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(10) / refOf.analogSignalMax;
   Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
   Iin_sensorV = Vref * Iin_pin.readSignal(10) / refOf.analogSignalMax;
@@ -206,7 +206,7 @@ void BMS::initQs()
   {
     Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
   }
-  Qs_lastUpdatedTime = millis();
+  Qs_lastUpdatedTime.reset();
 }
 void BMS::updateQs()
 {
@@ -216,9 +216,9 @@ void BMS::updateQs()
   }
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;
+    Qs[i] += Iin * (Qs_lastUpdatedTime.getDuration() / 3600);
   }
-  Qs_lastUpdatedTime = millis();
+  Qs_lastUpdatedTime.reset();
 }
 double BMS::checkSocOf(int const cell_no) const
 {
@@ -275,7 +275,6 @@ bool BMS::checkSafety(bool const reportsToSerial)
   {
     measureValues();
   }
-
   // Check current
   if (Iin > allowedA_max)
   {
@@ -293,7 +292,6 @@ bool BMS::checkSafety(bool const reportsToSerial)
       serr << "`Iin`" << " too LOW.";
     }
   }
-
   // Check voltages
   for (int i = 0; i < LENGTH(cellVs); i++)
   {
@@ -314,7 +312,6 @@ bool BMS::checkSafety(bool const reportsToSerial)
       }
     }
   }
-
   measuredValuesAreFresh = false;
   return isBad;
 }
@@ -324,7 +321,6 @@ void BMS::controlSystem()
   {
     measureValues();
   }
-
   jobsDone = true;
   for (int i = 0; i < LENGTH(cellVs); i++)
   {
@@ -332,7 +328,6 @@ void BMS::controlSystem()
     bool const is_this_cell_fully_charged_now = cellVs[i] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
 
     jobsDone &= is_this_cell_fully_charged_now;
-
     if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
     {
       startCharging(i);
@@ -342,7 +337,6 @@ void BMS::controlSystem()
       breakCharging(i);
     }
   }
-
   measuredValuesAreFresh = false;
 }
 void BMS::goodbye(int const countDown)

@@ -12,7 +12,7 @@
 
 LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
 {
-  LcdHandle_t lcdHandle = nullptr;
+  LcdHandle_t myLcdHandle = nullptr;
 
   if (lcdWidth > 0 && lcdHeight > 0)
   {
@@ -27,8 +27,8 @@ LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
       if (response == 0)
       {
         sout << "I2C address found: address = " << adr << ".";
-        lcdHandle = new LiquidCrystal_I2C(adr, lcdWidth, lcdHeight);
-        if (lcdHandle)
+        myLcdHandle = new LiquidCrystal_I2C(adr, lcdWidth, lcdHeight);
+        if (myLcdHandle)
         {
           sout << "I2C connected: address = " << adr << ".";
           break;
@@ -37,13 +37,13 @@ LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
       adr--;
     } while (adr != 0x00);
 
-    if (lcdHandle)
+    if (myLcdHandle)
     {
-      lcdHandle->init();
-      lcdHandle->backlight();
+      myLcdHandle->init();
+      myLcdHandle->backlight();
     }
   }
-  return lcdHandle;
+  return myLcdHandle;
 }
 
 LcdPrinter::LcdPrinter(LcdHandle_t const &lcdHandleRef)

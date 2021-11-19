@@ -20,7 +20,7 @@
 // version information
 #define MAJOR_VERSION     0
 #define MINOR_VERSION     4
-#define REVISION_NUMBER   1
+#define REVISION_NUMBER   2
 #include "version.h"
 
 // macro defns
@@ -83,9 +83,11 @@ public:
   Timer();
   Timer(Timer const &other) = delete;
   Timer(Timer &&other) = delete;
+  Timer(ms_t &&init_time);
   ~Timer();
   void reset();
   ms_t time() const;
+  ms_t getDuration() const;
   void delay(ms_t duration) const;
 };
 class AscMap {
@@ -280,15 +282,15 @@ extern SerialPrinter sout, serr, slog;
 **   [B] lcd_screen_width > 0
 **   [C] lcd_screen_height > 0
 **   [D] If the arduino board is Uno,
-**       then: I2C::SDA must be connected Uno::A4;
-**             I2C::SCL must be connected Uno::A5;
-**             I2C::VCC must be connected Uno::5V; and
-**             I2C::GND must be connected Uno::GND.
+**       then I2C::SDA must be connected Uno::A4;
+**            I2C::SCL must be connected Uno::A5;
+**            I2C::VCC must be connected Uno::5V; and
+**            I2C::GND must be connected Uno::GND.
 **   [E] If the arduino board is Nano,
-**       then: I2C::SDA must be connected Nano::A4;
-**             I2C::SCL must be connected Nano::A5;
-**             I2C::VCC must be connected Nano::5V; and
-**             I2C::GND must be connected Nano::GND.
+**       then I2C::SDA must be connected Nano::A4;
+**            I2C::SCL must be connected Nano::A5;
+**            I2C::VCC must be connected Nano::5V; and
+**            I2C::GND must be connected Nano::GND.
 ** - Guarantees
 **   [A] If `lcdHandle` is not a null-pointer,
 **       the screen of an LCD is initialized,

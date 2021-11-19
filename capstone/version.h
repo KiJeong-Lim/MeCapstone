@@ -26,6 +26,13 @@
 #define LCD_HEIGHT          2
 #define LCD_SECTION_EA      2
 
+/* Required packages
+** [LiquidCrystal_I2C]
+** - version   = 1.1.3
+** - homepage  = https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3
+** - interface = "LiquidCrystal_I2C.h"
+*/
+
 /* History
 ** [2021-11-14]
 ** Make new files `CapstoneStable/version.h`,
