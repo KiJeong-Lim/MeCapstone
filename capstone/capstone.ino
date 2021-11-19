@@ -215,11 +215,7 @@ void BMS::updateQs()
   }
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
-    number_of_batteries_being_charged += not cells[i].BalanceCircuit_pin.isHigh();
-  }
-  for (int i = 0; i < LENGTH_OF(cells); i++)
-  {
-    Qs[i] += (Iin / number_of_batteries_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;
+    Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;
   }
   Qs_lastUpdatedTime = millis();
 }

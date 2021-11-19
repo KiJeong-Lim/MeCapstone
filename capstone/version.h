@@ -80,6 +80,7 @@
 **      `capstone/printers.ino`    -> `capstone/printers.cpp`,
 **      `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
 **      `capstone/data.ino`        -> `capstone/data.cpp`.
+** Fix `BMS::updateQs`.
 */
 
 /* Schematics
