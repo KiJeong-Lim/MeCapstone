@@ -30,18 +30,18 @@
 #define Apin(pin_no)      A##pin_no
 #define Dpin(pin_no)      pin_no
 /* Comments
-** [LCD_SECTION_LEN]
-** `LCD_SECTION_LEN` returns the length of sections.
-** [LENGTH]
-** `LENGTH(ary)` returns the number of elements of `ary`.
-** [ROUND]
-** `ROUND(val)` returns the rounding of `val`.
-** [Apin]
-** `Apin` stands for analog pin.
-** For example, `Apin(0)` refers to the analog pin `A0`.
-** [Dpin]
-** `Dpin` stands for digital pin.
-** For example, `Dpin(2)` refers to the digital pin `2`.
+** <LCD_SECTION_LEN>
+** 1. `LCD_SECTION_LEN` returns the length of sections.
+** <LENGTH>
+** 1. `LENGTH(ary)` returns the number of elements of `ary`.
+** <ROUND>
+** 1. `ROUND(val)` returns the rounding of `val`.
+** <Apin>
+** 1. `Apin` stands for analog pin.
+** 2. For example, `Apin(0)` refers to the analog pin `A0`.
+** <Dpin>
+** 1. `Dpin` stands for digital pin.
+** 2. For example, `Dpin(2)` refers to the digital pin `2`.
 */
 
 // type synonym defns
@@ -55,24 +55,24 @@ typedef uint8_t pinId_t;
 typedef int64_t BigInt_t;
 typedef LiquidCrystal_I2C *LcdHandle_t;
 /* Comments
-** [ms_t]
-** `ms_t` stands for the type of milliseconds.
-** [Amp_t]
-** `Amp_t` stands for the type of ampere.
-** [Vol_t]
-** `Vol_t` stands for the type of voltage.
-** [Ohm_t]
-** `Ohm_t` stands for the type of ohm.
-** [mAh_t]
-** `mAh_t` stands for the type of milliampere hours.
-** [Val_t]
-** `Val_t` stands for the type of the real numbers.
-** [pinId_t]
-** `pinId_t` stands for the type of pins.
-** [BigInt_t]
-** `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
-** [ptrOfLcdI2C_t]
-** `ptrOfLcdI2C_t` stands for the type of pointers of `LiquidCrystal_I2C`.
+** <ms_t>
+** 1. `ms_t` stands for the type of milliseconds.
+** <Amp_t>
+** 1. `Amp_t` stands for the type of ampere.
+** <Vol_t>
+** 1. `Vol_t` stands for the type of voltage.
+** <Ohm_t>
+** 1. `Ohm_t` stands for the type of ohm.
+** <mAh_t>
+** 1. `mAh_t` stands for the type of milliampere hours.
+** <Val_t>
+** 1. `Val_t` stands for the type of the real numbers.
+** <pinId_t>
+** 1. `pinId_t` stands for the type of pins.
+** <BigInt_t>
+** 1. `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
+** <LcdHandle_t>
+** 1. `LcdHandle_t` stands for the type of pointers of `LiquidCrystal_I2C`.
 */
 
 // implemented in "utilities.cpp"
@@ -112,14 +112,16 @@ public:
   double get_x_from_y(double y) const;
 };
 /* Comments
-** [POW]
-** - Usage:
-**   BigInt_t y = POW(BigInt_t x, int n)
-**   * Requirements
-**     + x > 0
-**     + n >= 0
-**   * Guarantees
-**     + y = x^n provided by x^n =< 9223372036854775807
+** <POW>
+** 1. Usage
+**    y = POW(x, n)
+**    - Requirements
+**      [A] x > 0
+**      [B] n >= 0
+**    - Guarantees
+**      [A] y = x^n provided by x^n =< 9223372036854775807
+** <Timer>
+** <AscMap>
 */
 
 // implemented in "printers.cpp"
@@ -267,36 +269,39 @@ public:
 };
 extern SerialPrinter sout, serr, slog;
 /* Comments
-** [openLcdI2C]
-** - Usage:
-**   LcdHandle_t lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
-**   * Requirements:
-**     + `Wire.begin();` must be executed before calling this function.
-**     + lcd_screen_width > 0
-**     + lcd_screen_height > 0
-**     + If the arduino board is Uno,
-**       then: I2C::SDA must be connected Uno::A4,
-**             I2C::SCL must be connected Uno::A5,
-**             I2C::VCC must be connected Uno::5V, and
-**             I2C::GND must be connected Uno::GND.
-**     + If the arduino board is Nano,
-**       then: I2C::SDA must be connected Nano::A4,
-**             I2C::SCL must be connected Nano::A5,
-**             I2C::VCC must be connected Nano::5V, and
-**             I2C::GND must be connected Nano::GND.
-**   * Guarantees:
-**     + If `lcdHandle` is not a null-pointer,
-**       the screen of an LCD is initialized,
-**       which is being handled by `lcdHandle`.
-** - References:
-**   [1] https://codingrun.com/119
-**   [2] https://m.blog.naver.com/hy10101010/221562445464
-** [sout]
-** `sout` stands for serial output.
-** [serr]
-** `serr` stands for serial error.
-** [slog]
-** `slog` stands for serial logger.
+** <openLcdI2C>
+** 1. Usage
+**    lcdHandle = openLcdI2C(lcd_screen_width, lcd_screen_height)
+**    - Requirements
+**      [A] `Wire.begin();` must be executed before calling this function.
+**      [B] lcd_screen_width > 0
+**      [C] lcd_screen_height > 0
+**      [D] If the arduino board is Uno,
+**          then: I2C::SDA must be connected Uno::A4;
+**                I2C::SCL must be connected Uno::A5;
+**                I2C::VCC must be connected Uno::5V; and
+**                I2C::GND must be connected Uno::GND.
+**      [E] If the arduino board is Nano,
+**          then: I2C::SDA must be connected Nano::A4;
+**                I2C::SCL must be connected Nano::A5;
+**                I2C::VCC must be connected Nano::5V; and
+**                I2C::GND must be connected Nano::GND.
+**   - Guarantees
+**     [A] If `lcdHandle` is not a null-pointer,
+**         the screen of an LCD is initialized,
+**         which is being handled by `lcdHandle`.
+** 2. References
+**    [1] https://codingrun.com/119
+**    [2] https://m.blog.naver.com/hy10101010/221562445464
+** <SizedFormatter>
+** <LcdPrinter>
+** <SerialPrinter>
+** <sout>
+** 1. `sout` stands for serial output.
+** <serr>
+** 1. `serr` stands for serial error.
+** <slog>
+** 1. `slog` stands for serial logger.
 */
 
 // implemented in "pinhandlers.cpp"
@@ -352,6 +357,20 @@ public:
 // implemented in "data.cpp"
 extern AscMap const mySocOcvTable, mySocVcellTable;
 /* Comments
+** <mySocOcvTable>
+** 1. A table which maps `soc` to `ocv`;
+**    where `0.00 =< soc =< 100.00`.
+** 2. Usage
+**    soc = mySocOcvTable.get_x_from_y(ocv)
+**    - Guarantees
+**      [A] 0.00 =< soc =< 100.00
+** <mySocVcellTable>
+** 1. A table which maps `soc` to `Vcell`;
+**    where `0.00 =< soc =< 98.00`.
+** 2. Usage
+**    soc = mySocVcellTable.get_x_from_y(Vcell)
+**    - Guarantees
+**      [A] 0.00 =< soc =< 98.00
 */
 
 // implemented in "capstone.ino"
@@ -367,6 +386,10 @@ struct ReferenceCollection {
   Vol_t const zenerdiodeVfromRtoA;
 };
 /* Comments
+** <PinsOfCell>
+** 1. A class whose instances consist of pins associated with a cell.
+** <ReferenceCollection>
+** 1. A class, each instance of which is a collection of value references.
 */
 
 #endif
