@@ -118,12 +118,14 @@
 **   from `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
 **   to   `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
 **
-** Add comments.
+** Start implementing the plan: Adding comments.
 **
 */
 
 /* Schematics
+**
 ** [2021-11-09]
+**
 **                             +---< R
 **             +---------------|---< A
 **      5V >---|---< 1kOhm >---+---< K
@@ -136,6 +138,7 @@
 **             +---< 2kOhm >---+---< 18kOhm >---+
 **             |                                |
 **             +---< (-) Cell (+) >-------------+
+**
 */
 
 #endif
