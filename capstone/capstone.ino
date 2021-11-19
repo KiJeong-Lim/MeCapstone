@@ -98,6 +98,7 @@ void BMS::initialize(ms_t const given_time)
   Wire.begin();
   sout << "Run time started.";
   Iin_calibration = getCalibrationOfIin();
+  sout << "Iin_calibration = " << Iin_calibration << "[A].";
   for (int i = 0; i < LENGTH_OF(cells); i++)
   {
     cells[i].BalanceCircuit_pin.initWith(true);

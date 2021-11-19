@@ -74,6 +74,7 @@
 ** [2021-11-19]
 ** Remove `capstone/formatters.hpp`.
 ** Move `capstone/capstone.h` -> `capstone/capstone.hpp`.
+** Support to calibrate the main current.
 */
 
 /* Schematics
