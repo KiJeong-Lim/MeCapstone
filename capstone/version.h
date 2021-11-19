@@ -28,7 +28,6 @@
 
 /* History
 ** [2021-11-14]
-**
 ** Make new files `CapstoneStable/version.h`,
 **                `CapstoneStable/header.h`,
 **                `CapstoneStable/formatter.hpp`,
@@ -92,9 +91,7 @@
 */
 
 /* Schematics
-**
 ** [2021-11-09]
-**
 **                             +---< R
 **             +---------------|---< A
 **      5V >---|---< 1kOhm >---+---< K
@@ -107,7 +104,6 @@
 **             +---< 2kOhm >---+---< 18kOhm >---+
 **             |                                |
 **             +---< (-) Cell (+) >-------------+
-**
 */
 
 #endif
