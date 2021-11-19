@@ -94,13 +94,14 @@ public:
   double get_x_from_y(double y) const;
 };
 /* [Comments]
-** BigInt_t y = POW(BigInt_t x, int n)
-** { - Requirements
+** Note on `POW`.
+** - Usage:
+**   BigInt_t y = POW(BigInt_t x, int n)
+**   * Requirements
 **     + x > 0
 **     + n >= 0
-**   - Guarantees
-**     + y = x^n
-** }
+**   * Guarantees
+**     + y = x^n provided by x^n < 9223372036854775807
 */
 
 // implemented in "printers.cpp"
@@ -248,8 +249,10 @@ public:
 };
 extern SerialPrinter sout, serr, slog;
 /* [Comments]
-** LiquidCrystal_I2C *lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
-** { - Requirements
+** Note on `openLcdI2C`
+** - Usage:
+**   LiquidCrystal_I2C *lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
+**   * Requirements:
 **     + `Wire.begin();` must be executed before calling this function.
 **     + lcd_screen_width > 0
 **     + lcd_screen_height > 0
@@ -263,14 +266,16 @@ extern SerialPrinter sout, serr, slog;
 **             I2C::SCL must be connected Nano::A5,
 **             I2C::VCC must be connected Nano::5V, and
 **             I2C::GND must be connected Nano::GND.
-**   - Guarantees
+**   * Guarantees:
 **     + If `lcdHandle` is not a null-pointer,
 **       the screen of an LCD is initialized,
 **       which is being handled by `lcdHandle`.
-**   - References
-**     [1] https://codingrun.com/119
-**     [2] https://m.blog.naver.com/hy10101010/221562445464
-** }
+** - References:
+**   [1] https://codingrun.com/119
+**   [2] https://m.blog.naver.com/hy10101010/221562445464
+** `sout` stands for serial output.
+** `serr` stands for serial error.
+** `slog` stands for serial logger.
 */
 
 // implemented in "pinhandlers.cpp"
