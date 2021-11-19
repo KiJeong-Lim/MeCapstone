@@ -264,7 +264,7 @@ extern SerialPrinter sout, serr, slog;
 **             I2C::VCC must be connected Nano::5V, and
 **             I2C::GND must be connected Nano::GND.
 **   - Guarantees
-**     + If lcdHandle is not a null-pointer,
+**     + If `lcdHandle` is not a null-pointer,
 **       the screen of an LCD is initialized,
 **       which is being handled by `lcdHandle`.
 **   - References
