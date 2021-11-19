@@ -29,7 +29,7 @@
 #define ROUND(val)        ((BigInt_t)((val) + 0.5))
 #define Apin(pin_no)      { .pinId = A##pin_no }
 #define Dpin(pin_no)      { .pinId = pin_no }
-/* [Notes]
+/* [Comments]
 ** `LCD_SECTION_LEN` returns the length of sections.
 ** `LENGTH_OF(ary)` returns the number of elements of `ary`.
 ** `ROUND(val)` returns the rounding of `val`.
@@ -46,7 +46,7 @@ typedef double long mAh_t;
 typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int64_t BigInt_t;
-/* [Notes]
+/* [Comments]
 ** `ms_t` stands for the type of milliseconds.
 ** `Amp_t` stands for the type of ampere.
 ** `Vol_t` stands for the type of voltage.
@@ -93,6 +93,10 @@ private:
 public:
   double get_x_from_y(double y) const;
 };
+/* [Comments]
+** BigInt_t result = POW(BigInt_t base, int expn)
+**
+*/
 
 // implemented in "printers.cpp"
 LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
@@ -238,6 +242,28 @@ public:
   SerialPrinter operator<<(double val);
 };
 extern SerialPrinter sout, serr, slog;
+/* [Comments]
+** LiquidCrystal_I2C *lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
+** - Requirements
+**   + lcd_screen_width > 0
+**   + lcd_screen_height > 0
+**   + If the arduino board is Uno,
+**     then: I2C::SDA pin must be connected Uno::A4,
+**           I2C::SCL pin must be connected Uno::A5,
+**           I2C::VCC pin must be connected Uno::5V, and
+**           I2C::GND pin must be connected Uno::GND.
+**   + If the arduino board is Nano,
+**     then: I2C::SDA pin must be connected Nano::A4,
+**           I2C::SCL pin must be connected Nano::A5,
+**           I2C::VCC pin must be connected Nano::5V, and
+**           I2C::GND pin must be connected Nano::GND.
+** - Guarantees
+**   + If lcdHandle is not null-pointer,
+**     the screen of an LCD is initialized,
+**     which is being handled by `lcdHandle`.
+** - References
+**   [1] https://codingrun.com/119
+*/
 
 // implemented in "pinhandlers.cpp"
 struct PinHandler {
@@ -286,9 +312,13 @@ public:
   void init() const;
   void set(double duty_ratio) const;
 };
+/* [Comments]
+*/
 
 // implemented in "data.cpp"
 extern AscMap const mySocOcvTable, mySocVcellTable;
+/* [Comments]
+*/
 
 // implemented in "capstone.ino"
 struct PinsOfCell {
@@ -302,5 +332,7 @@ struct ReferenceCollection {
   Ohm_t const sensitivityOfCurrentSensor;
   Vol_t const zenerdiodeVfromRtoA;
 };
+/* [Comments]
+*/
 
 #endif
