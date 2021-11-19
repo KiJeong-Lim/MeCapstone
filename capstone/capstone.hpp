@@ -13,9 +13,9 @@
 #define CAPSTONE
 
 // required libraries
+#include <Arduino.h>
 #include <Wire.h>
 #include "LiquidCrystal_I2C.h"
-#include "ACS712.h"
 
 // version information
 #define MAJOR_VERSION     0
@@ -40,7 +40,7 @@ typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int long long bigInt_t;
 
-// implemented in "utilities.ino"
+// implemented in "utilities.cpp"
 bigInt_t POW(bigInt_t base, int expn);
 class Timer {
   ms_t volatile begTime;
@@ -77,7 +77,7 @@ public:
   double get_x_from_y(double y) const;
 };
 
-// implemented in "printers.ino"
+// implemented in "printers.cpp"
 LiquidCrystal_I2C *openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 template <size_t Capacity>
 class SizedFormatter {
@@ -222,7 +222,7 @@ public:
 };
 extern SerialPrinter sout, serr, slog;
 
-// implemented in "pinhandlers.ino"
+// implemented in "pinhandlers.cpp"
 struct PinHandler {
   pinId_t const pin_to_handle;
 };
@@ -270,7 +270,7 @@ public:
   void set(double duty_ratio) const;
 };
 
-// implemented in "data.ino"
+// implemented in "data.cpp"
 extern AscMap const mySocOcvTable, mySocVcellTable;
 
 // implemented in "capstone.ino"

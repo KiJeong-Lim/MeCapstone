@@ -20,7 +20,7 @@
 #endif
 
 #define SERIAL_PORT         9600
-#define MODE                1
+#define OPERATING_MODE      1
 #define LCD_WIDTH           16
 #define LCD_HEIGHT          2
 #define LCD_SECTION_EA      2
@@ -73,8 +73,12 @@
 ** Improve the method to check SoC of cells.
 ** [2021-11-19]
 ** Remove `capstone/formatters.hpp`.
-** Move `capstone/capstone.h` -> `capstone/capstone.hpp`.
 ** Support to calibrate the main current.
+** Move `capstone/capstone.h`      -> `capstone/capstone.hpp`,
+**      `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
+**      `capstone/printers.ino`    -> `capstone/printers.cpp`,
+**      `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
+**      `capstone/data.ino`        -> `capstone/data.cpp`.
 */
 
 /* Schematics

@@ -30,7 +30,7 @@ A_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 PinsOfCell const cells[] =
-#if( MODE == 1 )
+#if( OPERATING_MODE == 1 )
 { { .voltage_sensor_pin = Apin(0), .BalanceCircuit_pin = Dpin(2) } // B1(3V7)
 #else
 { { .voltage_sensor_pin = Apin(0), .BalanceCircuit_pin = Dpin(2) } // B1(3V7)
@@ -40,7 +40,7 @@ PinsOfCell const cells[] =
 };
 
 class BMS {
-#if( MODE == 1 )
+#if( OPERATING_MODE == 1 )
   PinReader const arduino5V_pin = Apin(1);
   PinReader const Iin_pin       = Apin(2);
   PinSetter const powerIn_pin   = Dpin(5);
