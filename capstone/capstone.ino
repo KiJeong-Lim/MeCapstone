@@ -349,7 +349,7 @@ void BMS::controlSystem()
 }
 void BMS::goodbye(int const countDown)
 {
-  Timer hourglass= {};
+  Timer hourglass = {};
 
   for (int i = 0; i < LENGTH(cells); i++)
   {

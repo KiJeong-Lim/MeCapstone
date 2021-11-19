@@ -26,7 +26,7 @@
 // macro defns
 #define LCD_SECTION_LEN   ((LCD_WIDTH) / (LCD_SECTION_EA))
 #define LENGTH(ary)       (sizeof(ary) / sizeof(*(ary)))
-#define ROUND(val)        ((BigInt_t)((val) + 0.5))
+#define ROUND(val)        (static_cast<BigInt_t>((val) + 0.5))
 #define Apin(pin_no)      A##pin_no
 #define Dpin(pin_no)      pin_no
 /* Comments
@@ -122,7 +122,9 @@ public:
 **    - Guarantees
 **      [A] y = x^n
 ** [Timer]
+** 1. A class, which imitates hourglass.
 ** [AscMap]
+** 1. A class to calculate the inverse of the strictly increasing function.
 */
 
 // implemented in "printers.cpp"
@@ -205,7 +207,7 @@ public:
     else
     {
       BigInt_t valE = POW(base, - afters_dot);
-      BigInt_t valN = ROUND(val / ((double)valE));
+      BigInt_t valN = ROUND(val / (static_cast<double>(valE)));
       valN *= valE;
       putInt(valN, base);
     }
@@ -295,8 +297,13 @@ extern SerialPrinter sout, serr, slog;
 **    [1] https://codingrun.com/119
 **    [2] https://m.blog.naver.com/hy10101010/221562445464
 ** [SizedFormatter]
+** 1. A class, which helps the class `LcdPrinter`.
 ** [LcdPrinter]
+** 1. A class, whose destructor prints contents in the screen.
 ** [SerialPrinter]
+** 1. A class, which is similar to std::ostream.
+** 2. But the major difference is that line breaks in this class become `;`.
+** 3. That feature is carried out by `SerialPrinter::~SerialPrinter`.
 ** [sout]
 ** 1. `sout` stands for serial output.
 ** [serr]
@@ -354,9 +361,14 @@ public:
 };
 /* Comments
 ** [PinHandler]
+** 1. The base class of pin-handling classes.
+** 2. Its instances consist of a pin to contol.
 ** [PinReader]
+** 1. A class, read analog signal from the sensor.
 ** [PinSetter]
+** 1. A class, make the pin send digital signal. 
 ** [PwmSetter]
+** 1. A class, make the pin send PWM-wave. 
 */
 
 // implemented in "data.cpp"

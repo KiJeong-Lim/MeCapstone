@@ -34,7 +34,7 @@ Val_t PinReader::readSignal(ms_t const duration) const
   {
     sum_of_vals += read_once();
   }
-  return ((double)sum_of_vals) / ((double)cnt_of_vals);
+  return (static_cast<double>(sum_of_vals)) / (static_cast<double>(cnt_of_vals));
 }
 
 PinSetter::PinSetter(pinId_t const pinId)
