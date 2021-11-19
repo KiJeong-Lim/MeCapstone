@@ -54,7 +54,7 @@ typedef int64_t BigInt_t;
 ** `mAh_t` stands for the type of milliampere hours.
 ** `Val_t` stands for the type of the real numbers.
 ** `pinId_t` stands for the type of pins.
-** `BigInt_t` stands for the integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
+** `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
 */
 
 // implemented in "utilities.cpp"
@@ -250,6 +250,7 @@ extern SerialPrinter sout, serr, slog;
 /* [Comments]
 ** LiquidCrystal_I2C *lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
 ** { - Requirements
+**     + `Wire.begin();` must be executed before calling this function.
 **     + lcd_screen_width > 0
 **     + lcd_screen_height > 0
 **     + If the arduino board is Uno,
