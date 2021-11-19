@@ -72,7 +72,7 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 ** [BigInt_t]
 ** `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
 ** [ptrOfLcdI2C_t]
-** `ptrOfLcdI2C_t` stands for 
+** `ptrOfLcdI2C_t` stands for the type of pointers of `LiquidCrystal_I2C`.
 */
 
 // implemented in "utilities.cpp"
@@ -119,7 +119,7 @@ public:
 **     + x > 0
 **     + n >= 0
 **   * Guarantees
-**     + y = x^n provided by x^n < 9223372036854775807
+**     + y = x^n provided by x^n =< 9223372036854775807
 */
 
 // implemented in "printers.cpp"
