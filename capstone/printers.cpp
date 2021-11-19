@@ -46,7 +46,7 @@ LiquidCrystal_I2C *openLcdI2C(int const lcdWidth, int const lcdHeight)
   return lcdHandle;
 }
 
-LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef)
+LcdPrinter::LcdPrinter(LiquidCrystal_I2C *const lcdHandleRef)
   : lcdHandle{ lcdHandleRef }
   , section_no{ 0 }
   , fbuf{ }
@@ -156,7 +156,7 @@ void SerialPrinter::trick()
   }
 #endif
 }
-SerialPrinter SerialPrinter::operator<<(byte const &hex)
+SerialPrinter SerialPrinter::operator<<(byte const hex)
 {
   trick();
 #if defined(SERIAL_PORT)
@@ -169,7 +169,7 @@ SerialPrinter SerialPrinter::operator<<(byte const &hex)
 #endif
   return { .prefix = nullptr, .lend = true };
 }
-SerialPrinter SerialPrinter::operator<<(int const &num)
+SerialPrinter SerialPrinter::operator<<(int const num)
 {
   trick();
 #if defined(SERIAL_PORT)
@@ -177,7 +177,7 @@ SerialPrinter SerialPrinter::operator<<(int const &num)
 #endif
   return { .prefix = nullptr, .lend = true };
 }
-SerialPrinter SerialPrinter::operator<<(char const *const &str)
+SerialPrinter SerialPrinter::operator<<(char const *const str)
 {
   trick();
 #if defined(SERIAL_PORT)
@@ -185,7 +185,7 @@ SerialPrinter SerialPrinter::operator<<(char const *const &str)
 #endif
   return { .prefix = nullptr, .lend = true };
 }
-SerialPrinter SerialPrinter::operator<<(double const &val)
+SerialPrinter SerialPrinter::operator<<(double const val)
 {
   trick();
 #if defined(SERIAL_PORT)

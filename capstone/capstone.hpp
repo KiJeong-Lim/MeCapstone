@@ -189,7 +189,7 @@ public:
   LcdPrinter() = delete;
   LcdPrinter(LcdPrinter const &other) = delete;
   LcdPrinter(LcdPrinter &&other) = delete;
-  LcdPrinter(LiquidCrystal_I2C *const &lcdHandleRef);
+  LcdPrinter(LiquidCrystal_I2C *const lcdHandleRef);
   ~LcdPrinter();
 private:
   void newline();
@@ -215,10 +215,10 @@ public:
 private:
   void trick();
 public:
-  SerialPrinter operator<<(byte const &hex);
-  SerialPrinter operator<<(int const &num);
-  SerialPrinter operator<<(char const *const &str);
-  SerialPrinter operator<<(double const &val);
+  SerialPrinter operator<<(byte const hex);
+  SerialPrinter operator<<(int const num);
+  SerialPrinter operator<<(char const *const str);
+  SerialPrinter operator<<(double const val);
 };
 extern SerialPrinter sout, serr, slog;
 
