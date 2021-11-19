@@ -29,12 +29,19 @@
 #define ROUND(val)        ((BigInt_t)((val) + 0.5))
 #define Apin(pin_no)      { .pinId = A##pin_no }
 #define Dpin(pin_no)      { .pinId = pin_no }
-/* [Comments]
+/* Comments
+** [LCD_SECTION_LEN]
 ** `LCD_SECTION_LEN` returns the length of sections.
+** [LENGTH_OF]
 ** `LENGTH_OF(ary)` returns the number of elements of `ary`.
+** [ROUND]
 ** `ROUND(val)` returns the rounding of `val`.
+** [Apin]
 ** `Apin` stands for analog pin.
+** For example, `Apin(0)` refers to the analog pin `A0`.
+** [Dpin]
 ** `Dpin` stands for digital pin.
+** For example, `Dpin(2)` refers to the digital pin `2`.
 */
 
 // type synonym defns
@@ -46,14 +53,22 @@ typedef double long mAh_t;
 typedef double Val_t;
 typedef uint8_t pinId_t;
 typedef int64_t BigInt_t;
-/* [Comments]
+/* Comments
+** [ms_t]
 ** `ms_t` stands for the type of milliseconds.
+** [Amp_t]
 ** `Amp_t` stands for the type of ampere.
+** [Vol_t]
 ** `Vol_t` stands for the type of voltage.
+** [Ohm_t]
 ** `Ohm_t` stands for the type of ohm.
+** [mAh_t]
 ** `mAh_t` stands for the type of milliampere hours.
+** [Val_t]
 ** `Val_t` stands for the type of the real numbers.
+** [pinId_t]
 ** `pinId_t` stands for the type of pins.
+** [BigInt_t]
 ** `BigInt_t` stands for the type of integers between `-9223372036854775807LL - 1` and `9223372036854775807LL`.
 */
 
@@ -93,8 +108,8 @@ private:
 public:
   double get_x_from_y(double y) const;
 };
-/* [Comments]
-** Note on `POW`.
+/* Comments
+** [POW]
 ** - Usage:
 **   BigInt_t y = POW(BigInt_t x, int n)
 **   * Requirements
@@ -248,8 +263,8 @@ public:
   SerialPrinter operator<<(double val);
 };
 extern SerialPrinter sout, serr, slog;
-/* [Comments]
-** Note on `openLcdI2C`
+/* Comments
+** [openLcdI2C]
 ** - Usage:
 **   LiquidCrystal_I2C *lcdHandle = openLcdI2C(int lcd_screen_width, int lcd_screen_height)
 **   * Requirements:
@@ -273,8 +288,11 @@ extern SerialPrinter sout, serr, slog;
 ** - References:
 **   [1] https://codingrun.com/119
 **   [2] https://m.blog.naver.com/hy10101010/221562445464
+** [sout]
 ** `sout` stands for serial output.
+** [serr]
 ** `serr` stands for serial error.
+** [slog]
 ** `slog` stands for serial logger.
 */
 
@@ -325,12 +343,12 @@ public:
   void init() const;
   void set(double duty_ratio) const;
 };
-/* [Comments]
+/* Comments
 */
 
 // implemented in "data.cpp"
 extern AscMap const mySocOcvTable, mySocVcellTable;
-/* [Comments]
+/* Comments
 */
 
 // implemented in "capstone.ino"
@@ -345,7 +363,7 @@ struct ReferenceCollection {
   Ohm_t const sensitivityOfCurrentSensor;
   Vol_t const zenerdiodeVfromRtoA;
 };
-/* [Comments]
+/* Comments
 */
 
 #endif

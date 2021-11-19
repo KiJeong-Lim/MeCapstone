@@ -27,7 +27,6 @@
 #define LCD_SECTION_EA      2
 
 /* History
-**
 ** [2021-11-14]
 **
 ** Make new files `CapstoneStable/version.h`,
@@ -36,42 +35,27 @@
 **                `CapstoneStable/printer.ino`,
 **                `CapstoneStable/utility.ino`,
 **                `CapstoneStable/CapstoneStable.ino`.
-**
 ** Relace `BufferWithFormat` with `Formatter<LCD_SECTION_LEN>`.
-**
 ** Set `VERSION` to be `0.10`.
-**
 ** [2021-11-15]
-**
 ** Insert `Wire.begin();` in the method `BMS::initialize`.
 ** - This is a very important change.
 ** - If `Wire.begin();` is missed,
 **   the function `openLcdI2c` will not work.
-**
 ** Move `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
-**
 ** Fix the method `LcdPrettyPrinter::~LcdPrettyPrinter`.
 ** - Logic changed,
 **   from `mybuf[c][LCD_WIDTH - 1] = '\0';`,
 **   to   `mybuf[c][LCD_WIDTH] = '\0';`.
-**
 ** Make new file `CapstoneStable/ocv.ino`.
 ** - For deriving OCV by looking-up the soc-ocv table.
-**
 ** Set `VERSION` to be `0.20`.
-**
 ** [2021-11-16]
-**
 ** Fix the class `SerialPrinter`.
-**
 ** Improve the function `Formatter::putDouble`.
-**
 ** Fix the class `Timer`.
-**
 ** Move `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
-**
 ** Set `VERSION` to be `0.30`.
-**
 ** [2021-11-17]
 ** Move `CapstoneStable/version.h`          -> `capstone/version.h`,
 **      `CapstoneStable/header.hpp`         -> `capstone/header.h`,
@@ -80,46 +64,31 @@
 **      `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
 **      `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
 **      `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
-**
 ** Fix the schematic of [2021-11-09].
-**
 ** Improve the class `SerialPrinter`.
-**
 ** Improve the class `Formatter`.
-**
 ** Set `VERSION` to be `0.40`.
-**
 ** [2021-11-18]
-**
 ** Make new file `capstone/pinhandlers.ino`.
-**
 ** Move `capstone/utility.ino`   -> `capstone/utilities.ino`,
 **      `capstone/formatter.hpp` -> `capstone/formatters.hpp`,
 **      `capstone/printer.ino`   -> `capstone/printers.ino`,
 **      `capstone/soc.ino`       -> `capstone/data.ino`,
 **      `capstone/header.h`      -> `capstone/capstone.h`.
-**
 ** Improve the method `BMS::checkSocOf`.
-**
 ** [2021-11-19]
-**
 ** Remove `capstone/formatters.hpp`.
-**
 ** Make new method `BMS::getCalibrationOfIin`.
-**
 ** Move `capstone/capstone.h`      -> `capstone/capstone.hpp`,
 **      `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
 **      `capstone/printers.ino`    -> `capstone/printers.cpp`,
 **      `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
 **      `capstone/data.ino`        -> `capstone/data.cpp`.
-**
 ** Fix the method `BMS::updateQs`.
 ** - Logic changed,
 **   from `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
 **   to   `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
-**
 ** Start implementing the plan: Adding comments.
-**
 */
 
 /* Schematics
