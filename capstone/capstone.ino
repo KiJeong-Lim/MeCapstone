@@ -95,6 +95,12 @@ void BMS::initialize(ms_t const given_time)
   Timer hourglass = { };
 
   Wire.begin();
+#if defined(SERIAL_PORT)
+  while (!Serial)
+  {
+    delay(1);
+  }
+#endif
   sout << "Run time started.";
   for (int i = 0; i < LENGTH(cells); i++)
   {
