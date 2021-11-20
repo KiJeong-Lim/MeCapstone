@@ -30,7 +30,7 @@ Val_t PinReader::readSignal(ms_t const duration) const
   BigInt_t sum_of_vals = 0;
   BigInt_t cnt_of_vals = 0;
 
-  for (Timer hourglass = { }; hourglass.time() < duration; cnt_of_vals++)
+  for (Timer hourglass = { }; hourglass.getDuration() < duration; cnt_of_vals++)
   {
     sum_of_vals += read_once();
   }
