@@ -51,7 +51,7 @@
 **      the function `openLcdI2c` will not work.
 ** 2. Moved `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
 ** 3. Fixed the method `LcdPrettyPrinter::~LcdPrettyPrinter`.
-**    - Logic changed,
+**    - Code changed,
 **      old-version = `mybuf[c][LCD_WIDTH - 1] = '\0';`,
 **      new-version = `mybuf[c][LCD_WIDTH] = '\0';`.
 ** 4. Made new file `CapstoneStable/ocv.ino`.
@@ -92,7 +92,7 @@
 **          `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
 **          `capstone/data.ino`        -> `capstone/data.cpp`.
 ** 4. Fixed the method `BMS::updateQs`.
-**    - Logic changed,
+**    - Code changed,
 **      old-version = `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
 **      new-version = `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
 ** 5. Fixed the method `BMS::initialize`.
@@ -101,6 +101,7 @@
 
 /* Schematics
 ** [2021-11-09]
+** (A)
 **                             +---< R
 **             +---------------|---< A
 **      5V >---|---< 1kOhm >---+---< K
