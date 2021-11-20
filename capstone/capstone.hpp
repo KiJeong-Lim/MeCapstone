@@ -303,9 +303,9 @@ extern SerialPrinter sout, serr, slog;
 ** [LcdPrinter]
 ** 1. A class, whose destructor prints contents in the screen.
 ** [SerialPrinter]
-** 1. A class, which is similar to std::ostream.
+** 1. A class, which is similar to `std::ostream` of C++.
 ** 2. But the major difference is that line breaks in this class become `;`.
-** 3. That feature is carried out by `SerialPrinter::~SerialPrinter` and `SerialPrinter::trick`.
+**    That feature is carried out by `SerialPrinter::~SerialPrinter` and `SerialPrinter::trick`.
 ** [sout]
 ** 1. `sout` stands for serial output.
 ** [serr]
