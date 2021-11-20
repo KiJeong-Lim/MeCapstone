@@ -10,27 +10,27 @@
 
 #ifndef VERSION
 #if defined(MAJOR_VERSION) & defined(MINOR_VERSION) & defined(REVISION_NUMBER)
-#define VERSION (1.00 * (MAJOR_VERSION) + 0.10 * (MINOR_VERSION) + 0.01 * (REVISION_NUMBER))
+#define VERSION           (1.00 * (MAJOR_VERSION) + 0.10 * (MINOR_VERSION) + 0.01 * (REVISION_NUMBER))
 #elif defined(MAJOR_VERSION) & defined(MINOR_VERSION)
-#define VERSION (1.00 * (MAJOR_VERSION) + 0.10 * (MINOR_VERSION))
+#define VERSION           (1.00 * (MAJOR_VERSION) + 0.10 * (MINOR_VERSION))
 #elif defined(MAJOR_VERSION)
-#define VERSION (1.00 * (MAJOR_VERSION))
+#define VERSION           (1.00 * (MAJOR_VERSION))
 #else
-#define VERSION (0.00)
+#define VERSION           (0.00)
 #endif
 
 // Please do NOT manipulate any macros other than these:
-#define SERIAL_PORT         9600
-#define OPERATING_MODE      1
-#define LCD_WIDTH           16
-#define LCD_HEIGHT          2
-#define LCD_SECTION_EA      2
+#define SERIAL_PORT       9600
+#define OPERATING_MODE    1
+#define LCD_WIDTH         16
+#define LCD_HEIGHT        2
+#define LCD_SECTION_EA    2
 
 /* Dependencies
 ** [LiquidCrystal_I2C]
 ** 1. description = "A library for DFRobot I2C LCD displays"
 ** 2. repository  = "https://github.com/marcoschwartz/LiquidCrystal_I2C.git"
-** 3. release-url = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
+** 3. release.url = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
 ** 4. interface   = "LiquidCrystal_I2C.h"
 */
 

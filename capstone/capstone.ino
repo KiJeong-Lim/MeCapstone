@@ -255,12 +255,16 @@ void BMS::printValues() const
 }
 void BMS::startCharging(int const cell_no)
 {
+#if( 0 )
   updateQs();
+#endif
   cells[cell_no].BalanceCircuit_pin.turnOff();
 }
 void BMS::breakCharging(int const cell_no)
 {
+#if( 0 )
   updateQs();
+#endif
   cells[cell_no].BalanceCircuit_pin.turnOn();
 }
 bool BMS::checkSafety(bool const reportsToSerial)
