@@ -59,19 +59,19 @@ class BMS {
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
 public:
-  void initialize(ms_t timeLimit);
-  void progress(ms_t timeLimit);
-  Amp_t getCalibrationOfIin() const;
-  void measureValues();
-  void initQs();
-  void updateQs();
-  double checkSocOf(int cell_no) const;
-  void printValues() const;
-  void startCharging(int cell_no);
-  void breakCharging(int cell_no);
-  bool checkSafety(bool reportsToSerial);
-  void controlSystem();
-  void goodbye(int secsLeftToQuit);
+  auto initialize(ms_t timeLimit) -> void;
+  auto progress(ms_t timeLimit) -> void;
+  auto getCalibrationOfIin() const -> Amp_t;
+  auto measureValues() -> void;
+  auto initQs() -> void;
+  auto updateQs() -> void;
+  auto checkSocOf(int cell_no) const -> double;
+  auto printValues() const -> void;
+  auto startCharging(int cell_no) -> void;
+  auto breakCharging(int cell_no) -> void;
+  auto checkSafety(bool reportsToSerial) -> bool;
+  auto controlSystem() -> void;
+  auto goodbye(int secsLeftToQuit) -> void;
 } myBMS;
 
 void setup()

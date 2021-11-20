@@ -85,10 +85,10 @@ public:
   Timer(Timer &&other) = delete;
   Timer(ms_t &&init_time);
   ~Timer();
-  void reset();
-  ms_t time() const;
-  ms_t getDuration() const;
-  void delay(ms_t duration) const;
+  auto reset() -> void;
+  auto time() const -> ms_t;
+  auto getDuration() const -> ms_t;
+  auto delay(ms_t duration) const -> void;
 };
 class AscMap {
   double const left_bound_of_xs;
@@ -109,9 +109,9 @@ public:
   }
   ~AscMap();
 private:
-  double get_x_from_parameter(double param) const;
+  auto get_x_from_parameter(double param) const -> double;
 public:
-  double get_x_from_y(double y) const;
+  auto get_x_from_y(double y) const -> double;
 };
 /* Comments
 ** [POW]
@@ -136,7 +136,7 @@ class SizedFormatter {
   int cnt = 0;
   char buf[Capacity] = { };
 public:
-  void clear()
+  auto clear() -> void
   {
     for (cnt = 0; cnt < Capacity; cnt++)
     {
@@ -144,28 +144,28 @@ public:
     }
     cnt = 0;
   }
-  void send(char *const target_address)
+  auto send(char *const target_address) -> void
   {
     if (target_address)
     {
       memcpy(target_address, &buf[0], sizeof(buf));
     }
   }
-  void putChar(char const printMe)
+  auto putChar(char const printMe) -> void
   {
     if (cnt < Capacity)
     {
       buf[cnt++] = printMe;
     }
   }
-  void putDigit(int const printMe)
+  auto putDigit(int const printMe) -> void
   {
     if (printMe >= 0 && printMe < 16)
     {
       putChar("0123456789ABCDEF"[printMe]);
     }
   }
-  void putInt(BigInt_t const printMe, int const base)
+  auto putInt(BigInt_t const printMe, int const base) -> void
   {
     int cn = 0;
     BigInt_t val = printMe;
@@ -183,7 +183,7 @@ public:
       putDigit(((base * val) / POW(base, cn)) % base);
     } while (--cn > 0);
   }
-  void putDouble(double const printMe, int const afters_dot)
+  auto putDouble(double const printMe, int const afters_dot) -> void
   {
     constexpr int base = 10;
     double val = printMe;
@@ -214,7 +214,7 @@ public:
       putInt(valN, base);
     }
   }
-  void putString(char const *const printMe)
+  auto putString(char const *const printMe) -> void
   {
     if (printMe)
     {
@@ -244,15 +244,15 @@ public:
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
 private:
-  void newline();
+  auto newline() -> void;
 public:
-  void print(int num, int base = 10);
-  void println(int num, int base = 10);
-  void print(double val, int afters_dot = 2);
-  void println(double val, int afters_dot = 2);
-  void print(char const *str);
-  void println(char const *str);
-  void flush();
+  auto print(int num, int base = 10) -> void;
+  auto println(int num, int base = 10) -> void;
+  auto print(double val, int afters_dot = 2) -> void;
+  auto println(double val, int afters_dot = 2) -> void;
+  auto print(char const *str) -> void;
+  auto println(char const *str) -> void;
+  auto flush() -> void;
 };
 class SerialPrinter {
   char const *const prefix_of_message;
@@ -265,12 +265,12 @@ public:
   SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();
 private:
-  void trick();
+  auto trick() -> void;
 public:
-  SerialPrinter operator<<(byte hex);
-  SerialPrinter operator<<(int num);
-  SerialPrinter operator<<(char const *str);
-  SerialPrinter operator<<(double val);
+  auto operator<<(byte hex) -> SerialPrinter;
+  auto operator<<(int num) -> SerialPrinter;
+  auto operator<<(char const *str) -> SerialPrinter;
+  auto operator<<(double val) -> SerialPrinter;
 };
 extern SerialPrinter sout, serr, slog;
 /* Comments
@@ -326,10 +326,10 @@ public:
   PinReader(pinId_t pinId);
   ~PinReader();
 private:
-  int read_once() const;
+  auto read_once() const -> int;
 public:
-  Val_t readSignalOnce() const;
-  Val_t readSignal(ms_t duration) const;
+  auto readSignalOnce() const -> Val_t;
+  auto readSignal(ms_t duration) const -> Val_t;
 };
 class PinSetter : public PinHandler {
   bool volatile is_high;
@@ -340,13 +340,13 @@ public:
   PinSetter(pinId_t pinId);
   ~PinSetter();
 private:
-  void openPin() const;
-  void syncPin();
+  auto openPin() const -> void;
+  auto syncPin() -> void;
 public:
-  void initWith(bool be_high);
-  void turnOn();
-  void turnOff();
-  bool isHigh() const;
+  auto initWith(bool be_high) -> void;
+  auto turnOn() -> void;
+  auto turnOff() -> void;
+  auto isHigh() const -> bool;
 };
 class PwmSetter : public PinHandler {
 public:
@@ -356,10 +356,10 @@ public:
   PwmSetter(pinId_t pinId);
   ~PwmSetter();
 private:
-  void openPin() const;
+  auto openPin() const -> void;
 public:
-  void init() const;
-  void set(double duty_ratio) const;
+  auto init() const -> void;
+  auto set(double duty_ratio) const -> void;
 };
 /* Comments
 ** [PinHandler]
