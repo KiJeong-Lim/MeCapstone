@@ -98,20 +98,20 @@
 ** 5. Fixed the method `BMS::initialize`.
 ** 6. Added information about dependencies.
 ** [2021-11-20]
-** 1. Write schematics.
+** 1. Uploaded schematics.
 */
 
 /* Schematics
 ** [A]
 ** - Operating dates
 **   [#1] 2021.11.09
-** - Used part    Product name           Quantity
-**   [Arduino]    Arduino Uno Rev3       x 1
-**   [Cell]       18650 Li-ion NCR18650G x 1
-**   [Resistor]   1kOhm                  x 1
-**                2kOhm                  x 1
-**                18kOhm                 x 1
-**   [ZenerDiode] TL431BVLPRAGOSCT-ND    x 1
+** - Used part    Product name                     Quantity
+**   [Arduino]    Arduino Uno Rev3                 x 1
+**   [Cell]       Panasonic 18650 Li-ion NCR18650G x 1
+**   [Resistor]   1kOhm                            x 1
+**                2kOhm                            x 1
+**                18kOhm                           x 1
+**   [ZenerDiode] TL431BVLPRAGOSCT-ND              x 1
 ** - Diagram
 ** >                             +---< R
 ** >             +---------------|---< A
@@ -131,7 +131,7 @@
 ** - Used part      Product name                           Quantity
 **   [AmpereSensor] ACS712ELCTR-20A-T                      x 1
 **   [Arduino]      Arduino Uno Rev3                       x 1
-**   [Cell]         panasonic 18650 Li-ion NCR18650G       x 1
+**   [Cell]         Panasonic 18650 Li-ion NCR18650G       x 1
 **   [LCDI2C]       Arduino I2C 1602 LCD module SZH-EK101  x 1
 **   [N-MOSFET]     RFP12N10L N-Channel Power MOSFET       x 1
 **   [NPN]          2N2222 NPN Transistor                  x 2
