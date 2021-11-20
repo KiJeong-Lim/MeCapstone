@@ -105,9 +105,12 @@
 ** [A]
 ** - Operating dates
 **   [#1] 2021.11.09
-** - Used parts   Product name
+** - Used part    Product name           Quantity
 **   [Arduino]    Arduino Uno Rev3       x 1
 **   [Cell]       18650 Li-ion NCR18650G x 1
+**   [Resistor]   1kOhm                  x 1
+**                2kOhm                  x 1
+**                18kOhm                 x 1
 **   [ZenerDiode] TL431BVLPRAGOSCT-ND    x 1
 ** - Diagram
 ** >                             +---< R
@@ -125,17 +128,25 @@
 ** [B]
 ** - Operating dates
 **   [#1] 2021.11.16
-** - Used parts     Product name
-**   [AmpereSensor] ACS712ELCTR-20A-T                 x 1
-**   [Arduino]      Arduino Uno Rev3                  x 1
-**   [Cell]         18650 Li-ion NCR18650G            x 1
-**   [RedLED]       IL011 5mm Diffused Red LED        x 1
-**   [N-MOSFET]     RFP12N10L N-Channel Power MOSFET  x 1
-**   [NPN]          2N2222 NPN Transistor             x 2
-**   [P-MOSFET]     IRF4905PBF P-Channel Power MOSFET x 1
-**   [PNP]          2N3906 PNP Transistor             x 1
-**   [WCR5OhmJ5W]   EPX7RBL3                          x 1
-**   [ZenerDiode]   TL431BVLPRAGOSCT-ND               x 1
+** - Used part      Product name                           Quantity
+**   [AmpereSensor] ACS712ELCTR-20A-T                      x 1
+**   [Arduino]      Arduino Uno Rev3                       x 1
+**   [Cell]         panasonic 18650 Li-ion NCR18650G       x 1
+**   [LCDI2C]       Arduino I2C 1602 LCD module SZH-EK101  x 1
+**   [N-MOSFET]     RFP12N10L N-Channel Power MOSFET       x 1
+**   [NPN]          2N2222 NPN Transistor                  x 2
+**   [P-MOSFET]     IRF4905PBF P-Channel Power MOSFET      x 1
+**   [PNP]          2N3906 PNP Transistor                  x 1
+**   [RedLED]       microtivity IL011 5mm Diffused Red LED x 1
+**   [Resistor]     120Ohm                                 x 1
+**                  220Ohm                                 x 1
+**                  330Ohm                                 x 2
+**                  1kOhm                                  x 3
+**                  2kOhm                                  x 1
+**                  18kOhm                                 x 1
+**                  100kOhm                                x 2
+**   [WCR5OhmJ5W]   Wire Wound Cement Resistor EPX7RBL3    x 1
+**   [ZenerDiode]   TL431BVLPRAGOSCT-ND                    x 1
 ** - Diagram
 */
 
