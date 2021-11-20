@@ -110,9 +110,7 @@ public:
   {
   }
   ~AscMap();
-private:
   auto get_x_from_parameter(double param) const -> double;
-public:
   auto get_x_from_y(double y) const -> double;
 };
 /* Comments
@@ -250,9 +248,7 @@ public:
   LcdPrinter(LcdPrinter &&other) = delete;
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
-private:
   auto newline() -> void;
-public:
   auto print(int num, int base = 10) -> void;
   auto println(int num, int base = 10) -> void;
   auto print(double val, int afters_dot = 2) -> void;
@@ -271,9 +267,7 @@ public:
   SerialPrinter(char const *prefix);
   SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();
-private:
   auto trick() -> void;
-public:
   auto operator<<(byte hex) -> SerialPrinter;
   auto operator<<(int num) -> SerialPrinter;
   auto operator<<(char const *str) -> SerialPrinter;
@@ -332,9 +326,7 @@ public:
   PinReader(PinReader &&other) = delete;
   PinReader(pinId_t pinId);
   ~PinReader();
-private:
   auto read_once() const -> int;
-public:
   auto readSignalOnce() const -> Val_t;
   auto readSignal(ms_t duration) const -> Val_t;
 };
@@ -346,10 +338,8 @@ public:
   PinSetter(PinSetter &&other) = delete;
   PinSetter(pinId_t pinId);
   ~PinSetter();
-private:
   auto openPin() const -> void;
   auto syncPin() -> void;
-public:
   auto initWith(bool be_high) -> void;
   auto turnOn() -> void;
   auto turnOff() -> void;
@@ -362,9 +352,7 @@ public:
   PwmSetter(PwmSetter &&other) = delete;
   PwmSetter(pinId_t pinId);
   ~PwmSetter();
-private:
   auto openPin() const -> void;
-public:
   auto init() const -> void;
   auto set(double duty_ratio) const -> void;
 };

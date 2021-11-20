@@ -76,13 +76,11 @@ public:
 
 void setup()
 {
-  invokeSerial();
   myBMS.initialize(3000);
 }
 
 void loop()
 {
-  mklineSerial();
   myBMS.progress(3000);
 }
 
@@ -90,6 +88,7 @@ void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass = { };
 
+  invokeSerial();
   sout << "Run time started.";
   Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
@@ -123,6 +122,7 @@ void BMS::progress(ms_t const given_time)
 {
   Timer hourglass = { };
 
+  mklineSerial();
   measureValues();
   printValues();
   {
