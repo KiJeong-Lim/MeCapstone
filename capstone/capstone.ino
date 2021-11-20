@@ -11,7 +11,7 @@
 #include "capstone.hpp"
 
 static constexpr
-Vol_t V_wanted = 4.00, overV_wanted = 4.20; // FIX ME!
+Vol_t V_wanted = 4.00, overV_wanted = 4.10; // FIX ME!
 
 static constexpr
 ReferenceCollection refOf =
@@ -59,19 +59,19 @@ class BMS {
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
 public:
-  auto initialize(ms_t timeLimit) -> void;
-  auto progress(ms_t timeLimit) -> void;
+  auto initialize(ms_t time_limit) -> void;
+  auto progress(ms_t time_limit) -> void;
   auto getCalibrationOfIin() const -> Amp_t;
   auto measureValues() -> void;
-  auto initQs() -> void;
+  auto findQs_0() -> void;
   auto updateQs() -> void;
-  auto checkSocOf(int cell_no) const -> double;
+  auto getSocOf(int cell_no) const -> double;
   auto printValues() const -> void;
   auto startCharging(int cell_no) -> void;
   auto breakCharging(int cell_no) -> void;
-  auto checkSafety(bool reportsToSerial) -> bool;
+  auto checkSafety(bool reports_to_serial) -> bool;
   auto controlSystem() -> void;
-  auto goodbye(int secsLeftToQuit) -> void;
+  auto goodbye(int seconds_left_to_quit) -> void;
 } myBMS;
 
 void setup()
@@ -88,7 +88,7 @@ void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass = { };
 
-  invokeSerial();
+  invokingSerial();
   sout << "Run time started.";
   Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
@@ -115,14 +115,14 @@ void BMS::initialize(ms_t const given_time)
     serr << "LCD not connected.";
   }
   hourglass.delay(given_time);
-  initQs();
+  findQs_0();
   powerIn_pin.turnOn();
 }
 void BMS::progress(ms_t const given_time)
 {
   Timer hourglass = { };
 
-  mklineSerial();
+  drawlineSerial();
   measureValues();
   printValues();
   {
@@ -192,7 +192,7 @@ void BMS::measureValues()
   // Guarantee that the above values are fresh
   measuredValuesAreFresh = true;
 }
-void BMS::initQs()
+void BMS::findQs_0()
 {
   if (not measuredValuesAreFresh)
   {
@@ -216,7 +216,7 @@ void BMS::updateQs()
   }
   Qs_lastUpdatedTime.reset();
 }
-double BMS::checkSocOf(int const cell_no) const
+double BMS::getSocOf(int const cell_no) const
 {
 #if( 0 )
   return mySocVcellTable.get_x_from_y(cellVs[cell_no]);
@@ -238,7 +238,7 @@ void BMS::printValues() const
 
     for (int i = 0; i < LENGTH(cellVs); i++)
     {
-      double const soc = checkSocOf(i);
+      double const soc = getSocOf(i);
 
       lcd.print("B");
       lcd.print(i + 1);

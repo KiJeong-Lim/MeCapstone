@@ -76,8 +76,8 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 */
 
 // implemented in "utilities.cpp"
-auto invokeSerial() -> void;
-auto mklineSerial() -> void;
+auto invokingSerial() -> void;
+auto drawlineSerial() -> void;
 auto POW(BigInt_t base, int expn) -> BigInt_t;
 class Timer {
   ms_t volatile begTime;
@@ -114,9 +114,9 @@ public:
   auto get_x_from_y(double y) const -> double;
 };
 /* Comments
-** [invokeSerial]
+** [invokingSerial]
 ** 1. A function to start serial connection.
-** [mklineSerial]
+** [drawlineSerial]
 ** 1. A function to draw line in the serial monitor.
 ** [POW]
 ** 1. Usage

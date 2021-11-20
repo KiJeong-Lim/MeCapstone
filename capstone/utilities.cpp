@@ -16,7 +16,7 @@ void delay1ms()
   delay(1);
 }
 
-void invokeSerial()
+void invokingSerial()
 {
 #if defined(SERIAL_PORT)
   Serial.begin(SERIAL_PORT);
@@ -27,7 +27,7 @@ void invokeSerial()
 #endif
 }
 
-void mklineSerial()
+void drawlineSerial()
 {
 #if defined(SERIAL_PORT)
   if (Serial)
