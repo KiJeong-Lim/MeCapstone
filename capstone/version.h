@@ -104,13 +104,12 @@
 /* Schematics
 ** [A]
 ** - Operating dates
-**   (1) 2021.11.09
-** - Used parts   Product Name
+**   [#1] 2021.11.09
+** - Used parts   Product name
 **   [Arduino]    Arduino Uno Rev3       x 1
 **   [Cell]       18650 Li-ion NCR18650G x 1
 **   [ZenerDiode] TL431BVLPRAGOSCT-ND    x 1
-** - Assembled diagrams
-** #0
+** - Diagram
 ** >                             +---< R
 ** >             +---------------|---< A
 ** >      5V >---|---< 1kOhm >---+---< K
@@ -125,7 +124,7 @@
 ** >             +---< (-) [Cell] (+) >-----------+
 ** [B]
 ** - Operating dates
-**   (1) 2021.11.16
+**   [#1] 2021.11.16
 ** - Used parts     Product name
 **   [AmpereSensor] ACS712ELCTR-20A-T                 x 1
 **   [Arduino]      Arduino Uno Rev3                  x 1
@@ -137,7 +136,7 @@
 **   [PNP]          2N3906 PNP Transistor             x 1
 **   [WCR5OhmJ5W]   EPX7RBL3                          x 1
 **   [ZenerDiode]   TL431BVLPRAGOSCT-ND               x 1
-** - Assembled diagrams
+** - Diagram
 */
 
 #endif
