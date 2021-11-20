@@ -16,6 +16,27 @@ void delay1ms()
   delay(1);
 }
 
+void invokeSerial()
+{
+#if defined(SERIAL_PORT)
+  Serial.begin(SERIAL_PORT);
+  while (!Serial)
+  {
+    delay1ms();
+  }
+#endif
+}
+
+void mklineSerial()
+{
+#if defined(SERIAL_PORT)
+  if (Serial)
+  {
+    Serial.println("=======");
+  }
+#endif
+}
+
 BigInt_t POW(BigInt_t base, int expn)
 {
   BigInt_t result = 1;

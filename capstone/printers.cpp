@@ -139,10 +139,12 @@ SerialPrinter::SerialPrinter(char const *const prefix, bool const lend)
 SerialPrinter::~SerialPrinter()
 {
 #if defined(SERIAL_PORT)
-  if (newline)
-  {
-    Serial.println("");
-    delay(5);
+  if (Serial)
+  { if (newline)
+    {
+      Serial.println("");
+      delay(5);
+    }
   }
 #endif
 }
@@ -150,9 +152,12 @@ void SerialPrinter::trick()
 {
   newline = false;
 #if defined(SERIAL_PORT)
-  if (prefix_of_message)
+  if (Serial)
   {
-    Serial.print(prefix_of_message);
+    if (prefix_of_message)
+    {
+      Serial.print(prefix_of_message);
+    }
   }
 #endif
 }
@@ -160,12 +165,15 @@ SerialPrinter SerialPrinter::operator<<(byte const hex)
 {
   trick();
 #if defined(SERIAL_PORT)
-  Serial.print("0x");
-  if (hex < 16)
+  if (Serial)
   {
-    Serial.print("0");
+    Serial.print("0x");
+    if (hex < 16)
+    {
+      Serial.print("0");
+    }
+    Serial.print(hex, HEX);
   }
-  Serial.print(hex, HEX);
 #endif
   return { .prefix = nullptr, .lend = true };
 }
@@ -173,7 +181,10 @@ SerialPrinter SerialPrinter::operator<<(int const num)
 {
   trick();
 #if defined(SERIAL_PORT)
-  Serial.print(num);
+  if (Serial)
+  {
+    Serial.print(num);
+  }
 #endif
   return { .prefix = nullptr, .lend = true };
 }
@@ -181,7 +192,10 @@ SerialPrinter SerialPrinter::operator<<(char const *const str)
 {
   trick();
 #if defined(SERIAL_PORT)
-  Serial.print(str);
+  if (Serial)
+  {
+    Serial.print(str);
+  }
 #endif
   return { .prefix = nullptr, .lend = true };
 }
@@ -189,7 +203,10 @@ SerialPrinter SerialPrinter::operator<<(double const val)
 {
   trick();
 #if defined(SERIAL_PORT)
-  Serial.print(val);
+  if (Serial)
+  {
+    Serial.print(val);
+  }
 #endif
   return { .prefix = nullptr, .lend = true };
 }

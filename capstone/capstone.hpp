@@ -76,7 +76,9 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 */
 
 // implemented in "utilities.cpp"
-BigInt_t POW(BigInt_t base, int expn);
+auto invokeSerial() -> void;
+auto mklineSerial() -> void;
+auto POW(BigInt_t base, int expn) -> BigInt_t;
 class Timer {
   ms_t volatile begTime;
 public:
@@ -114,6 +116,10 @@ public:
   auto get_x_from_y(double y) const -> double;
 };
 /* Comments
+** [invokeSerial]
+** 1. A function to start serial connection.
+** [mklineSerial]
+** 1. A function to draw line in the serial monitor.
 ** [POW]
 ** 1. Usage
 ** > y = POW(x, n);
@@ -131,7 +137,7 @@ public:
 */
 
 // implemented in "printers.cpp"
-LcdHandle_t openLcdI2C(int lcd_screen_width, int lcd_screen_height);
+auto openLcdI2C(int lcd_screen_width, int lcd_screen_height) -> LcdHandle_t;
 template <size_t Capacity>
 class SizedFormatter {
   int cnt = 0;

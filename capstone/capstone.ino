@@ -76,17 +76,13 @@ public:
 
 void setup()
 {
-#if defined(SERIAL_PORT)
-  Serial.begin(SERIAL_PORT);
-#endif
+  invokeSerial();
   myBMS.initialize(3000);
 }
 
 void loop()
 {
-#if defined(SERIAL_PORT)
-  Serial.println("=======");
-#endif
+  mklineSerial();
   myBMS.progress(3000);
 }
 
@@ -94,14 +90,8 @@ void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass = { };
 
-  Wire.begin();
-#if defined(SERIAL_PORT)
-  while (!Serial)
-  {
-    delay(1);
-  }
-#endif
   sout << "Run time started.";
+  Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
   {
     cells[i].BalanceCircuit_pin.initWith(true);
