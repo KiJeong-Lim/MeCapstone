@@ -20,7 +20,7 @@ LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
 
     do
     {
-      byte response = 4;
+      int response = 4;
 
       Wire.beginTransmission(adr);
       response = Wire.endTransmission(adr);
@@ -74,16 +74,6 @@ LcdPrinter::~LcdPrinter()
     }
   }
 }
-void LcdPrinter::flush()
-{
-  int const c = (section_no / LCD_SECTION_EA) * 1;
-  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
-  if (c < LCD_HEIGHT && r < LCD_WIDTH)
-  {
-    fbuf.send(&mybuf[c][r]);
-  }
-  fbuf.clear();
-}
 void LcdPrinter::newline()
 {
   flush();
@@ -118,6 +108,16 @@ void LcdPrinter::println(char const *const str)
 {
   print(str);
   newline();
+}
+void LcdPrinter::flush()
+{
+  int const c = (section_no / LCD_SECTION_EA) * 1;
+  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
+  if (c < LCD_HEIGHT && r < LCD_WIDTH)
+  {
+    fbuf.send(&mybuf[c][r]);
+  }
+  fbuf.clear();
 }
 
 SerialPrinter::SerialPrinter(SerialPrinter &&other)
