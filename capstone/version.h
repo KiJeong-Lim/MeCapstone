@@ -100,20 +100,42 @@
 */
 
 /* Schematics
-** [2021-11-09]
-** (A)
-**                             +---< R
-**             +---------------|---< A
-**      5V >---|---< 1kOhm >---+---< K
-**     GND >---+               |   [TL431]
-**      A0 >---|---+           |
-**      A1 >---|---|-----------+
-** [Arudino]   |   |
-**             |   +-----------+
-**             |               |
-**             +---< 2kOhm >---+---< 18kOhm >---+
-**             |                                |
-**             +---< (-) Cell (+) >-------------+
+** [A]
+** - Operating dates
+**   (1) 2021.11.09
+** - Used parts   Product Name
+**   [Arduino]    Arduino Uno Rev3                 x 1
+**   [Cell]       Panasonic 18650 Li-ion NCR18650G x 1
+**   [ZenerDiode] TL431BVLPRAGOSCT-ND              x 1
+** - Assembled diagrams
+** #0
+** >                             +---< R
+** >             +---------------|---< A
+** >      5V >---|---< 1kOhm >---+---< K
+** >     GND >---+               |   [ZenerDiode]
+** >      A0 >---|---+           |
+** >      A1 >---|---|-----------+
+** > [Arduino]   |   |
+** >             |   +-----------+
+** >             |               |
+** >             +---< 2kOhm >---+---< 18kOhm >---+
+** >             |                                |
+** >             +---< (-) [Cell] (+) >-----------+
+** [B]
+** - Operating dates
+**   (1) 2021.11.16
+** - Used parts     Product name
+**   [AmpereSensor] ACS712ELCTR-20A-T                 x 1
+**   [Arduino]      Arduino Uno Rev3                  x 1
+**   [Cell]         Panasonic 18650 Li-ion NCR18650G  x 1
+**   [RedLED]       IL011 5mm Diffused Red LED        x 1
+**   [N-MOSFET]     RFP12N10L N-Channel Power MOSFET  x 1
+**   [NPN]          2N2222 NPN Transistor             x 2
+**   [P-MOSFET]     IRF4905PBF P-Channel Power MOSFET x 1
+**   [PNP]          2N3906 PNP Transistor             x 1
+**   [WCR5OhmJ5W]   EPX7RBL3                          x 1
+**   [ZenerDiode]   TL431BVLPRAGOSCT-ND               x 1
+** - Assembled diagrams
 */
 
 #endif
