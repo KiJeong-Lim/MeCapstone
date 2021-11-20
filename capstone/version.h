@@ -23,7 +23,7 @@
 ** [LiquidCrystal_I2C]
 ** 1. description = "A library for DFRobot I2C LCD displays"
 ** 2. repository  = "https://github.com/marcoschwartz/LiquidCrystal_I2C.git"
-** 3. release     = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
+** 3. release-url = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
 ** 4. interface   = "LiquidCrystal_I2C.h"
 */
 
@@ -36,67 +36,67 @@
 
 /* History
 ** [2021-11-14]
-** Made new files `CapstoneStable/version.h`,
-**                `CapstoneStable/header.h`,
-**                `CapstoneStable/formatter.hpp`,
-**                `CapstoneStable/printer.ino`,
-**                `CapstoneStable/utility.ino`,
-**                `CapstoneStable/CapstoneStable.ino`.
-** Relaced `BufferWithFormat` with `Formatter<LCD_SECTION_LEN>`.
-** Set `VERSION` to be `0.10`.
+** 1. Made new files `CapstoneStable/version.h`,
+**                   `CapstoneStable/header.h`,
+**                   `CapstoneStable/formatter.hpp`,
+**                   `CapstoneStable/printer.ino`,
+**                   `CapstoneStable/utility.ino`,
+**                   `CapstoneStable/CapstoneStable.ino`.
+** 2. Relaced `BufferWithFormat` with `Formatter<LCD_SECTION_LEN>`.
+** 3. Set `VERSION` to be `0.10`.
 ** [2021-11-15]
-** Inserted `Wire.begin();` in the method `BMS::initialize`.
-** - This is a very important change.
-** - If `Wire.begin();` is missed,
-**   the function `openLcdI2c` will not work.
-** Moved `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
-** Fixed the method `LcdPrettyPrinter::~LcdPrettyPrinter`.
-** - Logic changed,
-**   old-version = `mybuf[c][LCD_WIDTH - 1] = '\0';`,
-**   new-version = `mybuf[c][LCD_WIDTH] = '\0';`.
-** Made new file `CapstoneStable/ocv.ino`.
-** - For deriving OCV by looking-up the soc-ocv table.
-** Set `VERSION` to be `0.20`.
+** 1. Inserted `Wire.begin();` in the method `BMS::initialize`.
+**    - This is a very important change.
+**    - If `Wire.begin();` is missed,
+**      the function `openLcdI2c` will not work.
+** 2. Moved `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
+** 3. Fixed the method `LcdPrettyPrinter::~LcdPrettyPrinter`.
+**    - Logic changed,
+**      old-version = `mybuf[c][LCD_WIDTH - 1] = '\0';`,
+**      new-version = `mybuf[c][LCD_WIDTH] = '\0';`.
+** 4. Made new file `CapstoneStable/ocv.ino`.
+**    - For deriving OCV by looking-up the soc-ocv table.
+** 5. Set `VERSION` to be `0.20`.
 ** [2021-11-16]
-** Fixed the class `SerialPrinter`.
-** Improved the function `Formatter::putDouble`.
-** Fixed the class `Timer`.
-** Moved `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
-** Set `VERSION` to be `0.30`.
+** 1. Fixed the class `SerialPrinter`.
+** 2. Improved the function `Formatter::putDouble`.
+** 3. Fixed the class `Timer`.
+** 4. Moved `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
+** 5. Set `VERSION` to be `0.30`.
 ** [2021-11-17]
-** Moved `CapstoneStable/version.h`          -> `capstone/version.h`,
-**       `CapstoneStable/header.hpp`         -> `capstone/header.h`,
-**       `CapstoneStable/formatter.hpp`      -> `capstone/formatter.hpp`,
-**       `CapstoneStable/printer.ino`        -> `capstone/printer.ino`,
-**       `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
-**       `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
-**       `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
-** Fixed the schematic of [2021-11-09].
-** Improved the class `SerialPrinter`.
-** Improved the class `Formatter`.
-** Set `VERSION` to be `0.40`.
+** 1. Moved `CapstoneStable/version.h`          -> `capstone/version.h`,
+**          `CapstoneStable/header.hpp`         -> `capstone/header.h`,
+**          `CapstoneStable/formatter.hpp`      -> `capstone/formatter.hpp`,
+**          `CapstoneStable/printer.ino`        -> `capstone/printer.ino`,
+**          `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
+**          `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
+**          `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
+** 2. Fixed the schematic of [2021-11-09].
+** 3. Improved the class `SerialPrinter`.
+** 4. Improved the class `Formatter`.
+** 5. Set `VERSION` to be `0.40`.
 ** [2021-11-18]
-** Made new file `capstone/pinhandlers.ino`.
-** Moved `capstone/utility.ino`   -> `capstone/utilities.ino`,
-**       `capstone/formatter.hpp` -> `capstone/formatters.hpp`,
-**       `capstone/printer.ino`   -> `capstone/printers.ino`,
-**       `capstone/soc.ino`       -> `capstone/data.ino`,
-**       `capstone/header.h`      -> `capstone/capstone.h`.
-** Improved the method `BMS::checkSocOf`.
+** 1. Made new file `capstone/pinhandlers.ino`.
+** 2. Moved `capstone/utility.ino`   -> `capstone/utilities.ino`,
+**          `capstone/formatter.hpp` -> `capstone/formatters.hpp`,
+**          `capstone/printer.ino`   -> `capstone/printers.ino`,
+**          `capstone/soc.ino`       -> `capstone/data.ino`,
+**          `capstone/header.h`      -> `capstone/capstone.h`.
+** 3. Improved the method `BMS::checkSocOf`.
 ** [2021-11-19]
-** Removed file `capstone/formatters.hpp`.
-** Made new method `BMS::getCalibrationOfIin`.
-** Moved `capstone/capstone.h`      -> `capstone/capstone.hpp`,
-**       `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
-**       `capstone/printers.ino`    -> `capstone/printers.cpp`,
-**       `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
-**       `capstone/data.ino`        -> `capstone/data.cpp`.
-** Fixed the method `BMS::updateQs`.
-** - Logic changed,
-**   old-version = `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
-**   new-version = `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
-** Fixed the method `BMS::initialize`.
-** Added information about dependencies.
+** 1. Removed file `capstone/formatters.hpp`.
+** 2. Made new method `BMS::getCalibrationOfIin`.
+** 3. Moved `capstone/capstone.h`      -> `capstone/capstone.hpp`,
+**          `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
+**          `capstone/printers.ino`    -> `capstone/printers.cpp`,
+**          `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
+**          `capstone/data.ino`        -> `capstone/data.cpp`.
+** 4. Fixed the method `BMS::updateQs`.
+**    - Logic changed,
+**      old-version = `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
+**      new-version = `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
+** 5. Fixed the method `BMS::initialize`.
+** 6. Added information about dependencies.
 */
 
 /* Schematics
