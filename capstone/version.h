@@ -19,6 +19,14 @@
 #define VERSION (0.00)
 #endif
 
+/* Dependencies
+** [LiquidCrystal_I2C]
+** 1. description = "A library for DFRobot I2C LCD displays"
+** 2. repository  = "https://github.com/marcoschwartz/LiquidCrystal_I2C.git"
+** 3. release     = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
+** 4. interface   = "LiquidCrystal_I2C.h"
+*/
+
 // Please do NOT manipulate anything other than these macros:
 #define SERIAL_PORT         9600
 #define OPERATING_MODE      1
@@ -26,75 +34,70 @@
 #define LCD_HEIGHT          2
 #define LCD_SECTION_EA      2
 
-/* Dependencies
-** [LiquidCrystal_I2C]
-** - version   = 1.1.3
-** - homepage  = https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3
-** - interface = "LiquidCrystal_I2C.h"
-*/
-
 /* History
 ** [2021-11-14]
-** Make new files `CapstoneStable/version.h`,
+** Made new files `CapstoneStable/version.h`,
 **                `CapstoneStable/header.h`,
 **                `CapstoneStable/formatter.hpp`,
 **                `CapstoneStable/printer.ino`,
 **                `CapstoneStable/utility.ino`,
 **                `CapstoneStable/CapstoneStable.ino`.
-** Relace `BufferWithFormat` with `Formatter<LCD_SECTION_LEN>`.
+** Relaced `BufferWithFormat` with `Formatter<LCD_SECTION_LEN>`.
 ** Set `VERSION` to be `0.10`.
 ** [2021-11-15]
-** Insert `Wire.begin();` in the method `BMS::initialize`.
+** Inserted `Wire.begin();` in the method `BMS::initialize`.
 ** - This is a very important change.
 ** - If `Wire.begin();` is missed,
 **   the function `openLcdI2c` will not work.
-** Move `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
-** Fix the method `LcdPrettyPrinter::~LcdPrettyPrinter`.
+** Moved `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
+** Fixed the method `LcdPrettyPrinter::~LcdPrettyPrinter`.
 ** - Logic changed,
-**   from `mybuf[c][LCD_WIDTH - 1] = '\0';`,
-**   to   `mybuf[c][LCD_WIDTH] = '\0';`.
-** Make new file `CapstoneStable/ocv.ino`.
+**   old-version = `mybuf[c][LCD_WIDTH - 1] = '\0';`,
+**   new-version = `mybuf[c][LCD_WIDTH] = '\0';`.
+** Made new file `CapstoneStable/ocv.ino`.
 ** - For deriving OCV by looking-up the soc-ocv table.
 ** Set `VERSION` to be `0.20`.
 ** [2021-11-16]
-** Fix the class `SerialPrinter`.
-** Improve the function `Formatter::putDouble`.
-** Fix the class `Timer`.
-** Move `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
+** Fixed the class `SerialPrinter`.
+** Improved the function `Formatter::putDouble`.
+** Fixed the class `Timer`.
+** Moved `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
 ** Set `VERSION` to be `0.30`.
 ** [2021-11-17]
-** Move `CapstoneStable/version.h`          -> `capstone/version.h`,
-**      `CapstoneStable/header.hpp`         -> `capstone/header.h`,
-**      `CapstoneStable/formatter.hpp`      -> `capstone/formatter.hpp`,
-**      `CapstoneStable/printer.ino`        -> `capstone/printer.ino`,
-**      `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
-**      `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
-**      `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
-** Fix the schematic of [2021-11-09].
-** Improve the class `SerialPrinter`.
-** Improve the class `Formatter`.
+** Moved `CapstoneStable/version.h`          -> `capstone/version.h`,
+**       `CapstoneStable/header.hpp`         -> `capstone/header.h`,
+**       `CapstoneStable/formatter.hpp`      -> `capstone/formatter.hpp`,
+**       `CapstoneStable/printer.ino`        -> `capstone/printer.ino`,
+**       `CapstoneStable/utility.ino`        -> `capstone/utility.ino`,
+**       `CapstoneStable/soc.ino`            -> `capstone/soc.ino`,
+**       `CapstoneStable/CapstoneStable.ino` -> `capstone/capstone.ino`.
+** Fixed the schematic of [2021-11-09].
+** Improved the class `SerialPrinter`.
+** Improved the class `Formatter`.
 ** Set `VERSION` to be `0.40`.
 ** [2021-11-18]
-** Make new file `capstone/pinhandlers.ino`.
-** Move `capstone/utility.ino`   -> `capstone/utilities.ino`,
-**      `capstone/formatter.hpp` -> `capstone/formatters.hpp`,
-**      `capstone/printer.ino`   -> `capstone/printers.ino`,
-**      `capstone/soc.ino`       -> `capstone/data.ino`,
-**      `capstone/header.h`      -> `capstone/capstone.h`.
-** Improve the method `BMS::checkSocOf`.
+** Made new file `capstone/pinhandlers.ino`.
+** Moved `capstone/utility.ino`   -> `capstone/utilities.ino`,
+**       `capstone/formatter.hpp` -> `capstone/formatters.hpp`,
+**       `capstone/printer.ino`   -> `capstone/printers.ino`,
+**       `capstone/soc.ino`       -> `capstone/data.ino`,
+**       `capstone/header.h`      -> `capstone/capstone.h`.
+** Improved the method `BMS::checkSocOf`.
 ** [2021-11-19]
-** Remove `capstone/formatters.hpp`.
-** Make new method `BMS::getCalibrationOfIin`.
-** Move `capstone/capstone.h`      -> `capstone/capstone.hpp`,
-**      `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
-**      `capstone/printers.ino`    -> `capstone/printers.cpp`,
-**      `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
-**      `capstone/data.ino`        -> `capstone/data.cpp`.
-** Fix the method `BMS::updateQs`.
+** Removed file `capstone/formatters.hpp`.
+** Made new method `BMS::getCalibrationOfIin`.
+** Moved `capstone/capstone.h`      -> `capstone/capstone.hpp`,
+**       `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
+**       `capstone/printers.ino`    -> `capstone/printers.cpp`,
+**       `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
+**       `capstone/data.ino`        -> `capstone/data.cpp`.
+** Fixed the method `BMS::updateQs`.
 ** - Logic changed,
-**   from `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
-**   to   `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
-** Fix the method `BMS::initialize`.
+**   old-version = `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
+**   new-version = `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
+** Fixed the method `BMS::initialize`.
+** [2021-11-20]
+** Added information about dependencies.
 */
 
 /* Schematics
