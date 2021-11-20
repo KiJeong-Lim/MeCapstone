@@ -97,6 +97,8 @@
 **      new-version = `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
 ** 5. Fixed the method `BMS::initialize`.
 ** 6. Added information about dependencies.
+** [2021-11-20]
+** 1. Write schematics.
 */
 
 /* Schematics
@@ -104,9 +106,9 @@
 ** - Operating dates
 **   (1) 2021.11.09
 ** - Used parts   Product Name
-**   [Arduino]    Arduino Uno Rev3                 x 1
-**   [Cell]       Panasonic 18650 Li-ion NCR18650G x 1
-**   [ZenerDiode] TL431BVLPRAGOSCT-ND              x 1
+**   [Arduino]    Arduino Uno Rev3       x 1
+**   [Cell]       18650 Li-ion NCR18650G x 1
+**   [ZenerDiode] TL431BVLPRAGOSCT-ND    x 1
 ** - Assembled diagrams
 ** #0
 ** >                             +---< R
@@ -127,7 +129,7 @@
 ** - Used parts     Product name
 **   [AmpereSensor] ACS712ELCTR-20A-T                 x 1
 **   [Arduino]      Arduino Uno Rev3                  x 1
-**   [Cell]         Panasonic 18650 Li-ion NCR18650G  x 1
+**   [Cell]         18650 Li-ion NCR18650G            x 1
 **   [RedLED]       IL011 5mm Diffused Red LED        x 1
 **   [N-MOSFET]     RFP12N10L N-Channel Power MOSFET  x 1
 **   [NPN]          2N2222 NPN Transistor             x 2
