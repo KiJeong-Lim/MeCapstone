@@ -102,10 +102,10 @@
 */
 
 /* Schematics
-** [A]
+** [Circuit-A]
 ** - Operating dates
 **   [#1] 2021.11.09
-** - Used part    Product name                     Quantity
+** - Parts list   Product name                     Quantity
 **   [Arduino]    Arduino Uno Rev3                 x 1
 **   [Cell]       Panasonic 18650 Li-ion NCR18650G x 1
 **   [Resistor]   1kOhm                            x 1
@@ -124,11 +124,13 @@
 ** >             |               |
 ** >             +---< 2kOhm >---+---< 18kOhm >---+
 ** >             |                                |
-** >             +---< (-) [Cell] (+) >-----------+
-** [B]
+** >             +---< - [Cell] + >---------------+
+** - Notes
+**   1. This circuit will not work if `VERSION` >= 0.4.0.
+** [Circuit-B]
 ** - Operating dates
 **   [#1] 2021.11.16
-** - Used part      Product name                           Quantity
+** - Parts  list    Product name                           Quantity
 **   [AmpereSensor] ACS712ELCTR-20A-T                      x 1
 **   [Arduino]      Arduino Uno Rev3                       x 1
 **   [Cell]         Panasonic 18650 Li-ion NCR18650G       x 1
@@ -137,6 +139,7 @@
 **   [NPN]          2N2222 NPN Transistor                  x 2
 **   [P-MOSFET]     IRF4905PBF P-Channel Power MOSFET      x 1
 **   [PNP]          2N3906 PNP Transistor                  x 1
+**   [PowerSupply]  ???                                    x 1
 **   [RedLED]       microtivity IL011 5mm Diffused Red LED x 1
 **   [Resistor]     120Ohm                                 x 1
 **                  220Ohm                                 x 1
@@ -148,6 +151,40 @@
 **   [WCR5OhmJ5W]   Wire Wound Cement Resistor EPX7RBL3    x 1
 **   [ZenerDiode]   TL431BVLPRAGOSCT-ND                    x 1
 ** - Diagram
+** >             +---------------< GND
+** >             |   +-----------< VCC
+** >             |   |   +-------< SDA
+** >             |   |   |   +---< SCL
+** >             |   |   |   |   [LCDI2C]
+** >     +5V >---|---+---|---|---------------+-------< Vcc    IN1 >
+** >     GND >---+       |   |               |   +---< Out
+** >     GND >-----------|---|-----------+---|---|---< Gnd    IN2 >---+
+** >      A0 >-----------|---|-------+   |   |   |   [AmpereSensor]   |
+** >      A1 >-----------|---|---+   |   |   |   |                    |
+** >      A2 >-----------|---|---|---|---|---|---+                    |
+** >      A4 >-----------+   |   |   |   |   |                        +---< (+)
+** >      A5 >---------------+   |   |   +---|----------------------------< (-)
+** >       2 >-------+           |   |   |   |                            [PowerSupply]
+** >      ~5 >---+   |           |   |   |   |
+** > [Arduino]   |   |           |   |   |   +---< 1kOhm >---+---< K
+** >             |   |           |   |   +-------------------|---< A
+** >             |   |           +---|---|-------------------+---< R
+** >             |   |               |   |                       [ZenerDiode]
+** >             |   |               |   |
+** >             |   +---------------|---|---
+** >             |                   |   |
+** >             +-------------------|---|---
+** >                                 |   |
+** >                     +-----------+   |
+** >                     |               |
+** >    +----------------|---------------|--------------------------------------------------------------< Main (+)
+** >    |                |               |
+** >    +---< 18kOhm >---+---< 2kOhm >---+--------------------------------------------------------------< Main (-)
+** >
+** - Notes
+**   1. This circuit will work if 0.4.0 =< `VERSION` < 0.5.0.
+**   2. The macro `OPERATING_MODE` must be defined by `1`.
+**   3. If `SERIAL_PORT` is defined as macro, then it must be expanded as `9600`.
 */
 
 #endif
