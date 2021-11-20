@@ -99,6 +99,7 @@
 ** 6. Added information about dependencies.
 ** [2021-11-20]
 ** 1. Uploaded schematics.
+** 2. Correct the product name of the DC power supply.
 */
 
 /* Schematics
@@ -130,7 +131,7 @@
 ** [Circuit-B]
 ** - Operating dates
 **   [#1] 2021.11.16
-** - Parts  list    Product name                           Quantity
+** - Parts list     Product name                           Quantity
 **   [AmpereSensor] ACS712ELCTR-20A-T                      x 1
 **   [Arduino]      Arduino Uno Rev3                       x 1
 **   [Cell]         Panasonic 18650 Li-ion NCR18650G       x 1
@@ -139,7 +140,7 @@
 **   [NPN]          2N2222 NPN Transistor                  x 2
 **   [P-MOSFET]     IRF4905PBF P-Channel Power MOSFET      x 1
 **   [PNP]          2N3906 PNP Transistor                  x 1
-**   [PowerSupply]  SMTECHNO SDP30-5D DC Power Supply      x 1
+**   [PowerSupply]  SMART RDP-305 DC Power Supply          x 1
 **   [RedLED]       microtivity IL011 5mm Diffused Red LED x 1
 **   [Resistor]     120Ohm                                 x 1
 **                  220Ohm                                 x 1
