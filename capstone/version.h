@@ -19,6 +19,13 @@
 #define VERSION (0.00)
 #endif
 
+// Please do NOT manipulate any macros other than these:
+#define SERIAL_PORT         9600
+#define OPERATING_MODE      1
+#define LCD_WIDTH           16
+#define LCD_HEIGHT          2
+#define LCD_SECTION_EA      2
+
 /* Dependencies
 ** [LiquidCrystal_I2C]
 ** 1. description = "A library for DFRobot I2C LCD displays"
@@ -26,13 +33,6 @@
 ** 3. release-url = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
 ** 4. interface   = "LiquidCrystal_I2C.h"
 */
-
-// Please do NOT manipulate anything other than these macros:
-#define SERIAL_PORT         9600
-#define OPERATING_MODE      1
-#define LCD_WIDTH           16
-#define LCD_HEIGHT          2
-#define LCD_SECTION_EA      2
 
 /* History
 ** [2021-11-14]

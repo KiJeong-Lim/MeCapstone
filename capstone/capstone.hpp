@@ -83,7 +83,7 @@ public:
   Timer();
   Timer(Timer const &other) = delete;
   Timer(Timer &&other) = delete;
-  Timer(ms_t &&init_time);
+  Timer(ms_t init_time);
   ~Timer();
   auto reset() -> void;
   auto time() const -> ms_t;
@@ -118,11 +118,12 @@ public:
 ** 1. Usage
 ** > y = POW(x, n);
 ** - Requirements
-**   [A] x > 0
+**   [A] x >= 0
 **   [B] n >= 0
-**   [C] x^n =< 9223372036854775807
+**   [C] x^n =< 2^63 - 1
 ** - Guarantees
 **   [A] y = x^n
+**   [B] y >= 1
 ** [Timer]
 ** 1. A class, which imitates hourglass.
 ** [AscMap]

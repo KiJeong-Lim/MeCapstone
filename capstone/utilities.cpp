@@ -33,7 +33,7 @@ Timer::Timer()
 {
   begTime = millis();
 }
-Timer::Timer(ms_t &&beg_time)
+Timer::Timer(ms_t beg_time)
   : begTime{ beg_time }
 {
 }
