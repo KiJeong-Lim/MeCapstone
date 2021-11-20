@@ -305,7 +305,7 @@ extern SerialPrinter sout, serr, slog;
 ** [SerialPrinter]
 ** 1. A class, which is similar to `std::ostream` of C++.
 ** 2. But the major difference is that line breaks in this class become `;`.
-**    That feature is carried out by `SerialPrinter::~SerialPrinter` and `SerialPrinter::trick`.
+**    This feature is carried out by `SerialPrinter::~SerialPrinter` and `SerialPrinter::trick`.
 ** [sout]
 ** 1. `sout` stands for serial output.
 ** [serr]
