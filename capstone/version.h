@@ -107,13 +107,20 @@
 ** [2021-11-21]
 ** 1. The schematic [Circuit-B] corrected.
 ** 2. The class `BMS` improved.
+**    -- Fields added `BMS::every_cell_attatched`,
+**                    `BMS::is_operating_now`.
+**    -- Methods added `BMS::showBmsInfo`,
+**                     `BMS::checkCellsAttatched`.
 ** 3. Test results
 **    [Circuit-B]
 **    (1) Not charging -> Okay
+**        -- Serial port has been connected, port number = 9600.
 **    (2) Charging     -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port must be connected, port number = 9600.
+**        -- Serial port has been connected, port number = 9600.
 **    (3) Blinking     -> Okay!!!
+**        -- Turn on the power supply before running Arduino.
+**        -- Serial port has been connected, port number = 9600.
 */
 
 /* Schematics

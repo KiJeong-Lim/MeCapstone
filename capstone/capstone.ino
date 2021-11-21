@@ -66,7 +66,6 @@ public:
   void checkCellsAttatched();
   void getCalibrationOfIin();
   void measureValues();
-  void checkOperatingNow();
   void findQs_0();
   void updateQs();
   double getSocOf(int cell_no) const;
