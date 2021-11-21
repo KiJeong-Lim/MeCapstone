@@ -97,7 +97,6 @@ class AscList {
   double const right_bound_of_xs;
   double const *const ys;
   int const number_of_intervals;
-  bool validity;
 public:
   AscList() = delete;
   AscList(AscList const &other) = delete;
@@ -108,23 +107,7 @@ public:
     , right_bound_of_xs{ right_bound }
     , ys{ *data_sheet_ref }
     , number_of_intervals{ static_cast<int>(size_of_data_sheet) - 1 }
-    , validity{ false }
   {
-    if (number_of_intervals >= 0)
-    {
-      validity = left_bound_of_xs < right_bound_of_xs;
-      for (int i = 0; i < number_of_intervals; i++)
-      {
-        if (validity)
-        {
-          validity &= ys[i] < ys[i + 1];
-        }
-        else
-        {
-          break;
-        }
-      }
-    }
   }
   ~AscList();
   auto isValid() const -> bool;

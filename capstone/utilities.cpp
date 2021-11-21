@@ -86,6 +86,23 @@ AscList::~AscList()
 }
 bool AscList::isValid() const
 {
+  bool validity = false;
+
+  if (number_of_intervals >= 0)
+  {
+    validity = left_bound_of_xs < right_bound_of_xs;
+    for (int i = 0; i < number_of_intervals; i++)
+    {
+      if (validity)
+      {
+        validity &= ys[i] < ys[i + 1];
+      }
+      else
+      {
+        break;
+      }
+    }
+  }
   return validity;
 }
 double AscList::get_y_by_x(double const x) const
