@@ -108,7 +108,8 @@
 ** 1. The schematic [Circuit-B] corrected.
 ** 2. Test results
 **    [Circuit-B]
-**    (1) Not charging -> okay
+**    (1) Not charging -> Okay
+**    (2) Charging     -> Okay!!!
 */
 
 /* Schematics

@@ -161,34 +161,58 @@ void BMS::progress(ms_t const given_time)
         }
       }
       updateQs();
-      break;
     }
     else
     {
+      if (lcd_handle)
+      {
+        LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+        lcd.println("CELLS AR");
+        lcd.println("E");
+        lcd.println("RECOGNIZ");
+        lcd.println("ED.");
+      }
       powerIn_pin.turnOff();
-      delay(1000);
+      delay(2000);
       getCalibrationOfIin();
       sout << "Iin_calibration = " << Iin_calibration << "[A].";
       if (lcd_handle)
       {
         LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-
-        lcd.println("> WAIT..");
-        lcd.println(".");
+        lcd.println("WAIT FOR");
+        lcd.println(" CIRCUIT");
+        lcd.println("BEING ST");
+        lcd.println("ABLIZED.");
       }
+      delay(3000);
+#if 1
       powerIn_pin.turnOn();
-      is_operating_now = true;
+      delay(2000);
+      measureValues();
+      findQs_0();
       for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
       {
         startCharging(cell_no);
       }
-      delay(5000);
+#else
       measureValues();
       findQs_0();
+      for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+      {
+        startCharging(cell_no);
+      }
+      powerIn_pin.turnOn();
+#endif
+      slog << "OPERATING NOW!";
+      is_operating_now = true;
       hourglass.delay(given_time);
-      break;
     }
+    break;
   case false:
+    if (not is_operating_now)
+    {
+      sout << "Arduino sleep!";
+    }
     is_operating_now = false;
     for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
     {
@@ -222,17 +246,17 @@ void BMS::checkCellsAttatched()
   every_cell_attatched = true;
   for (int i = 0; i < LENGTH(cellVs); i++)
   {
-    every_cell_attatched &= cellVs[i] > 2.58;
+    every_cell_attatched &= cellVs[i] >= allowedV_min;
   }
 }
 void BMS::getCalibrationOfIin()
 {
   Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
 
-  Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(10) / refOf.analogSignalMax;
+  Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(20) / refOf.analogSignalMax;
   Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
-  Iin_sensorV = Vref * Iin_pin.readSignal(10) / refOf.analogSignalMax;
-  return ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor);
+  Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
+  Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
 }
 void BMS::measureValues()
 {
@@ -259,7 +283,7 @@ void BMS::findQs_0()
 {
   for (int i = 0; i < LENGTH(Qs); i++)
   {
-    Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_by_y(cellVs[i]) / 100);
+    Qs[i] = refOf.batteryCapacity * mySocOcvTable.get_x_by_y(cellVs[i]) / 100.0;
   }
   Qs_lastUpdatedTime.reset();
 }
@@ -267,7 +291,7 @@ void BMS::updateQs()
 {
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    Qs[i] += Iin * (Qs_lastUpdatedTime.getDuration() / 3600);
+    Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
   }
   Qs_lastUpdatedTime.reset();
 }
@@ -276,7 +300,7 @@ double BMS::getSocOf(int const cell_no) const
 #if( 0 )
   return mySocVcellTable.get_x_by_y(cellVs[cell_no]);
 #else
-  return (Qs[cell_no] / refOf.batteryCapacity) * 100;
+  return Qs[cell_no] / refOf.batteryCapacity * 100.0;
 #endif
 }
 void BMS::printValues() const
@@ -392,12 +416,16 @@ void BMS::controlSystem()
 }
 void BMS::showBmsInfo()
 {
+  sout << "powerIn_pin.is_high = " << powerIn_pin.isHigh() << ".";
   for (int i = 0; i < LENGTH(cells); i++)
   {
     sout << "cells[" << i << "].BalanceCircuit_pin.is_high = " << cells[i].BalanceCircuit_pin.isHigh() << ".";
   }
-  sout << "powerIn_pin.is_high = " << powerIn_pin.isHigh() << ".";
-  sout << "Iin_calibration = " << Iin_calibration << "[A].";
+  slog << "Iin_calibration = " << Iin_calibration << "[A].";
+  for (int i = 0; i < LENGTH(Qs); i++)
+  {
+    slog << "Qs[" << i << "] = " << static_cast<double>(Qs[i]) << "[mAh].";
+  }
 }
 void BMS::goodbye(char const *const msg, int const countDown)
 {
