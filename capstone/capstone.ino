@@ -71,7 +71,7 @@ public:
   auto breakCharging(int cell_no) -> void;
   auto checkSafety(bool reports_to_serial) -> bool;
   auto controlSystem() -> void;
-  auto goodbye(int seconds_left_to_quit) -> void;
+  auto goodbye(char const *bye_message, int seconds_left_to_quit = 10) -> void;
 } myBMS;
 
 void setup()
@@ -132,13 +132,7 @@ void BMS::progress(ms_t const given_time)
     if (system_is_okay and jobsDone)
     {
       sout << "CHARGING COMPLETED.";
-      if (lcd_handle)
-      {
-        lcd_handle->clear();
-        lcd_handle->setCursor(0, 1);
-        lcd_handle->print("JOBS FINISHED");
-      }
-      goodbye(10);
+      goodbye("JOBS FINISHED");
     }
     else
     {
@@ -339,7 +333,7 @@ void BMS::controlSystem()
   }
   measuredValuesAreFresh = false;
 }
-void BMS::goodbye(int const countDown)
+void BMS::goodbye(char const *const msg, int const countDown)
 {
   Timer hourglass = { };
 
@@ -349,6 +343,9 @@ void BMS::goodbye(int const countDown)
   }
   if (lcd_handle)
   {
+    lcd_handle->clear();
+    lcd_handle->setCursor(0, 1);
+    lcd_handle->print(msg);
     lcd_handle->setCursor(1, 0);
     lcd_handle->print(" SECS LEFT");
   }

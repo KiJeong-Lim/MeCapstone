@@ -29,8 +29,8 @@
 /* Dependencies
 ** [LiquidCrystal_I2C]
 ** 1. description = "A library for DFRobot I2C LCD displays"
-** 2. repository  = "https://github.com/marcoschwartz/LiquidCrystal_I2C.git"
-** 3. release     = "https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3"
+** 2. repository  = https://github.com/marcoschwartz/LiquidCrystal_I2C.git
+** 3. release     = https://github.com/johnrickman/LiquidCrystal_I2C/releases/tag/1.1.3
 ** 4. interface   = "LiquidCrystal_I2C.h"
 */
 
@@ -42,15 +42,15 @@
 **                `CapstoneStable/printer.ino`,
 **                `CapstoneStable/utility.ino`,
 **                `CapstoneStable/CapstoneStable.ino`.
-** 2. Class `BufferWithFormat` replaced with `Formatter<LCD_SECTION_LEN>`.
+** 2. The class `BufferWithFormat` replaced with `Formatter<LCD_SECTION_LEN>`.
 ** 3. `VERSION` updated to `0.10`.
 ** [2021-11-15]
-** 1. Statement `Wire.begin();` inserted in the method `BMS::initialize`.
+** 1. `Wire.begin();` inserted in the method `BMS::initialize`.
 **    - This is a very important change.
 **    - If `Wire.begin();` is missed,
 **      the function `openLcdI2c` will not work.
 ** 2. Files moved `CapstoneStable/header.h` -> `CapstoneStable/header.hpp`.
-** 3. Method `LcdPrettyPrinter::~LcdPrettyPrinter` corrected.
+** 3. The method `LcdPrettyPrinter::~LcdPrettyPrinter` corrected.
 **    - Code changed,
 **      old-version = `mybuf[c][LCD_WIDTH - 1] = '\0';`,
 **      new-version = `mybuf[c][LCD_WIDTH] = '\0';`.
@@ -58,9 +58,9 @@
 **    - For deriving OCV by looking-up the soc-ocv table.
 ** 5. `VERSION` updated to `0.20`.
 ** [2021-11-16]
-** 1. Class `SerialPrinter` corrected.
-** 2. Function `Formatter::putDouble` improved.
-** 3. Class `Timer` corrected.
+** 1. The class `SerialPrinter` corrected.
+** 2. The function `Formatter::putDouble` improved.
+** 3. The class `Timer` corrected.
 ** 4. Files moved `CapstoneStable/ocv.ino` -> `CapstoneStable/soc.ino`.
 ** 5. `VERSION` updated to `0.30`.
 ** [2021-11-17]
@@ -85,25 +85,25 @@
 ** 3. The method `BMS::checkSocOf` improved.
 ** [2021-11-19]
 ** 1. Files eliminated `capstone/formatters.hpp`.
-** 2. Method `BMS::getCalibrationOfIin` introduced.
+** 2. The method `BMS::getCalibrationOfIin` introduced.
 ** 3. Files moved `capstone/capstone.h`      -> `capstone/capstone.hpp`,
 **                `capstone/utilities.ino`   -> `capstone/utilities.cpp`,
 **                `capstone/printers.ino`    -> `capstone/printers.cpp`,
 **                `capstone/pinhandlers.ino` -> `capstone/pinhandlers.cpp`,
 **                `capstone/data.ino`        -> `capstone/data.cpp`.
-** 4. Method `BMS::updateQs` corrected.
+** 4. The method `BMS::updateQs` corrected.
 **    - Code changed,
 **      old-version = `Qs[i] += (Iin / number_of_cell_being_charged) * (millis() - Qs_lastUpdatedTime) / 3600;`,
 **      new-version = `Qs[i] += Iin * (millis() - Qs_lastUpdatedTime) / 3600;`.
-** 5. Method `BMS::initialize` corrected.
+** 5. The method `BMS::initialize` corrected.
 ** 6. Dependencies information added.
 ** [2021-11-20]
 ** 1. Used schematics uploaded.
 ** 2. Product name of the DC power supply corrected.
-** 3. Class `AscMap` renamed into `AscList`.
-**    Method `AscMap::get_x_from_y`         renamed into `AscList::get_x_by_y`,
-**           `AscMap::get_x_from_parameter` renamed into `AscList::get_x_by_parameter`.
-**    Method `AscList::get_y_by_x` introduced.
+** 3. The class `AscMap` renamed into `AscList`.
+**    The method `AscMap::get_x_from_y`         renamed into `AscList::get_x_by_y`,
+**               `AscMap::get_x_from_parameter` renamed into `AscList::get_x_by_parameter`.
+**    The method `AscList::get_y_by_x` introduced.
 */
 
 /* Schematics
@@ -203,9 +203,11 @@
 ** >    |                                                                               |             |
 ** >    +-------------------------------------------------------------------------------+-------------+
 ** - Notes
-**   1. If 0.4.0 =< `VERSION` < 0.5.0, this circuit will work.
+**   1. If 0.4.0 =< `VERSION` < 0.5.0,
+**      this circuit will work.
 **   2. The macro `OPERATING_MODE` must be defined by `1`.
-**   3. If `SERIAL_PORT` is defined as macro, then it must be expanded to `9600`.
+**   3. If `SERIAL_PORT` is defined as macro,
+**      then it must be expanded to `9600`.
 */
 
 #endif
