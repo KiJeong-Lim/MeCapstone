@@ -106,10 +106,13 @@
 **    The method `AscList::get_y_by_x` introduced.
 ** [2021-11-21]
 ** 1. The schematic [Circuit-B] corrected.
-** 2. Test results
+** 2. The class `BMS` improved.
+** 3. Test results
 **    [Circuit-B]
 **    (1) Not charging -> Okay
 **    (2) Charging     -> Okay!!!
+**        -- Turn on the power supply before running Arduino.
+**        -- Serial port must be connected, port number = 9600.
 */
 
 /* Schematics
