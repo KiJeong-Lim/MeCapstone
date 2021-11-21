@@ -186,10 +186,10 @@ void BMS::progress(ms_t const given_time)
               LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
               if (rebooted)
               {
-                lcd.println("POWER SUP");
-                lcd.println("PLY");
-                lcd.println("NOT CONNE");
-                lcd.println("CTED");
+                lcd.println("POWER SU");
+                lcd.println("PPLY");
+                lcd.println("NOT CONN");
+                lcd.println("ECTED");
               }
               else
               {
@@ -200,7 +200,7 @@ void BMS::progress(ms_t const given_time)
               }
             }
             powerIn_pin.turnOff();
-            delay(2000);
+            delay(4000);
             getCalibrationOfIin();
             sout << "Iin_calibration = " << Iin_calibration << "[A].";
             if (lcd_handle)
@@ -219,7 +219,7 @@ void BMS::progress(ms_t const given_time)
                 lcd.println("ABLIZED");
               }
             }
-            delay(3000);
+            delay(4000);
             powerIn_pin.turnOn();
             delay(2000);
             measureValues();
