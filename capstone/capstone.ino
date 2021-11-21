@@ -62,8 +62,8 @@ class BMS {
   bool is_operating_now         = false;
   bool power_connected          = false;
 public:
-  void initialize(ms_t time_limit);
-  void progress(ms_t time_limit);
+  void setup();
+  void loop();
   void checkCellsAttatched();
   void getCalibrationOfIin();
   void measureValues();
@@ -81,15 +81,15 @@ public:
 
 void setup()
 {
-  myBMS.initialize(3000);
+  myBMS.setup();
 }
 
 void loop()
 {
-  myBMS.progress(3000);
+  myBMS.loop();
 }
 
-void BMS::initialize(ms_t const given_time)
+void BMS::setup()
 {
   Timer hourglass = { };
 
@@ -116,16 +116,15 @@ void BMS::initialize(ms_t const given_time)
   {
     serr << "LCD not connected.";
   }
-  hourglass.delay(given_time);
+  hourglass.delay(3000);
 }
-void BMS::progress(ms_t const given_time)
+void BMS::loop()
 {
   Timer hourglass = { };
 
   checkCellsAttatched();
-  switch (every_cell_attatched)
+  if (every_cell_attatched)
   {
-  case true:
     if (is_operating_now)
     {
       drawlineSerial();
@@ -144,7 +143,7 @@ void BMS::progress(ms_t const given_time)
         }
         else
         {
-          while (hourglass.time() < given_time)
+          while (hourglass.time() < 3000)
           {
             if (not system_is_okay)
             {
@@ -161,13 +160,11 @@ void BMS::progress(ms_t const given_time)
           }
         }
         updateQs();
-        hourglass.delay(given_time);
-        break;
+        hourglass.delay(3000);
       }
       else
       {
         is_operating_now = false;
-        break;
       }
     }
     else
@@ -182,27 +179,31 @@ void BMS::progress(ms_t const given_time)
           checkCellsAttatched();
           if (every_cell_attatched)
           {
+            if (power_connected)
         case false:
-            if (lcd_handle)
             {
-              LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-              if (rebooted)
+              if (lcd_handle)
               {
+                LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+                lcd.println("ALL CELL");
+                lcd.println("S ARE");
+                lcd.println("RECOGNIZ");
+                lcd.println("ED");
+              }
+            }
+            else
+            {
+              if (lcd_handle)
+              {
+                LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
                 lcd.println("POWER SU");
                 lcd.println("PPLY");
                 lcd.println("NOT CONN");
                 lcd.println("ECTED");
               }
-              else
-              {
-                lcd.println("CELLS AR");
-                lcd.println("E");
-                lcd.println("RECOGNIZ");
-                lcd.println("ED");
-              }
             }
             powerIn_pin.turnOff();
-            delay(4000);
+            delay(3000);
             getCalibrationOfIin();
             sout << "Iin_calibration = " << Iin_calibration << "[A].";
             if (lcd_handle)
@@ -211,7 +212,7 @@ void BMS::progress(ms_t const given_time)
               if (rebooted)
               {
                 lcd.println("REBOOTIN");
-                lcd.println("G BMS");
+                lcd.println("G");
               }
               else
               {
@@ -221,7 +222,7 @@ void BMS::progress(ms_t const given_time)
                 lcd.println("ABLIZED");
               }
             }
-            delay(4000);
+            delay(3000);
             powerIn_pin.turnOn();
             delay(2000);
             measureValues();
@@ -237,13 +238,14 @@ void BMS::progress(ms_t const given_time)
       slog << "OPERATING NOW!";
       is_operating_now = true;
       showBmsInfo();
-      hourglass.delay(given_time);
+      hourglass.delay(3000);
     }
-    break;
-  case false:
+  }
+  else
+  {
     if (not is_operating_now)
     {
-      sout << "Arduino sleep!";
+      sout << "Break";
     }
     is_operating_now = false;
     for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
@@ -260,9 +262,8 @@ void BMS::progress(ms_t const given_time)
       lcd.print("= ");
       lcd.println(VERSION);
     }
-    hourglass.delay(given_time);
+    hourglass.delay(3000);
     Qs_lastUpdatedTime.reset();
-    break;
   }
 }
 void BMS::checkCellsAttatched()
