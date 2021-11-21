@@ -165,6 +165,7 @@ void BMS::loop()
       else
       {
         is_operating_now = false;
+        slog << "BREAK";
       }
     }
     else
@@ -245,7 +246,7 @@ void BMS::loop()
   {
     if (not is_operating_now)
     {
-      sout << "Break";
+      slog << "BREAK";
     }
     is_operating_now = false;
     for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
