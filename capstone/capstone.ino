@@ -290,7 +290,11 @@ void BMS::updateQs()
 {
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
+    bool const balance_circuit_on = cells[i].BalanceCircuit_pin.isHigh();
+    if (not balance_circuit_on)
+    {
+      Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
+    }
   }
   Qs_lastUpdatedTime.reset();
 }

@@ -111,6 +111,9 @@
 **                    `BMS::is_operating_now`.
 **    -- Methods added `BMS::showBmsInfo`,
 **                     `BMS::checkCellsAttatched`.
+**    -- Methods corrected `BMS::initialize`,
+**                         `BMS::progress`,
+**                         `BMS::updateQs`.
 ** 3. Test results
 **    [Circuit-B]
 **    (1) Not charging -> Okay
