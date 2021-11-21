@@ -203,11 +203,9 @@
 ** >    |                                                                               |             |
 ** >    +-------------------------------------------------------------------------------+-------------+
 ** - Notes
-**   1. If 0.4.0 =< `VERSION` < 0.5.0,
-**      this circuit will work.
+**   1. If 0.4.0 =< `VERSION` < 0.5.0, this circuit will work.
 **   2. The macro `OPERATING_MODE` must be defined by `1`.
-**   3. If `SERIAL_PORT` is defined as macro,
-**      then it must be expanded to `9600`.
+**   3. The macro `SERIAL_PORT` must be expanded to `9600` if it defined.
 */
 
 #endif

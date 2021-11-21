@@ -14,12 +14,12 @@ static constexpr
 Vol_t V_wanted = 4.00, overV_wanted = 4.10; // FIX ME!
 
 static constexpr
-ReferenceCollection refOf =
-{ .analogSignalMax            = 1024
-, .arduinoRegularV            = 5.00
-, .batteryCapacity            = 3317
-, .sensitivityOfCurrentSensor = .100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
-, .zenerdiodeVfromRtoA        = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
+ReferenceCollection const refOf =
+{ .analogSignalMax              = 1024
+, .arduinoRegularV              = 5.00
+, .batteryCapacity              = 3317
+, .sensitivityOfCurrentSensor   = .100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
+, .zenerdiodeVfromRtoA          = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
 };
 
 static constexpr
@@ -316,19 +316,19 @@ void BMS::controlSystem()
     measureValues();
   }
   jobsDone = true;
-  for (int i = 0; i < LENGTH(cellVs); i++)
+  for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
-    bool const is_this_cell_being_charged_now = not cells[i].BalanceCircuit_pin.isHigh();
-    bool const is_this_cell_fully_charged_now = cellVs[i] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
+    bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
+    bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
 
     jobsDone &= is_this_cell_fully_charged_now;
     if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
     {
-      startCharging(i);
+      startCharging(cell_no);
     }
     if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
     {
-      breakCharging(i);
+      breakCharging(cell_no);
     }
   }
   measuredValuesAreFresh = false;
