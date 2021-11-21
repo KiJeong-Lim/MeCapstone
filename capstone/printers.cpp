@@ -16,11 +16,11 @@ LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
 
   if (lcdWidth > 0 && lcdHeight > 0)
   {
-    byte adr = 0xFF;
+    byte adr = 0x7F;
 
     do
     {
-      int response = 4;
+      byte response = 4;
 
       Wire.beginTransmission(adr);
       response = Wire.endTransmission(adr);
