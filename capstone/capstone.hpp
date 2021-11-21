@@ -115,6 +115,112 @@ public:
   double get_x_by_parameter(double param) const;
   double get_x_by_y(double y) const;
 };
+template <size_t TableWidth, typename Val_t = double>
+class Map2d {
+  Val_t const left_bound_of_xs;
+  Val_t const right_bound_of_xs;
+  Val_t const min_of_s;
+  Val_t const max_of_s;
+  int number_of_intervals;
+  int number_of_s_levels;
+  Val_t const (*table)[TableWidth];
+  Val_t ys[TableWidth];
+public:
+  template <size_t TableHeight>
+  Map2d(Val_t const (*table_ref)[TableHeight][TableWidth], Val_t const left_bound, Val_t const right_bound, Val_t const s_min, Val_t const s_max)
+    : left_bound_of_xs{ left_bound }
+    , right_bound_of_xs{ right_bound }
+    , min_of_s{ s_min }
+    , max_of_s{ s_max }
+    , number_of_intervals{ static_cast<int>(TableWidth) - 1 }
+    , number_of_s_levels{ static_cast<int>(TableHeight) - 1 }
+    , table{ *table_ref }
+    , ys{ }
+  {
+  }
+  Map2d() = delete;
+  Map2d(Map2d const &other) = delete;
+  Map2d(Map2d &&other) = delete;
+  ~Map2d()
+  {
+  }
+  Val_t get_x_by_parameter(Val_t const param) const
+  {
+    return ((param * (right_bound_of_xs - left_bound_of_xs) / number_of_intervals) + left_bound_of_xs);
+  }
+  Val_t get_x_by_y(Val_t const y) const
+  {
+    int low = 0, high = number_of_intervals;
+  
+    while (low <= high)
+    {
+      int mid = low + ((high - low) / 2);
+  
+      if (ys[mid] > y)
+      {
+        high = mid - 1;
+      }
+      else if (ys[mid] < y)
+      {
+        low = mid + 1;
+      }
+      else
+      {
+        return get_x_by_parameter(mid);
+      }
+    }
+    if (low > number_of_intervals)
+    {
+      return get_x_by_parameter(number_of_intervals);
+    }
+    else if (high < 0)
+    {
+      return get_x_by_parameter(0);
+    }
+    else
+    {
+      return get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
+    } 
+  }
+  Val_t with_s_get_x_by_y(Val_t const s, Val_t const y)
+  {
+    if (s <= min_of_s)
+    {
+      for (int i = 0; i < TableWidth; i++)
+      {
+        ys[i] = table[0][i];
+      }
+    }
+    else if (s >= max_of_s)
+    {
+      for (int i = 0; i < TableWidth; i++)
+      {
+        ys[i] = table[number_of_s_levels][i];
+      }
+    }
+    else
+    {
+      Val_t const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
+      int const idx = param_s;
+      
+      if (static_cast<double>(idx) == param_s)
+      {
+        for (int i = 0; i < TableWidth; i++)
+        {        
+          ys[i] = table[idx][i];
+        }
+      }
+      else
+      {
+        for (int i = 0; i < TableWidth; i++)
+        {        
+          ys[i] = ((table[idx + 1][i] - table[idx][i]) * (param_s - idx)) + table[idx][i];
+        }
+      }
+    }
+    return get_x_by_y(y);
+  }
+};
 /* Comments
 ** [invokingSerial]
 ** 1. A function to start serial connection.
@@ -134,6 +240,8 @@ public:
 ** 1. A class, which imitates hourglass.
 ** [AscList]
 ** 1. A class to calculate the inverse of the strictly increasing function.
+** [Map2d]
+** 1. A class, which is equivalent to the class `AscList` with parameter `s`.
 */
 
 // implemented in "printers.cpp"

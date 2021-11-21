@@ -124,6 +124,8 @@
 **    (3) Blinking     -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
 **        -- Serial port has been connected, port number = 9600.
+** [2021-11-22]
+** 1. The class `Map2d` added.
 */
 
 /* Schematics
