@@ -161,6 +161,17 @@ void SerialPrinter::trick()
   }
 #endif
 }
+SerialPrinter SerialPrinter::operator<<(bool is)
+{
+  trick();
+#if defined(SERIAL_PORT)
+  if (Serial)
+  {
+    Serial.print(is ? "true" : "false");
+  }
+#endif
+  return { .prefix = nullptr, .lend = true };
+}
 SerialPrinter SerialPrinter::operator<<(byte const hex)
 {
   trick();

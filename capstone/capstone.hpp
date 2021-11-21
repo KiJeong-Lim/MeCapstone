@@ -76,9 +76,9 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 */
 
 // implemented in "utilities.cpp"
-auto invokingSerial() -> void;
-auto drawlineSerial() -> void;
-auto POW(BigInt_t base, int expn) -> BigInt_t;
+void invokingSerial();
+void drawlineSerial();
+BigInt_t POW(BigInt_t base, int expn);
 class Timer {
   ms_t volatile begTime;
 public:
@@ -87,10 +87,10 @@ public:
   Timer(Timer &&other) = delete;
   Timer(ms_t init_time);
   ~Timer();
-  auto reset() -> void;
-  auto time() const -> ms_t;
-  auto getDuration() const -> ms_t;
-  auto delay(ms_t duration) const -> void;
+  void reset();
+  ms_t time() const;
+  ms_t getDuration() const;
+  void delay(ms_t duration) const;
 };
 class AscList {
   double const left_bound_of_xs;
@@ -110,10 +110,10 @@ public:
   {
   }
   ~AscList();
-  auto isValid() const -> bool;
-  auto get_y_by_x(double x) const -> double;
-  auto get_x_by_parameter(double param) const -> double;
-  auto get_x_by_y(double y) const -> double;
+  bool isValid() const;
+  double get_y_by_x(double x) const;
+  double get_x_by_parameter(double param) const;
+  double get_x_by_y(double y) const;
 };
 /* Comments
 ** [invokingSerial]
@@ -137,13 +137,13 @@ public:
 */
 
 // implemented in "printers.cpp"
-auto openLcdI2C(int lcd_screen_width, int lcd_screen_height) -> LcdHandle_t;
+LcdHandle_t openLcdI2C(int lcd_screen_width, int lcd_screen_height);
 template <size_t Capacity>
 class SizedFormatter {
   int cnt = 0;
   char buf[Capacity] = { };
 public:
-  auto clear() -> void
+  void clear()
   {
     for (cnt = 0; cnt < Capacity; cnt++)
     {
@@ -151,28 +151,28 @@ public:
     }
     cnt = 0;
   }
-  auto send(char *const target_address) -> void
+  void send(char *const target_address)
   {
     if (target_address)
     {
       memcpy(target_address, &buf[0], sizeof(buf));
     }
   }
-  auto putChar(char const printMe) -> void
+  void putChar(char const printMe)
   {
     if (cnt < Capacity)
     {
       buf[cnt++] = printMe;
     }
   }
-  auto putDigit(int const printMe) -> void
+  void putDigit(int const printMe)
   {
     if (printMe >= 0 && printMe < 16)
     {
       putChar("0123456789ABCDEF"[printMe]);
     }
   }
-  auto putInt(BigInt_t const printMe, int const base) -> void
+  void putInt(BigInt_t const printMe, int const base)
   {
     int cn = 0;
     BigInt_t val = printMe;
@@ -190,7 +190,7 @@ public:
       putDigit(((base * val) / POW(base, cn)) % base);
     } while (--cn > 0);
   }
-  auto putDouble(double const printMe, int const afters_dot) -> void
+  void putDouble(double const printMe, int const afters_dot)
   {
     constexpr int base = 10;
     double val = printMe;
@@ -221,7 +221,7 @@ public:
       putInt(valN, base);
     }
   }
-  auto putString(char const *const printMe) -> void
+  void putString(char const *const printMe)
   {
     if (printMe)
     {
@@ -250,14 +250,14 @@ public:
   LcdPrinter(LcdPrinter &&other) = delete;
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
-  auto newline() -> void;
-  auto print(int num, int base = 10) -> void;
-  auto println(int num, int base = 10) -> void;
-  auto print(double val, int afters_dot = 2) -> void;
-  auto println(double val, int afters_dot = 2) -> void;
-  auto print(char const *str) -> void;
-  auto println(char const *str) -> void;
-  auto flush() -> void;
+  void newline();
+  void print(int num, int base = 10);
+  void println(int num, int base = 10);
+  void print(double val, int afters_dot = 2);
+  void println(double val, int afters_dot = 2);
+  void print(char const *str);
+  void println(char const *str);
+  void flush();
 };
 class SerialPrinter {
   char const *const prefix_of_message;
@@ -269,11 +269,12 @@ public:
   SerialPrinter(char const *prefix);
   SerialPrinter(char const *prefix, bool lend);
   ~SerialPrinter();
-  auto trick() -> void;
-  auto operator<<(byte hex) -> SerialPrinter;
-  auto operator<<(int num) -> SerialPrinter;
-  auto operator<<(char const *str) -> SerialPrinter;
-  auto operator<<(double val) -> SerialPrinter;
+  void trick();
+  SerialPrinter operator<<(bool is);
+  SerialPrinter operator<<(byte hex);
+  SerialPrinter operator<<(int num);
+  SerialPrinter operator<<(char const *str);
+  SerialPrinter operator<<(double val);
 };
 extern SerialPrinter sout, serr, slog;
 /* Comments
@@ -340,12 +341,12 @@ public:
   PinSetter(PinSetter &&other) = delete;
   PinSetter(pinId_t pinId);
   ~PinSetter();
-  auto openPin() const -> void;
-  auto syncPin() -> void;
-  auto initWith(bool be_high) -> void;
-  auto turnOn() -> void;
-  auto turnOff() -> void;
-  auto isHigh() const -> bool;
+  void openPin() const;
+  void syncPin();
+  void initWith(bool be_high);
+  void turnOn();
+  void turnOff();
+  bool isHigh() const;
 };
 class PwmSetter : public PinHandler {
 public:
@@ -354,9 +355,9 @@ public:
   PwmSetter(PwmSetter &&other) = delete;
   PwmSetter(pinId_t pinId);
   ~PwmSetter();
-  auto openPin() const -> void;
-  auto init() const -> void;
-  auto set(double duty_ratio) const -> void;
+  void openPin() const;
+  void init() const;
+  void set(double duty_ratio) const;
 };
 /* Comments
 ** [PinHandler]
