@@ -181,21 +181,22 @@ void BMS::progress(ms_t const given_time)
           if (every_cell_attatched)
           {
         case false:
-            if (rebooted)
+            if (lcd_handle)
             {
-              measureValues();
-              printValues();
-              showBmsInfo();
-            }
-            else
-            {
-              if (lcd_handle)
+              LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+              if (rebooted)
               {
-                LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+                lcd.println("POWER SUP");
+                lcd.println("PLY");
+                lcd.println("NOT CONNE");
+                lcd.println("CTED");
+              }
+              else
+              {
                 lcd.println("CELLS AR");
                 lcd.println("E");
                 lcd.println("RECOGNIZ");
-                lcd.println("ED.");
+                lcd.println("ED");
               }
             }
             powerIn_pin.turnOff();
@@ -208,14 +209,14 @@ void BMS::progress(ms_t const given_time)
               if (rebooted)
               {
                 lcd.println("REBOOTIN");
-                lcd.println("G BMS...");
+                lcd.println("G BMS");
               }
               else
               {
                 lcd.println("WAIT FOR");
                 lcd.println(" CIRCUIT");
                 lcd.println("BEING ST");
-                lcd.println("ABLIZED.");
+                lcd.println("ABLIZED");
               }
             }
             delay(3000);
