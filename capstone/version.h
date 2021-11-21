@@ -106,6 +106,9 @@
 **    The method `AscList::get_y_by_x` introduced.
 ** [2021-11-21]
 ** 1. The schematic [Circuit-B] corrected.
+** 2. Test results
+**    [Circuit-B]
+**    (1) Not charging -> okay
 */
 
 /* Schematics
@@ -137,6 +140,7 @@
 ** [Circuit-B]
 ** - Operating dates
 **   [#1] 2021.11.16
+**   [#2] 2021.11.21
 ** - Parts list     Product name                           Quantity
 **   [AmpereSensor] ACS712ELCTR-20A-T                      x 1
 **   [Arduino]      Arduino Uno Rev3                       x 1

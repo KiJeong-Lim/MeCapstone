@@ -63,6 +63,7 @@ LcdPrinter::LcdPrinter(LcdHandle_t const &lcdHandleRef)
 }
 LcdPrinter::~LcdPrinter()
 {
+  flush();
   if (lcdHandle)
   {
     lcdHandle->clear();
