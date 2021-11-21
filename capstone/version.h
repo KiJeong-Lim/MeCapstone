@@ -113,6 +113,7 @@
 **    (2) Charging     -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
 **        -- Serial port must be connected, port number = 9600.
+**    (3) Blinking     -> Okay!!!
 */
 
 /* Schematics
