@@ -92,26 +92,45 @@ public:
   auto getDuration() const -> ms_t;
   auto delay(ms_t duration) const -> void;
 };
-class AscMap {
+class AscList {
   double const left_bound_of_xs;
   double const right_bound_of_xs;
   double const *const ys;
   int const number_of_intervals;
+  bool validity;
 public:
-  AscMap() = delete;
-  AscMap(AscMap const &other) = delete;
-  AscMap(AscMap &&other) = delete;
+  AscList() = delete;
+  AscList(AscList const &other) = delete;
+  AscList(AscList &&other) = delete;
   template <size_t size_of_data_sheet>
-  AscMap(double const (*const data_sheet_ref)[size_of_data_sheet], double const left_bound, double const right_bound)
+  AscList(double const (*const data_sheet_ref)[size_of_data_sheet], double const left_bound, double const right_bound)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , ys{ *data_sheet_ref }
     , number_of_intervals{ static_cast<int>(size_of_data_sheet) - 1 }
+    , validity{ false }
   {
+    if (number_of_intervals >= 0)
+    {
+      validity = left_bound_of_xs < right_bound_of_xs;
+      for (int i = 0; i < number_of_intervals; i++)
+      {
+        if (validity)
+        {
+          validity &= ys[i] < ys[i + 1];
+        }
+        else
+        {
+          break;
+        }
+      }
+    }
   }
-  ~AscMap();
-  auto get_x_from_parameter(double param) const -> double;
-  auto get_x_from_y(double y) const -> double;
+  ~AscList();
+  auto isValid() const -> bool;
+  auto get_y_by_x(double x) const -> double;
+  auto get_x_by_parameter(double param) const -> double;
+  auto get_x_by_y(double y) const -> double;
 };
 /* Comments
 ** [invokingSerial]
@@ -130,7 +149,7 @@ public:
 **   [B] y >= 1
 ** [Timer]
 ** 1. A class, which imitates hourglass.
-** [AscMap]
+** [AscList]
 ** 1. A class to calculate the inverse of the strictly increasing function.
 */
 
@@ -369,20 +388,20 @@ public:
 */
 
 // implemented in "data.cpp"
-extern AscMap const mySocOcvTable, mySocVcellTable;
+extern AscList const mySocOcvTable, mySocVcellTable;
 /* Comments
 ** [mySocOcvTable]
 ** 1. A table which maps `soc` to `ocv`,
 **    where `0.00 =< soc =< 100.00`.
 ** 2. Usage
-** > soc = mySocOcvTable.get_x_from_y(ocv);
+** > soc = mySocOcvTable.get_x_by_y(ocv);
 ** - Guarantees
 **   [A] 0.00 =< soc =< 100.00
 ** [mySocVcellTable]
 ** 1. A table which maps `soc` to `Vcell`,
 **    where `0.00 =< soc =< 98.00`.
 ** 2. Usage
-** > soc = mySocVcellTable.get_x_from_y(Vcell);
+** > soc = mySocVcellTable.get_x_by_y(Vcell);
 ** - Guarantees
 **   [A] 0.00 =< soc =< 98.00
 */

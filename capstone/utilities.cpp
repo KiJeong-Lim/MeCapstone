@@ -81,14 +81,43 @@ void Timer::delay(ms_t const duration) const
   }
 }
 
-AscMap::~AscMap()
+AscList::~AscList()
 {
 }
-double AscMap::get_x_from_parameter(double const param) const
+bool AscList::isValid() const
+{
+  return validity;
+}
+double AscList::get_y_by_x(double const x) const
+{
+  if (x <= left_bound_of_xs)
+  {
+    return ys[0];
+  }
+  else if (x >= right_bound_of_xs)
+  {
+    return ys[number_of_intervals];
+  }
+  else
+  {
+    double const param = (x - left_bound_of_xs) * (number_of_intervals / (right_bound_of_xs - left_bound_of_xs));
+    int const idx = param;
+
+    if (static_cast<double>(idx) == param)
+    {
+      return ys[idx];
+    }
+    else
+    {
+      return ((ys[idx + 1] - ys[idx]) * (param - idx)) + ys[idx];
+    }
+  }
+}
+double AscList::get_x_by_parameter(double const param) const
 {
   return ((param * (right_bound_of_xs - left_bound_of_xs) / number_of_intervals) + left_bound_of_xs);
 }
-double AscMap::get_x_from_y(double const y) const
+double AscList::get_x_by_y(double const y) const
 {
   int low = 0, high = number_of_intervals;
 
@@ -106,19 +135,19 @@ double AscMap::get_x_from_y(double const y) const
     }
     else
     {
-      return get_x_from_parameter(mid);
+      return get_x_by_parameter(mid);
     }
   }
   if (low > number_of_intervals)
   {
-    return get_x_from_parameter(number_of_intervals);
+    return get_x_by_parameter(number_of_intervals);
   }
   else if (high < 0)
   {
-    return get_x_from_parameter(0);
+    return get_x_by_parameter(0);
   }
   else
   {
-    return get_x_from_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
+    return get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
   }
 }

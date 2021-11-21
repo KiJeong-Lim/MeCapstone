@@ -200,7 +200,7 @@ void BMS::findQs_0()
   }
   for (int i = 0; i < LENGTH(Qs); i++)
   {
-    Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_from_y(cellVs[i]) / 100);
+    Qs[i] = refOf.batteryCapacity * (mySocOcvTable.get_x_by_y(cellVs[i]) / 100);
   }
   Qs_lastUpdatedTime.reset();
 }
@@ -219,7 +219,7 @@ void BMS::updateQs()
 double BMS::getSocOf(int const cell_no) const
 {
 #if( 0 )
-  return mySocVcellTable.get_x_from_y(cellVs[cell_no]);
+  return mySocVcellTable.get_x_by_y(cellVs[cell_no]);
 #else
   return (Qs[cell_no] / refOf.batteryCapacity) * 100;
 #endif

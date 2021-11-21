@@ -119,13 +119,13 @@ double const Vcells[] =
 , 4.20300118506630
 };
 
-AscMap const mySocOcvTable =
+AscList const mySocOcvTable =
 { .data_sheet_ref = &Ocvs
 , .left_bound     = 0.00
 , .right_bound    = 100.00
 };
 
-AscMap const mySocVcellTable =
+AscList const mySocVcellTable =
 { .data_sheet_ref = &Vcells
 , .left_bound     = 0.00
 , .right_bound    = 98.00
