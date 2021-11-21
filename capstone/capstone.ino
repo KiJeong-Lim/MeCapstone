@@ -181,13 +181,22 @@ void BMS::progress(ms_t const given_time)
           if (every_cell_attatched)
           {
         case false:
-            if (lcd_handle)
+            if (rebooted)
             {
-              LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-              lcd.println("CELLS AR");
-              lcd.println("E");
-              lcd.println("RECOGNIZ");
-              lcd.println("ED.");
+              measureValues();
+              printValues();
+              showBmsInfo();
+            }
+            else
+            {
+              if (lcd_handle)
+              {
+                LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+                lcd.println("CELLS AR");
+                lcd.println("E");
+                lcd.println("RECOGNIZ");
+                lcd.println("ED.");
+              }
             }
             powerIn_pin.turnOff();
             delay(2000);
@@ -224,6 +233,7 @@ void BMS::progress(ms_t const given_time)
       }
       slog << "OPERATING NOW!";
       is_operating_now = true;
+      showBmsInfo();
       hourglass.delay(given_time);
     }
     break;

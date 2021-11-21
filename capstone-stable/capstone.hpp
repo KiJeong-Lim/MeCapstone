@@ -437,9 +437,9 @@ public:
   PinReader(PinReader &&other) = delete;
   PinReader(pinId_t pinId);
   ~PinReader();
-  auto read_once() const -> int;
-  auto readSignalOnce() const -> Val_t;
-  auto readSignal(ms_t duration) const -> Val_t;
+  int read_once() const;
+  Val_t readSignalOnce() const;
+  Val_t readSignal(ms_t duration) const;
 };
 class PinSetter : public PinHandler {
   bool volatile is_high;
