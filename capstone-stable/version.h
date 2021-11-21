@@ -117,15 +117,20 @@
 ** 3. Test results
 **    [Circuit-B]
 **    (1) Not charging -> Okay
-**        -- Serial port has been connected, port number = 9600.
+**        -- Serial port has been connected, port-number = 9600.
+**        -- OPERATING_MODE = 1.
 **    (2) Charging     -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port has been connected, port number = 9600.
+**        -- Serial port has been connected, port-number = 9600.
+**        -- OPERATING_MODE = 1.
 **    (3) Blinking     -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port has been connected, port number = 9600.
+**        -- Serial port has been connected, port-number = 9600.
+**        -- OPERATING_MODE = 1.
 ** [2021-11-22]
 ** 1. The class `Map2d` added.
+** 2. `VERSION` updated to `1.00`.
+** 3. File moved `capstone/capstone.ino` -> `capstone/capstone-stable.ino`.
 */
 
 /* Schematics
