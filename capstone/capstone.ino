@@ -132,6 +132,7 @@ void BMS::progress(ms_t const given_time)
       measureValues();
       printValues();
       showBmsInfo();
+      if (power_connected)
       {
         bool system_is_okay = checkSafety(true);
 
@@ -159,14 +160,15 @@ void BMS::progress(ms_t const given_time)
             system_is_okay = checkSafety(false);
           }
         }
+        updateQs();
+        hourglass.delay(given_time);
+        break;
       }
-      updateQs();
-      hourglass.delay(given_time);
-      if (not power_connected)
+      else
       {
         is_operating_now = false;
+        break;
       }
-      break;
     }
     else
     {
