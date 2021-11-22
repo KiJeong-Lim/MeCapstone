@@ -66,7 +66,7 @@ LcdPrinter::~LcdPrinter()
   this->flush();
   this->send();
 }
-void LcdPrinter::rezero()
+void LcdPrinter::overwrite()
 {
   section_no = 0;
   auxiliary_buffer.clear();

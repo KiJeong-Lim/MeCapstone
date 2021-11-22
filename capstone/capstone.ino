@@ -274,7 +274,6 @@ void BMS::sleep()
   if (lcd_handle)
   {
     LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-    //           01234567
     lcd.println("NOT ALL ");
     lcd.println("CELLS AR");
     lcd.println("E CONNEC");
