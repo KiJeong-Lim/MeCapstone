@@ -79,6 +79,54 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 void invokingSerial();
 void drawlineSerial();
 BigInt_t POW(BigInt_t base, int expn);
+template <typename UnsignedIntegers = uint8_t>
+class Bits {
+  UnsignedIntegers volatile my_bits;
+public:
+  Bits(UnsignedIntegers const _my_bits)
+    : my_bits{ _my_bits }
+  {
+  }
+  Bits(Bits const &other)
+    : my_bits{ other.my_bits }
+  {
+  }
+  Bits &operator=(Bits &&rhs)
+  {
+    this->my_bits = rhs.my_bits;
+  }
+  ~Bits()
+  {
+  }
+  bool operator==(UnsignedIntegers const &rhs) const
+  {
+    return my_bits == rhs;
+  }
+  bool operator!=(UnsignedIntegers const &rhs) const
+  {
+    return my_bits != rhs;
+  }
+  operator UnsignedIntegers()
+  {
+    return my_bits;
+  }
+  bool get(int const n) const
+  {
+    return (n > 0 ? (my_bits & (1u << n)) != 0 : false);
+  }
+  Bits &set(int const n, bool const to_be)
+  {
+    if (to_be)
+    {
+      my_bits |= (1u << n);
+    }
+    else
+    {
+      my_bits &= (~ 1u << n);
+    }
+    return *this;
+  }
+};
 class Timer {
   ms_t volatile begTime;
 public:
