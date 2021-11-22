@@ -117,16 +117,16 @@
 ** 3. Test results
 **    [Circuit-B]
 **    (1) Not charging -> Okay
-**        -- Serial port has been connected, port-number = 9600.
-**        -- OPERATING_MODE = 1.
-**    (2) Charging     -> Okay!!!
+**        -- Serial port has been connected, SERIAL_PORT := 9600.
+**        -- OPERATING_MODE := 1.
+**    (2) Charging -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port has been connected, port-number = 9600.
-**        -- OPERATING_MODE = 1.
-**    (3) Blinking     -> Okay!!!
+**        -- Serial port has been connected, SERIAL_PORT := 9600.
+**        -- OPERATING_MODE := 1.
+**    (3) Blinking -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port has been connected, port-number = 9600.
-**        -- OPERATING_MODE = 1.
+**        -- Serial port has been connected, SERIAL_PORT := 9600.
+**        -- OPERATING_MODE := 1.
 ** [2021-11-22]
 ** 1. The class `Map2d` added.
 ** 2. `VERSION` updated to `1.00`.
@@ -174,7 +174,8 @@
 **   [PNP]          2N3906 PNP Transistor                  x 1
 **   [PowerSupply]  SMART RDP-305 DC Power Supply          x 1
 **   [RedLED]       microtivity IL011 5mm Diffused Red LED x 1
-**   [Resistor]     120Ohm                                 x 1
+**   [Resistor]     5Ohm                                   x 1
+**                  120Ohm                                 x 1
 **                  220Ohm                                 x 1
 **                  330Ohm                                 x 2
 **                  1kOhm                                  x 3
