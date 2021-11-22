@@ -2,9 +2,9 @@
 ** ===============================================================================
 ** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
-** Hwan-hee Jeon | School of Meslogical Engineering, Chonnam National University |
-** Hak-jung Im   | School of Meslogical Engineering, Chonnam National University |
-** Ki-jeong Lim  | School of Meslogical Engineering, Chonnam National University |
+** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
+** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
+** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
 ** ===============================================================================
 */
 
