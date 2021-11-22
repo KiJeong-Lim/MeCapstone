@@ -146,6 +146,7 @@ void BMS::loop()
       {
         sout << "Perform charging.";
         this->routine();
+        break;
       }
       if (bms_state.get(power_locked))
       {
@@ -192,7 +193,6 @@ void BMS::loop()
       sout << "Waiting for every cell being connected."; 
     }
     this->dormant();
-    break;
   }
   hourglass.delay(3000);
 }
