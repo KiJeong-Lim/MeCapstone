@@ -12,7 +12,7 @@
 
 enum bms_state_mask_t : int {
   bms_life                = 0,
-  jobs_done               = 1,
+  jobs_finished           = 1,
   every_cells_connected   = 2,
   Iin_recongnized         = 3,
   cells_locked            = 4,
@@ -66,12 +66,12 @@ class BMS {
   Amp_t Iin_calibration         = 0.00;
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
-  Bits<uint16_t> bms_state      = 0u;
+  Bits<uint8_t> bms_state       = 0u;
 public:
   void setup();
   void loop();
   void routine();
-  void printVersion();
+  void greeting();
   bool checkCellsAttatched();
   void goodbye(char const *bye_message, int seconds_left_to_quit = 10);
   bool checkPowerConnected();
@@ -85,7 +85,7 @@ public:
   void updateQs();
   double getSocOf(int cell_no) const;
   void printValues() const;
-  void log() const;
+  void logInfo() const;
   void dormant();
   void recover();
 } myBMS;
@@ -117,7 +117,7 @@ void BMS::setup()
   lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcd_handle)
   {
-    this->printVersion();
+    this->greeting();
   }
   else
   {
@@ -129,14 +129,14 @@ void BMS::setup()
 void BMS::loop()
 {
   Timer hourglass = { };
-  this->log();
+  this->logInfo();
   switch (bms_state.get(bms_life))
   {
   default:
     this->checkCellsAttatched();
     if (bms_state.get(every_cells_connected))
     {
-      if (bms_state.get(jobs_done))
+      if (bms_state.get(jobs_finished))
       {
         sout << "CHARGING COMPLETED.";
         this->goodbye("JOBS FINISHED");
@@ -233,7 +233,7 @@ void BMS::routine()
         cells[cell_no].BalanceCircuit_pin.turnOn();
       }
     }
-    bms_state.set(jobs_done, jobsDone);
+    bms_state.set(jobs_finished, jobsDone);
   }
   else
   {
@@ -248,7 +248,7 @@ void BMS::routine()
     bms_state.set(bms_life, false);
   }
 }
-void BMS::printVersion()
+void BMS::greeting()
 {
   if (lcd_handle)
   {
@@ -282,6 +282,7 @@ void BMS::goodbye(char const *const msg, int const countDown)
 {
   Timer hourglass = { };
   this->lockCells();
+  bms_state.set(bms_being_operating, false);
   if (lcd_handle)
   {
     lcd_handle->clear();
@@ -309,7 +310,6 @@ void BMS::goodbye(char const *const msg, int const countDown)
     lcd_handle = nullptr;
   }
   this->lockPower();
-  bms_state.set(bms_being_operating, false);
   bms_state.set(bms_life, false);
   abort();
 }
@@ -427,7 +427,7 @@ void BMS::printValues() const
     lcd.println(Iin);
   }
 }
-void BMS::log() const
+void BMS::logInfo() const
 {
   drawlineSerial();
   slog << "`powerIn_pin.is_high` = " << powerIn_pin.isHigh() << ".";
@@ -443,7 +443,7 @@ void BMS::log() const
 }
 void BMS::dormant()
 {
-  this->printVersion();
+  this->greeting();
 }
 void BMS::recover()
 {
