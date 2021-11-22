@@ -145,7 +145,7 @@ void BMS::loop()
       if (bms_state.get(bms_being_operating))
       {
         sout << "Execute routine.";
-        not_dormant = this->routine();
+        this->routine();
         break;
       }
       if (bms_state.get(power_locked))
@@ -214,6 +214,16 @@ bool BMS::routine()
   this->measureValues();
   this->updateQs();
   this->printValues();
+  if (Iin < allowedA_min)
+  {
+    serr << "`Iin`" << " too LOW.";
+    isGood = false;
+    not_dormant = false;
+  }
+  else
+  {
+    not_dormant = true;
+  }
   if (Iin > allowedA_max)
   {
     this->lockPower();
@@ -249,13 +259,7 @@ bool BMS::routine()
     }
   }
   bms_state.set(jobs_finished, jobsDone);
-  if (Iin < allowedA_min)
-  {
-    serr << "`Iin`" << " too LOW.";
-    isGood = false;
-    return false;
-  }
-  return true;
+  return not_dormant;
 }
 void BMS::lockCells()
 {
