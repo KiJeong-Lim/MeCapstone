@@ -118,24 +118,21 @@
 **    [Circuit-B]
 **    (1) Not charging -> Okay
 **        -- Serial port has been connected, SERIAL_PORT := 9600.
-**        -- OPERATING_MODE := 1.
 **    (2) Charging -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port has been connected, SERIAL_PORT := 9600.
-**        -- OPERATING_MODE := 1.
+**        -- Serial port has been connected.
 **    (3) Blinking -> Okay!!!
 **        -- Turn on the power supply before running Arduino.
-**        -- Serial port has been connected, SERIAL_PORT := 9600.
-**        -- OPERATING_MODE := 1.
+**        -- Serial port has been connected.
 ** [2021-11-22]
 ** 1. The class `Map2d` added.
 ** 2. `VERSION` updated to `1.00`.
 ** 3. File moved `capstone/capstone.ino` -> `capstone/capstone-stable.ino`.
 */
 
-/* Schematics
+/* Circuit Archive
 ** [Circuit-A]
-** - Operating dates
+** - List of operating dates
 **   [#1] 2021.11.09
 ** - Parts list   Product name                     Quantity
 **   [Arduino]    Arduino Uno Rev3                 x 1
@@ -144,7 +141,7 @@
 **                2kOhm                            x 1
 **                18kOhm                           x 1
 **   [ZenerDiode] TL431BVLPRAGOSCT-ND              x 1
-** - Diagram
+** - Schematic
 ** >                             +---< R
 ** >             +---------------|---< A
 ** >      5V >---|---< 1kOhm >---+---< K
@@ -160,7 +157,7 @@
 ** - Notes
 **   1. This circuit will not work if `VERSION` >= 0.4.0.
 ** [Circuit-B]
-** - Operating dates
+** - List of operating dates
 **   [#1] 2021.11.16
 **   [#2] 2021.11.21
 ** - Parts list     Product name                           Quantity
@@ -184,7 +181,7 @@
 **                  100kOhm                                x 2
 **   [WCR5OhmJ5W]   Wire Wound Cement Resistor EPX7RBL3    x 1
 **   [ZenerDiode]   TL431BVLPRAGOSCT-ND                    x 1
-** - Diagram
+** - Schematic
 ** >             +---------------< GND
 ** >             |   +-----------< VCC
 ** >             |   |   +-------< SDA

@@ -49,22 +49,38 @@ LcdHandle_t openLcdI2C(int const lcdWidth, int const lcdHeight)
 LcdPrinter::LcdPrinter(LcdHandle_t const &lcdHandleRef)
   : lcdHandle{ lcdHandleRef }
   , section_no{ 0 }
+  , auxiliary_buffer{ }
+  , main_buffer{ }
 {
-  for (int c = 0; c < LENGTH(mybuf); c++)
+  for (int c = 0; c < LENGTH(main_buffer); c++)
   {
-    for (int r = 0; r < LENGTH(*mybuf); r++)
+    for (int r = 0; r < LENGTH(*main_buffer); r++)
     {
-      mybuf[c][r] = '\0';
+      main_buffer[c][r] = '\0';
     }
   }
-  fbuf.clear();
+  auxiliary_buffer.clear();
 }
 LcdPrinter::~LcdPrinter()
 {
-  flush_fbuf();
-  draw();
+  this->flush();
+  this->send();
 }
-void LcdPrinter::draw()
+void LcdPrinter::clear()
+{
+  lcdHandle->clear();
+  section_no = 0;
+  for (int c = 0; c < LCD_HEIGHT; c++)
+  {
+    for (int r = 0; r < LCD_WIDTH; r++)
+    {
+      main_buffer[c][r] = ' ';
+    }
+    main_buffer[c][LCD_WIDTH] = '\0';
+  }
+  auxiliary_buffer.clear();
+}
+void LcdPrinter::send()
 {
   if (lcdHandle)
   {
@@ -72,55 +88,55 @@ void LcdPrinter::draw()
     for (int c = 0; c < LCD_HEIGHT; c++)
     {
       lcdHandle->setCursor(0, c);
-      mybuf[c][LCD_WIDTH] = '\0';
-      lcdHandle->print(mybuf[c]);
+      main_buffer[c][LCD_WIDTH] = '\0';
+      lcdHandle->print(main_buffer[c]);
     }
   }
 }
-void LcdPrinter::flush_fbuf()
+void LcdPrinter::flush()
 {
   int const c = (section_no / LCD_SECTION_EA) * 1;
   int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
   if (c < LCD_HEIGHT && r < LCD_WIDTH)
   {
-    fbuf.send(&mybuf[c][r]);
+    auxiliary_buffer.send(&main_buffer[c][r]);
   }
-  fbuf.clear();
+  auxiliary_buffer.clear();
 }
 void LcdPrinter::newline()
 {
-  flush_fbuf();
+  this->flush();
   section_no++;
 }
 void LcdPrinter::print(int const num, int const base)
 {
   if (base > 0 && base <= 16)
   {
-    fbuf.putInt(num, base);
+    auxiliary_buffer.putInt(num, base);
   }
 }
 void LcdPrinter::print(double const val, int const afters_dot)
 {
-  fbuf.putDouble(val, afters_dot);
+  auxiliary_buffer.putDouble(val, afters_dot);
 }
 void LcdPrinter::print(char const *const str)
 {
-  fbuf.putString(str);
+  auxiliary_buffer.putString(str);
 }
 void LcdPrinter::println(int const num, int const base)
 {
-  print(num, base);
-  newline();
+  this->print(num, base);
+  this->newline();
 }
 void LcdPrinter::println(double const val, int const afters_dot)
 {
-  print(val, afters_dot);
-  newline();
+  this->print(val, afters_dot);
+  this->newline();
 }
 void LcdPrinter::println(char const *const str)
 {
-  print(str);
-  newline();
+  this->print(str);
+  this->newline();
 }
 
 SerialPrinter::SerialPrinter(SerialPrinter &&other)
@@ -166,7 +182,7 @@ void SerialPrinter::trick()
 }
 SerialPrinter SerialPrinter::operator<<(bool is)
 {
-  trick();
+  this->trick();
 #if defined(SERIAL_PORT)
   if (Serial)
   {
@@ -177,7 +193,7 @@ SerialPrinter SerialPrinter::operator<<(bool is)
 }
 SerialPrinter SerialPrinter::operator<<(byte const hex)
 {
-  trick();
+  this->trick();
 #if defined(SERIAL_PORT)
   if (Serial)
   {
@@ -193,7 +209,7 @@ SerialPrinter SerialPrinter::operator<<(byte const hex)
 }
 SerialPrinter SerialPrinter::operator<<(int const num)
 {
-  trick();
+  this->trick();
 #if defined(SERIAL_PORT)
   if (Serial)
   {
@@ -204,7 +220,7 @@ SerialPrinter SerialPrinter::operator<<(int const num)
 }
 SerialPrinter SerialPrinter::operator<<(char const *const str)
 {
-  trick();
+  this->trick();
 #if defined(SERIAL_PORT)
   if (Serial)
   {
@@ -215,7 +231,7 @@ SerialPrinter SerialPrinter::operator<<(char const *const str)
 }
 SerialPrinter SerialPrinter::operator<<(double const val)
 {
-  trick();
+  this->trick();
 #if defined(SERIAL_PORT)
   if (Serial)
   {

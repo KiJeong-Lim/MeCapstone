@@ -93,16 +93,16 @@ public:
   void delay(ms_t duration) const;
 };
 class AscList {
-  double const left_bound_of_xs;
-  double const right_bound_of_xs;
-  double const *const ys;
+  Val_t const left_bound_of_xs;
+  Val_t const right_bound_of_xs;
+  Val_t const *const ys;
   int const number_of_intervals;
 public:
   AscList() = delete;
   AscList(AscList const &other) = delete;
   AscList(AscList &&other) = delete;
   template <size_t size_of_data_sheet>
-  AscList(double const (*const data_sheet_ref)[size_of_data_sheet], double const left_bound, double const right_bound)
+  AscList(Val_t const (*const data_sheet_ref)[size_of_data_sheet], Val_t const left_bound, Val_t const right_bound)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , ys{ *data_sheet_ref }
@@ -111,30 +111,30 @@ public:
   }
   ~AscList();
   bool isValid() const;
-  double get_y_by_x(double x) const;
-  double get_x_by_parameter(double param) const;
-  double get_x_by_y(double y) const;
+  Val_t get_y_by_x(Val_t x) const;
+  Val_t get_x_by_parameter(Val_t param) const;
+  Val_t get_x_by_y(Val_t y) const;
 };
-template <size_t TableWidth, typename Val_t = double>
+template <size_t TableWidth, typename TypeOfData = Val_t>
 class Map2d {
-  Val_t const left_bound_of_xs;
-  Val_t const right_bound_of_xs;
-  Val_t const min_of_s;
-  Val_t const max_of_s;
-  int number_of_intervals;
-  int number_of_s_levels;
-  Val_t const (*table)[TableWidth];
-  Val_t ys[TableWidth];
+  TypeOfData const left_bound_of_xs;
+  TypeOfData const right_bound_of_xs;
+  TypeOfData const min_of_s;
+  TypeOfData const max_of_s;
+  int const number_of_intervals;
+  int const number_of_s_levels;
+  TypeOfData const (*table)[TableWidth];
+  TypeOfData ys[TableWidth];
 public:
   template <size_t TableHeight>
-  Map2d(Val_t const (*table_ref)[TableHeight][TableWidth], Val_t const left_bound, Val_t const right_bound, Val_t const s_min, Val_t const s_max)
+  Map2d(TypeOfData const (*data_sheet_ref)[TableHeight][TableWidth], TypeOfData const left_bound, TypeOfData const right_bound, TypeOfData const s_min, TypeOfData const s_max)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , min_of_s{ s_min }
     , max_of_s{ s_max }
     , number_of_intervals{ static_cast<int>(TableWidth) - 1 }
     , number_of_s_levels{ static_cast<int>(TableHeight) - 1 }
-    , table{ *table_ref }
+    , table{ *data_sheet_ref }
     , ys{ }
   {
   }
@@ -144,11 +144,11 @@ public:
   ~Map2d()
   {
   }
-  Val_t get_x_by_parameter(Val_t const param) const
+  TypeOfData get_x_by_parameter(TypeOfData const param) const
   {
     return ((param * (right_bound_of_xs - left_bound_of_xs) / number_of_intervals) + left_bound_of_xs);
   }
-  Val_t get_x_by_y(Val_t const y) const
+  TypeOfData get_x_by_y(TypeOfData const y) const
   {
     int low = 0, high = number_of_intervals;
   
@@ -166,23 +166,23 @@ public:
       }
       else
       {
-        return get_x_by_parameter(mid);
+        return this->get_x_by_parameter(mid);
       }
     }
     if (low > number_of_intervals)
     {
-      return get_x_by_parameter(number_of_intervals);
+      return this->get_x_by_parameter(number_of_intervals);
     }
     else if (high < 0)
     {
-      return get_x_by_parameter(0);
+      return this->get_x_by_parameter(0);
     }
     else
     {
-      return get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
+      return this->get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
     } 
   }
-  Val_t with_s_get_x_by_y(Val_t const s, Val_t const y)
+  TypeOfData with_s_get_x_by_y(TypeOfData const s, TypeOfData const y)
   {
     if (s <= min_of_s)
     {
@@ -200,10 +200,10 @@ public:
     }
     else
     {
-      Val_t const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
+      TypeOfData const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
       int const idx = param_s;
       
-      if (static_cast<double>(idx) == param_s)
+      if (static_cast<TypeOfData>(idx) == param_s)
       {
         for (int i = 0; i < TableWidth; i++)
         {        
@@ -218,7 +218,7 @@ public:
         }
       }
     }
-    return get_x_by_y(y);
+    return this->get_x_by_y(y);
   }
 };
 /* Comments
@@ -277,7 +277,7 @@ public:
   {
     if (printMe >= 0 && printMe < 16)
     {
-      putChar("0123456789ABCDEF"[printMe]);
+      this->putChar("0123456789ABCDEF"[printMe]);
     }
   }
   void putInt(BigInt_t const printMe, int const base)
@@ -286,7 +286,7 @@ public:
     BigInt_t val = printMe;
     if (val < 0)
     {
-      putChar('-');
+      this->putChar('-');
       val *= -1;
     }
     for (BigInt_t _val = 1; _val <= val; _val *= base)
@@ -295,7 +295,7 @@ public:
     }
     do
     {
-      putDigit(((base * val) / POW(base, cn)) % base);
+      this->putDigit(((base * val) / POW(base, cn)) % base);
     } while (--cn > 0);
   }
   void putDouble(double const printMe, int const afters_dot)
@@ -304,7 +304,7 @@ public:
     double val = printMe;
     if (printMe < 0.0)
     {
-      putChar('-');
+      this->putChar('-');
       val *= -1;
     }
     if (afters_dot > 0)
@@ -314,11 +314,11 @@ public:
       BigInt_t valN = ROUND(val * pow10_afters_dot);
       BigInt_t valF = valN % pow10_afters_dot;
       valN /= pow10_afters_dot;
-      putInt(valN, base);
-      putChar('.');
+      this->putInt(valN, base);
+      this->putChar('.');
       do
       {
-        putDigit(((base * valF) / POW(base, cn)) % base);
+        this->putDigit(((base * valF) / POW(base, cn)) % base);
       } while (--cn > 0);
     }
     else
@@ -326,7 +326,7 @@ public:
       BigInt_t valE = POW(base, - afters_dot);
       BigInt_t valN = ROUND(val / (static_cast<double>(valE)));
       valN *= valE;
-      putInt(valN, base);
+      this->putInt(valN, base);
     }
   }
   void putString(char const *const printMe)
@@ -350,16 +350,17 @@ public:
 class LcdPrinter {
   LcdHandle_t const lcdHandle;
   int section_no;
-  SizedFormatter<LCD_SECTION_LEN> fbuf;
-  char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
+  SizedFormatter<LCD_SECTION_LEN> auxiliary_buffer;
+  char main_buffer[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
   LcdPrinter() = delete;
   LcdPrinter(LcdPrinter const &other) = delete;
   LcdPrinter(LcdPrinter &&other) = delete;
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
-  void draw();
-  void flush_fbuf();
+  void clear();
+  void send();
+  void flush();
   void newline();
   void print(int num, int base = 10);
   void println(int num, int base = 10);

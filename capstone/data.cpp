@@ -10,8 +10,12 @@
 
 #include "capstone.hpp"
 
+/* Q. What does the keyword `PROGMEM` do?
+** A. See https://www.arduino.cc/reference/ko/language/variables/utilities/progmem/
+*/
+
 static constexpr
-double const Ocvs[] =
+double const Ocvs[] PROGMEM =
 { 2.58503333333333
 , 2.90561016666667
 , 3.08249133333333
@@ -66,7 +70,7 @@ double const Ocvs[] =
 };
 
 static constexpr
-double const Vcells[] =
+double const Vcells[] PROGMEM =
 { 2.66267511813557
 , 2.97909231310534
 , 3.15181171748037

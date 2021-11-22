@@ -122,24 +122,24 @@ void BMS::loop()
 {
   Timer hourglass = { };
 
-  checkCellsAttatched();
+  drawlineSerial();
+  this->checkCellsAttatched();
   if (every_cell_attatched)
   {
     if (is_operating_now)
     {
-      drawlineSerial();
-      measureValues();
-      printValues();
-      showBmsInfo();
+      this->measureValues();
+      this->printValues();
+      this->showBmsInfo();
       if (power_connected)
       {
-        bool system_is_okay = checkSafety(true);
+        bool system_is_okay = this->checkSafety(true);
 
-        controlSystem();
+        this->controlSystem();
         if (system_is_okay and jobsDone)
         {
           sout << "CHARGING COMPLETED.";
-          goodbye("JOBS FINISHED");
+          this->goodbye("JOBS FINISHED");
         }
         else
         {
@@ -151,15 +151,15 @@ void BMS::loop()
               {
                 if (cellVs[i] > allowedV_max)
                 {
-                  breakCharging(i);
+                  this->breakCharging(i);
                 }
               }
               delay(100);
             }
-            system_is_okay = checkSafety(false);
+            system_is_okay = this->checkSafety(false);
           }
         }
-        updateQs();
+        this->updateQs();
         hourglass.delay(3000);
       }
       else
@@ -176,8 +176,10 @@ void BMS::loop()
       {
         switch (rebooting_cnt)
         {
+        case 5:
+          this->goodbye("NO POWER SUPPLY", 5);
         default:
-          checkCellsAttatched();
+          this->checkCellsAttatched();
           if (every_cell_attatched)
           {
             if (power_connected)
@@ -205,7 +207,7 @@ void BMS::loop()
             }
             powerIn_pin.turnOff();
             delay(3000);
-            getCalibrationOfIin();
+            this->getCalibrationOfIin();
             sout << "Iin_calibration = " << Iin_calibration << "[A].";
             if (lcd_handle)
             {
@@ -227,18 +229,18 @@ void BMS::loop()
             powerIn_pin.turnOn();
             rebooting_cnt++;
             delay(2000);
-            measureValues();
+            this->measureValues();
           }
         }
       } while (not power_connected);
-      findQs_0();
+      this->findQs_0();
       for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
       {
-        startCharging(cell_no);
+        this->startCharging(cell_no);
       }
       slog << "OPERATING NOW!";
       is_operating_now = true;
-      showBmsInfo();
+      this->showBmsInfo();
       hourglass.delay(3000);
     }
   }
@@ -251,7 +253,7 @@ void BMS::loop()
     is_operating_now = false;
     for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
     {
-      breakCharging(cell_no);
+      this->breakCharging(cell_no);
     }
     powerIn_pin.turnOff();
     if (lcd_handle)
@@ -352,7 +354,7 @@ void BMS::printValues() const
 
     for (int i = 0; i < LENGTH(cellVs); i++)
     {
-      double const soc = getSocOf(i);
+      double const soc = this->getSocOf(i);
 
       lcd.print("B");
       lcd.print(i + 1);
@@ -374,7 +376,7 @@ void BMS::startCharging(int const cell_no)
 }
 void BMS::breakCharging(int const cell_no)
 {
-  updateQs();
+  this->updateQs();
   cells[cell_no].BalanceCircuit_pin.turnOn();
 }
 bool BMS::checkSafety(bool const reportsToSerial)
@@ -383,7 +385,7 @@ bool BMS::checkSafety(bool const reportsToSerial)
 
   if (not measuredValuesAreFresh)
   {
-    measureValues();
+    this->measureValues();
   }
   // Check current
   if (Iin > allowedA_max)
@@ -429,7 +431,7 @@ void BMS::controlSystem()
 {
   if (not measuredValuesAreFresh)
   {
-    measureValues();
+    this->measureValues();
   }
   jobsDone = true;
   for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
@@ -440,11 +442,11 @@ void BMS::controlSystem()
     jobsDone &= is_this_cell_fully_charged_now;
     if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
     {
-      startCharging(cell_no);
+      this->startCharging(cell_no);
     }
     if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
     {
-      breakCharging(cell_no);
+      this->breakCharging(cell_no);
     }
   }
   measuredValuesAreFresh = false;
