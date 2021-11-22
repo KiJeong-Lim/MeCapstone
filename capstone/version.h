@@ -128,6 +128,7 @@
 ** 1. The class `Map2d` added.
 ** 2. `VERSION` updated to `1.00`.
 ** 3. File moved `capstone/capstone.ino` -> `capstone/capstone-stable.ino`.
+** 4. The class `BMS` fixed.
 */
 
 /* Circuit Archive
