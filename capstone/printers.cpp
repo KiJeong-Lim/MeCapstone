@@ -66,6 +66,11 @@ LcdPrinter::~LcdPrinter()
   this->flush();
   this->send();
 }
+void LcdPrinter::rezero()
+{
+  section_no = 0;
+  auxiliary_buffer.clear();
+}
 void LcdPrinter::clear()
 {
   lcdHandle->clear();

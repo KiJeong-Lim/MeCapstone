@@ -65,8 +65,11 @@ class BMS {
 public:
   void setup();
   void loop();
-  void checkCellsAttatched();
-  void getCalibrationOfIin();
+  void routine();
+  void boot();
+  void sleep();
+  bool checkCellsAttatched();
+  Amp_t getCalibrationOfIin();
   void measureValues();
   void findQs_0();
   void updateQs();
@@ -76,9 +79,8 @@ public:
   void breakCharging(int cell_no);
   bool checkSafety(bool reports_to_serial);
   void controlSystem();
-  void showBmsInfo();
+  void showBmsInfo() const;
   void goodbye(char const *bye_message, int seconds_left_to_quit = 10);
-  void showState() const;
 } myBMS;
 
 void setup()
@@ -128,160 +130,161 @@ void BMS::loop()
   this->checkCellsAttatched();
   if (every_cell_attatched)
   {
-    if (good_to_go_sir)
+    if (is_operating_now)
     {
-      this->measureValues();
-      this->printValues();
-      this->showBmsInfo();
-      if (power_connected)
-      {
-        bool system_is_okay = this->checkSafety(true);
-
-        this->controlSystem();
-        if (system_is_okay and jobsDone)
-        {
-          sout << "CHARGING COMPLETED.";
-          this->goodbye("JOBS FINISHED");
-        }
-        else
-        {
-          while (hourglass.time() < 3000)
-          {
-            if (not system_is_okay)
-            {
-              for (int i = 0; i < LENGTH(cells); i++)
-              {
-                if (cellVs[i] > allowedV_max)
-                {
-                  this->breakCharging(i);
-                }
-              }
-              delay(100);
-            }
-            system_is_okay = this->checkSafety(false);
-          }
-        }
-        this->updateQs();
-        hourglass.delay(3000);
-      }
-      else
-      {
-        good_to_go_sir = false;
-      }
+      this->routine();
     }
     else
     {
-      bool rebooting_cnt = 0;
+      this->boot();
+    }
+  }
+  else
+  {
+    this->sleep();
+  }
+}
+void BMS::routine()
+{
+  Timer hourglass = { };
 
-      do
+  this->measureValues();
+  this->printValues();
+  this->showBmsInfo();
+  if (power_connected)
+  {
+    good_to_go_sir = this->checkSafety(true);
+
+    this->controlSystem();
+    if (good_to_go_sir and jobsDone)
+    {
+      sout << "CHARGING COMPLETED.";
+      this->goodbye("JOBS FINISHED");
+    }
+    else
+    {
+      while (hourglass.time() < 3000)
       {
-        switch (rebooting_cnt)
+        if (not good_to_go_sir)
         {
-        case 5:
-          this->goodbye("NO POWER SUPPLY", 5);
-        default:
-          slog << "Rebooting count = " << rebooting_cnt;
-          this->checkCellsAttatched();
-          if (every_cell_attatched)
+          for (int i = 0; i < LENGTH(cells); i++)
           {
-            if (power_connected)
-        case 0:
+            if (cellVs[i] > allowedV_max)
             {
-              if (lcd_handle)
-              {
-                LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-                lcd.println("ALL CELL");
-                lcd.println("S ARE");
-                lcd.println("RECOGNIZ");
-                lcd.println("ED");
-              }
+              this->breakCharging(i);
             }
-            else
-            {
-              if (lcd_handle)
-              {
-                LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-                lcd.println("POWER SU");
-                lcd.println("PPLY");
-                lcd.println("NOT CONN");
-                lcd.println("ECTED");
-              }
-            }
-            powerIn_pin.turnOff();
-            delay(3000);
-            this->getCalibrationOfIin();
-            sout << "Iin_calibration = " << Iin_calibration << "[A].";
-            if (lcd_handle)
-            {
-              LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-              if (rebooting_cnt > 0)
-              {
-                lcd.println("REBOOTIN");
-                lcd.println("G");
-              }
-              else
-              {
-                lcd.println("WAIT FOR");
-                lcd.println(" CIRCUIT");
-                lcd.println("BEING ST");
-                lcd.println("ABLIZED");
-              }
-            }
-            delay(3000);
-            powerIn_pin.turnOn();
-            rebooting_cnt++;
-            delay(2000);
-            this->measureValues();
           }
-          else
-          {
-            good_to_go_sir = false;
-            break;
-          }
-          good_to_go_sir = true;
+          delay(100);
         }
-      } while (not power_connected);
-      if (good_to_go_sir)
-      {
-        this->findQs_0();
-        for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
-        {
-          this->startCharging(cell_no);
-        }
-        slog << "OPERATING NOW!";
-        is_operating_now = true;
-        this->showBmsInfo();
-        hourglass.delay(3000);
+        good_to_go_sir = this->checkSafety(false);
       }
     }
   }
   else
   {
-    if (not good_to_go_sir)
-    {
-      slog << "BREAK";
-    }
     is_operating_now = false;
-    for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
-    {
-      this->breakCharging(cell_no);
-    }
-    powerIn_pin.turnOff();
-    if (lcd_handle)
-    {
-      LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-      lcd.println("> SYSTEM");
-      lcd.println(" ONLINE");
-      lcd.println("VERSION");
-      lcd.print("= ");
-      lcd.println(VERSION);
-    }
-    hourglass.delay(3000);
-    Qs_lastUpdatedTime.reset();
+    slog << "BREAK";
   }
-  this->showState();
+  hourglass.delay(3000);
+  this->updateQs();
 }
-void BMS::checkCellsAttatched()
+void BMS::boot()
+{  
+  bool rebooting_cnt = 0;
+
+  do
+  {
+    switch (rebooting_cnt)
+    {
+    case 5:
+      this->goodbye("NO POWER SUPPLY", 5);
+    default:
+      drawlineSerial();
+      slog << "Rebooting count = " << rebooting_cnt;
+      this->checkCellsAttatched();
+      if (every_cell_attatched)
+      {
+        if (power_connected)
+    case 0:
+        {
+          if (lcd_handle)
+          {
+            LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+            lcd.println("ALL CELL");
+            lcd.println("S ARE");
+            lcd.println("RECOGNIZ");
+            lcd.println("ED");
+          }
+        }
+        else
+        {
+          if (lcd_handle)
+          {
+            LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+            lcd.println("POWER SU");
+            lcd.println("PPLY");
+            lcd.println("NOT CONN");
+            lcd.println("ECTED");
+          }
+        }
+        this->showBmsInfo();
+        powerIn_pin.turnOff();
+        delay(3000);
+        this->getCalibrationOfIin();
+        sout << "`Iin_calibration` = " << Iin_calibration << "[A].";
+        if (lcd_handle)
+        {
+          LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+          if (rebooting_cnt > 0)
+          {
+            lcd.println("REBOOTIN");
+            lcd.println("G");
+          }
+          else
+          {
+            lcd.println("WAIT FOR");
+            lcd.println(" CIRCUIT");
+            lcd.println("BEING ST");
+            lcd.println("ABLIZED");
+          }
+        }
+        delay(3000);
+        powerIn_pin.turnOn();
+        rebooting_cnt++;
+        delay(2000);
+        this->measureValues();
+      }
+    }
+  } while (not power_connected);
+  this->findQs_0();
+  for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+  {
+    this->startCharging(cell_no);
+  }
+  slog << "OPERATING NOW!";
+  is_operating_now = true;
+}
+void BMS::sleep()
+{
+  for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+  {
+    this->breakCharging(cell_no);
+  }
+  powerIn_pin.turnOff();
+  if (lcd_handle)
+  {
+    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+    //           01234567
+    lcd.println("NOT ALL ");
+    lcd.println("CELLS AR");
+    lcd.println("E CONNEC");
+    lcd.println("TED");
+  }
+  this->showBmsInfo();
+  delay(3000);
+  Qs_lastUpdatedTime.reset();
+}
+bool BMS::checkCellsAttatched()
 {
   Vol_t sensorV = 0.0, accumV = 0.00;
   for (int i = 0; i < LENGTH(cells); i++)
@@ -296,8 +299,10 @@ void BMS::checkCellsAttatched()
   {
     every_cell_attatched &= cellVs[i] >= allowedV_min;
   }
+  
+  return every_cell_attatched;
 }
-void BMS::getCalibrationOfIin()
+Amp_t BMS::getCalibrationOfIin()
 {
   Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
 
@@ -305,6 +310,8 @@ void BMS::getCalibrationOfIin()
   Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
   Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
   Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
+  
+  return Iin_calibration;
 }
 void BMS::measureValues()
 {
@@ -340,8 +347,7 @@ void BMS::updateQs()
 {
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    bool const balance_circuit_on = cells[i].BalanceCircuit_pin.isHigh();
-    if (not balance_circuit_on)
+    if (is_operating_now)
     {
       Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
     }
@@ -354,11 +360,11 @@ double BMS::getSocOf(int const cell_no) const
 }
 void BMS::printValues() const
 {
-  slog << "arduino5V = " << arduino5V << "[V].";
-  slog << "Iin = " << Iin << "[A].";
+  sout << "`arduino5V` = " << arduino5V << "[V].";
+  sout << "`Iin` = " << Iin << "[A].";
   for (int i = 0; i < LENGTH(cellVs); i++)
   {
-    slog << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
+    sout << "`cellVs[" << i << "]` = " << cellVs[i] << "[V].";
   }
   if (lcd_handle)
   {
@@ -463,18 +469,22 @@ void BMS::controlSystem()
   }
   measuredValuesAreFresh = false;
 }
-void BMS::showBmsInfo()
+void BMS::showBmsInfo() const
 {
-  sout << "powerIn_pin.is_high = " << powerIn_pin.isHigh() << ".";
-  for (int i = 0; i < LENGTH(cells); i++)
-  {
-    sout << "cells[" << i << "].BalanceCircuit_pin.is_high = " << cells[i].BalanceCircuit_pin.isHigh() << ".";
-  }
-  slog << "Iin_calibration = " << Iin_calibration << "[A].";
+  slog << "`Iin_calibration` = " << Iin_calibration << "[A].";
   for (int i = 0; i < LENGTH(Qs); i++)
   {
-    slog << "Qs[" << i << "] = " << static_cast<double>(Qs[i]) << "[mAh].";
+    slog << "`Qs[" << i << "]` = " << static_cast<double>(Qs[i]) << "[mAh].";
   }
+  slog << "`powerIn_pin.is_high` = " << powerIn_pin.isHigh() << ".";
+  for (int i = 0; i < LENGTH(cells); i++)
+  {
+    slog << "`cells[" << i << "].BalanceCircuit_pin.is_high` = " << cells[i].BalanceCircuit_pin.isHigh() << ".";
+  }
+  slog << "`every_cell_attatched` = " << every_cell_attatched << ".";
+  slog << "`is_operating_now` = " << is_operating_now << ".";
+  slog << "`power_connected` = " << power_connected << ".";
+  slog << "`good_to_go_sir` = " << good_to_go_sir << ".";
 }
 void BMS::goodbye(char const *const msg, int const countDown)
 {
@@ -512,11 +522,4 @@ void BMS::goodbye(char const *const msg, int const countDown)
   }
   powerIn_pin.turnOff();
   abort();
-}
-void BMS::showState() const
-{
-  slog << "every_cell_attatched = " << every_cell_attatched;
-  slog << "is_operating_now = " << is_operating_now;
-  slog << "power_connected = " << power_connected;
-  slog << "good_to_go_sir = " << good_to_go_sir;
 }

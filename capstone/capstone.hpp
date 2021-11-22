@@ -358,6 +358,7 @@ public:
   LcdPrinter(LcdPrinter &&other) = delete;
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
+  void rezero();
   void clear();
   void send();
   void flush();
