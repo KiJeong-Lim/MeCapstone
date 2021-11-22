@@ -17,13 +17,9 @@ PinReader::PinReader(pinId_t const pinId)
 PinReader::~PinReader()
 {
 }
-int PinReader::read_once() const
+int PinReader::readSignalOnce() const
 {
   return analogRead(pin_to_handle);
-}
-Val_t PinReader::readSignalOnce() const
-{
-  return read_once();
 }
 Val_t PinReader::readSignal(ms_t const duration) const
 {
@@ -32,7 +28,7 @@ Val_t PinReader::readSignal(ms_t const duration) const
 
   for (Timer hourglass = { }; hourglass.getDuration() < duration; cnt_of_vals++)
   {
-    sum_of_vals += read_once();
+    sum_of_vals += readSignalOnce();
   }
   return (static_cast<Val_t>(sum_of_vals)) / (static_cast<Val_t>(cnt_of_vals));
 }

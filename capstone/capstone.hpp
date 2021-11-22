@@ -438,8 +438,7 @@ public:
   PinReader(PinReader &&other) = delete;
   PinReader(pinId_t pinId);
   ~PinReader();
-  int read_once() const;
-  Val_t readSignalOnce() const;
+  int readSignalOnce() const;
   Val_t readSignal(ms_t duration) const;
 };
 class PinSetter : public PinHandler {
