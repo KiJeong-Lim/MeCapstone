@@ -358,6 +358,8 @@ public:
   LcdPrinter(LcdPrinter &&other) = delete;
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
+  void draw();
+  void flush_fbuf();
   void newline();
   void print(int num, int base = 10);
   void println(int num, int base = 10);
@@ -365,7 +367,6 @@ public:
   void println(double val, int afters_dot = 2);
   void print(char const *str);
   void println(char const *str);
-  void flush();
 };
 class SerialPrinter {
   char const *const prefix_of_message;

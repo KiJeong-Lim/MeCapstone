@@ -61,7 +61,11 @@ LcdPrinter::LcdPrinter(LcdHandle_t const &lcdHandleRef)
 }
 LcdPrinter::~LcdPrinter()
 {
-  flush();
+  flush_fbuf();
+  draw();
+}
+void LcdPrinter::draw()
+{
   if (lcdHandle)
   {
     lcdHandle->clear();
@@ -73,9 +77,19 @@ LcdPrinter::~LcdPrinter()
     }
   }
 }
+void LcdPrinter::flush_fbuf()
+{
+  int const c = (section_no / LCD_SECTION_EA) * 1;
+  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
+  if (c < LCD_HEIGHT && r < LCD_WIDTH)
+  {
+    fbuf.send(&mybuf[c][r]);
+  }
+  fbuf.clear();
+}
 void LcdPrinter::newline()
 {
-  flush();
+  flush_fbuf();
   section_no++;
 }
 void LcdPrinter::print(int const num, int const base)
@@ -107,16 +121,6 @@ void LcdPrinter::println(char const *const str)
 {
   print(str);
   newline();
-}
-void LcdPrinter::flush()
-{
-  int const c = (section_no / LCD_SECTION_EA) * 1;
-  int const r = (section_no % LCD_SECTION_EA) * LCD_SECTION_LEN;
-  if (c < LCD_HEIGHT && r < LCD_WIDTH)
-  {
-    fbuf.send(&mybuf[c][r]);
-  }
-  fbuf.clear();
 }
 
 SerialPrinter::SerialPrinter(SerialPrinter &&other)

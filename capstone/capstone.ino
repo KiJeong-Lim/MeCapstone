@@ -170,18 +170,18 @@ void BMS::loop()
     }
     else
     {
-      bool rebooted = false;
+      bool rebooting_cnt = 0;
 
       do
       {
-        switch (rebooted)
+        switch (rebooting_cnt)
         {
-        case true:
+        default:
           checkCellsAttatched();
           if (every_cell_attatched)
           {
             if (power_connected)
-        case false:
+        case 0:
             {
               if (lcd_handle)
               {
@@ -210,7 +210,7 @@ void BMS::loop()
             if (lcd_handle)
             {
               LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-              if (rebooted)
+              if (rebooting_cnt > 0)
               {
                 lcd.println("REBOOTIN");
                 lcd.println("G");
@@ -227,7 +227,7 @@ void BMS::loop()
             powerIn_pin.turnOn();
             delay(2000);
             measureValues();
-            rebooted = true;
+            rebooting_cnt++;
           }
         }
       } while (not power_connected);
