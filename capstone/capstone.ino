@@ -225,9 +225,9 @@ void BMS::loop()
             }
             delay(3000);
             powerIn_pin.turnOn();
+            rebooting_cnt++;
             delay(2000);
             measureValues();
-            rebooting_cnt++;
           }
         }
       } while (not power_connected);
