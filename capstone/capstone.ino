@@ -67,10 +67,11 @@ class BMS {
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
   Bits<uint8_t> bms_state       = 0u;
+  bool not_dormant              = true;
 public:
   void setup();
   void loop();
-  void routine();
+  bool routine();
   void greeting();
   bool checkCellsAttatched();
   void goodbye(char const *bye_message, int seconds_left_to_quit = 10);
@@ -86,8 +87,8 @@ public:
   double getSocOf(int cell_no) const;
   void printValues() const;
   void logInfo() const;
-  void dormant();
   void recover();
+  void reset();
 } myBMS;
 
 void setup()
@@ -134,7 +135,8 @@ void BMS::loop()
   {
   default:
     this->checkCellsAttatched();
-    if (bms_state.get(every_cells_connected))
+    not_dormant &= bms_state.get(every_cells_connected);
+    if (not_dormant)
     {
       if (bms_state.get(jobs_finished))
       {
@@ -145,7 +147,7 @@ void BMS::loop()
       if (bms_state.get(bms_being_operating))
       {
         sout << "Perform charging.";
-        this->routine();
+        not_dormant = this->routine();
         break;
       }
       if (bms_state.get(power_locked))
@@ -172,7 +174,7 @@ void BMS::loop()
         this->unlockCells();
         bms_state.set(bms_being_operating, true);
         sout << "NOW BMS OPERATING.";
-        break;
+        return;
       }
       sout << "Waiting for the power supply to turn on."; 
       this->lockCells();
@@ -182,27 +184,28 @@ void BMS::loop()
         lcd.println("PLZ CONN");
         lcd.println("ECT YOUR");
         lcd.println("POWER SU");
-        lcd.println("PPLY ...");
+        lcd.println("PPLY...");
       }
       break;
   case false:
       this->recover();
     }
-    else
-    {
-      sout << "Waiting for every cell being connected."; 
-    }
-    this->dormant();
+    this->reset();
   }
   hourglass.delay(3000);
 }
-void BMS::routine()
+bool BMS::routine()
 {
   bool isGood = true, jobsDone = true;
   this->measureValues();
   this->updateQs();
   this->printValues();
   // Check current
+  if (Iin < allowedA_min)
+  {
+    serr << "`Iin`" << " too LOW.";
+    return false;
+  }
   if (Iin > allowedA_max)
   {
     isGood = false;
@@ -247,6 +250,7 @@ void BMS::routine()
     }
     bms_state.set(bms_life, false);
   }
+  return true;
 }
 void BMS::greeting()
 {
@@ -388,8 +392,7 @@ void BMS::updateQs()
 {
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    bool const balance_circuit_on = cells[i].BalanceCircuit_pin.isHigh();
-    if (not balance_circuit_on)
+    if (bms_state.get(bms_being_operating))
     {
       Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
     }
@@ -441,10 +444,23 @@ void BMS::logInfo() const
     slog << "`Qs[" << i << "]` = " << static_cast<double>(Qs[i]) << "[mAh].";
   }
 }
-void BMS::dormant()
-{
-  this->greeting();
-}
 void BMS::recover()
 {
+  slog << "Recovering.";
+  bms_state.set(bms_life, true);
+}
+void BMS::reset()
+{
+  slog << "Rebooting.";
+  bms_state.set(bms_being_operating, false);
+  if (not bms_state.get(cells_locked))
+  {
+    this->lockCells();
+  }
+  if (not bms_state.get(power_locked))
+  {
+    this->lockPower();
+  }
+  this->greeting();
+  not_dormant = true;
 }
