@@ -132,16 +132,16 @@ void BMS::loop()
   switch (bms_state.get(bms_life))
   {
   default:
+    if (bms_state.get(jobs_finished))
+    {
+      sout << "CHARGING COMPLETED.";
+      this->goodbye("JOBS FINISHED");
+      break;
+    }
     this->checkCellsAttatched();
     not_dormant &= bms_state.get(every_cells_connected);
     if (not_dormant)
     {
-      if (bms_state.get(jobs_finished))
-      {
-        sout << "CHARGING COMPLETED.";
-        this->goodbye("JOBS FINISHED");
-        break;
-      }
       if (bms_state.get(bms_being_operating))
       {
         sout << "Execute routine.";
@@ -189,6 +189,7 @@ void BMS::loop()
       this->revive();
     }
     sout << "Restart BMS.";
+    bms_state.set(jobs_finished, false);
     bms_state.set(bms_being_operating, false);
     if (not bms_state.get(cells_locked))
     {
@@ -213,20 +214,12 @@ bool BMS::routine()
   this->measureValues();
   this->updateQs();
   this->printValues();
-  // Check current
-  if (Iin < allowedA_min)
-  {
-    serr << "`Iin`" << " too LOW.";
-    isGood = false;
-    return false;
-  }
   if (Iin > allowedA_max)
   {
     this->lockPower();
     isGood = false;
     serr << "`Iin`" << " too HIGH.";
   }
-  // Check voltages
   for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
     if (cellVs[cell_no] > allowedV_max)
@@ -256,6 +249,12 @@ bool BMS::routine()
     }
   }
   bms_state.set(jobs_finished, jobsDone);
+  if (Iin < allowedA_min)
+  {
+    serr << "`Iin`" << " too LOW.";
+    isGood = false;
+    return false;
+  }
   return true;
 }
 void BMS::lockCells()
