@@ -172,7 +172,7 @@ void BMS::loop()
         this->unlockCells();
         bms_state.set(bms_being_operating, true);
         sout << "NOW BMS OPERATING.";
-        return;
+        break;
       }
       sout << "Waiting for the power supply to turn on."; 
       this->lockCells();
@@ -217,23 +217,29 @@ bool BMS::routine()
   if (Iin < allowedA_min)
   {
     serr << "`Iin`" << " too LOW.";
+    isGood = false;
     return false;
   }
   if (Iin > allowedA_max)
   {
     this->lockPower();
-    serr << "`Iin`" << " too HIGH.";
     isGood = false;
+    serr << "`Iin`" << " too HIGH.";
   }
   // Check voltages
   for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
     if (cellVs[cell_no] > allowedV_max)
     {
-      serr << "`cellVs[" << cell_no << "]`" << " too HIGH.";
       cells[cell_no].BalanceCircuit_pin.turnOn();
       isGood = false;
+      serr << "`cellVs[" << cell_no << "]`" << " too HIGH.";
     }
+  }
+  if (not isGood)
+  {
+    delay(2000);
+    this->measureValues();
   }
   for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
@@ -249,76 +255,8 @@ bool BMS::routine()
       cells[cell_no].BalanceCircuit_pin.turnOn();
     }
   }
-  if (isGood)
-  {
-    bms_state.set(jobs_finished, jobsDone);
-  }
+  bms_state.set(jobs_finished, jobsDone);
   return true;
-}
-void BMS::greeting()
-{
-  if (lcd_handle)
-  {
-    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-    lcd.println("> SYSTEM");
-    lcd.println(" ONLINE");
-    lcd.println("VERSION");
-    lcd.print("= ");
-    lcd.println(VERSION);
-  }
-}
-bool BMS::checkCellsAttatched()
-{
-  bool every_cell_being_attatched = true;
-  Vol_t sensorV = 0.0, accumV = 0.00;
-  for (int i = 0; i < LENGTH(cells); i++)
-  {
-    constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
-    sensorV = refOf.arduinoRegularV * cells[i].voltage_sensor_pin.readSignal(20) / refOf.analogSignalMax;
-    cellVs[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
-    accumV += cellVs[i];
-  }
-  for (int i = 0; i < LENGTH(cellVs); i++)
-  {
-    every_cell_being_attatched &= cellVs[i] >= allowedV_min;
-  }
-  bms_state.set(every_cells_connected, every_cell_being_attatched);
-  return every_cell_being_attatched;
-}
-void BMS::goodbye(char const *const msg, int const countDown)
-{
-  Timer hourglass = { };
-  this->lockCells();
-  bms_state.set(bms_being_operating, false);
-  if (lcd_handle)
-  {
-    lcd_handle->clear();
-    lcd_handle->setCursor(0, 1);
-    lcd_handle->print(msg);
-    lcd_handle->setCursor(1, 0);
-    lcd_handle->print(" SECS LEFT");
-  }
-  for (int i = countDown; i > 0; i--)
-  {
-    if (lcd_handle)
-    {
-      lcd_handle->setCursor(0, 0);
-      lcd_handle->print(i - 1);
-    }
-    serr << "Your arduino will abort in " << i << " seconds.";
-    hourglass.delay(1000);
-    hourglass.reset();
-  }
-  if (lcd_handle)
-  {
-    lcd_handle->clear();
-    lcd_handle->noBacklight();
-    delete lcd_handle;
-    lcd_handle = nullptr;
-  }
-  this->lockPower();
-  bms_state.set(bms_life, false);
-  abort();
 }
 void BMS::lockCells()
 {
@@ -383,6 +321,24 @@ Amp_t BMS::getCalibrationOfIin()
   Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
   return Iin_calibration;
 }
+bool BMS::checkCellsAttatched()
+{
+  bool every_cell_being_attatched = true;
+  Vol_t sensorV = 0.0, accumV = 0.00;
+  for (int i = 0; i < LENGTH(cells); i++)
+  {
+    constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
+    sensorV = refOf.arduinoRegularV * cells[i].voltage_sensor_pin.readSignal(20) / refOf.analogSignalMax;
+    cellVs[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
+    accumV += cellVs[i];
+  }
+  for (int i = 0; i < LENGTH(cellVs); i++)
+  {
+    every_cell_being_attatched &= cellVs[i] >= allowedV_min;
+  }
+  bms_state.set(every_cells_connected, every_cell_being_attatched);
+  return every_cell_being_attatched;
+}
 void BMS::findQs_0()
 {
   for (int cell_no = 0; cell_no < LENGTH(Qs); cell_no++)
@@ -433,6 +389,57 @@ void BMS::printValues() const
     lcd.println(Iin);
   }
 }
+void BMS::greeting()
+{
+  if (lcd_handle)
+  {
+    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+    lcd.println("> SYSTEM");
+    lcd.println(" ONLINE");
+    lcd.println("VERSION");
+    lcd.print("= ");
+    lcd.println(VERSION);
+  }
+}
+void BMS::goodbye(char const *const msg, int const countDown)
+{
+  Timer hourglass = { };
+  this->lockCells();
+  bms_state.set(bms_being_operating, false);
+  if (lcd_handle)
+  {
+    lcd_handle->clear();
+    lcd_handle->setCursor(0, 1);
+    lcd_handle->print(msg);
+    lcd_handle->setCursor(1, 0);
+    lcd_handle->print(" SECS LEFT");
+  }
+  for (int i = countDown; i > 0; i--)
+  {
+    if (lcd_handle)
+    {
+      lcd_handle->setCursor(0, 0);
+      lcd_handle->print(i - 1);
+    }
+    serr << "Your arduino will abort in " << i << " seconds.";
+    hourglass.delay(1000);
+    hourglass.reset();
+  }
+  if (lcd_handle)
+  {
+    lcd_handle->clear();
+    lcd_handle->noBacklight();
+    delete lcd_handle;
+    lcd_handle = nullptr;
+  }
+  this->lockPower();
+  bms_state.set(bms_life, false);
+  abort();
+}
+void BMS::revive()
+{
+  bms_state.set(bms_life, true);
+}
 void BMS::logInfo() const
 {
   drawlineSerial();
@@ -446,8 +453,4 @@ void BMS::logInfo() const
   {
     slog << "`Qs[" << i << "]` = " << static_cast<double>(Qs[i]) << "[mAh].";
   }
-}
-void BMS::revive()
-{
-  bms_state.set(bms_life, true);
 }
