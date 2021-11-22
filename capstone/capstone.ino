@@ -191,14 +191,8 @@ void BMS::loop()
     }
     sout << "Restart BMS.";
     bms_state.set(bms_being_operating, false);
-    if (not bms_state.get(cells_locked))
-    {
-      this->lockCells();
-    }
-    if (not bms_state.get(power_locked))
-    {
-      this->lockPower();
-    }
+    this->lockCells();
+    lockPower();
     this->greeting();
     for (int i = 0; i < LENGTH(Qs); i++)
     {
@@ -211,35 +205,27 @@ void BMS::loop()
 }
 bool BMS::routine()
 {
-  bool isGood = true, jobsDone = true;
+  bool jobsDone = true;
   this->measureValues();
   this->updateQs();
   this->printValues();
   if (Iin < allowedA_min)
   {
     serr << "`Iin`" << " too LOW.";
-    isGood = false;
     not_dormant = false;
   }
   if (Iin > allowedA_max)
   {
-    this->lockPower();
-    isGood = false;
     serr << "`Iin`" << " too HIGH.";
+    this->lockPower();
   }
   for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
     if (cellVs[cell_no] > allowedV_max)
     {
-      cells[cell_no].BalanceCircuit_pin.turnOn();
-      isGood = false;
       serr << "`cellVs[" << cell_no << "]`" << " too HIGH.";
+      cells[cell_no].BalanceCircuit_pin.turnOn();
     }
-  }
-  if (not isGood)
-  {
-    delay(2000);
-    this->measureValues();
   }
   for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
@@ -260,11 +246,14 @@ bool BMS::routine()
 }
 void BMS::lockCells()
 {
-  for (int i = 0; i < LENGTH(cells); i++)
+  if (not bms_state.get(cells_locked))
   {
-    cells[i].BalanceCircuit_pin.turnOn();
+    for (int i = 0; i < LENGTH(cells); i++)
+    {
+      cells[i].BalanceCircuit_pin.turnOn();
+    }
+    bms_state.set(cells_locked, true);
   }
-  bms_state.set(cells_locked, true);
 }
 void BMS::unlockCells()
 {
@@ -276,8 +265,11 @@ void BMS::unlockCells()
 }
 void BMS::lockPower()
 {
-  powerIn_pin.turnOff();
-  bms_state.set(power_locked, true);
+  if (not bms_state.get(power_locked))
+  {
+    powerIn_pin.turnOff();
+    bms_state.set(power_locked, true);
+  }
 }
 void BMS::unlockPower()
 {
