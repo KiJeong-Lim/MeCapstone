@@ -71,7 +71,7 @@ ms_t Timer::getDuration() const
 }
 ms_t Timer::time() const
 {
-  return this->getDuration();
+  return millis() - begTime;
 }
 void Timer::delay(ms_t const duration) const
 {
