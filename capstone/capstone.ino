@@ -61,6 +61,7 @@ class BMS {
   bool every_cell_attatched     = false;
   bool is_operating_now         = false;
   bool power_connected          = false;
+  bool good_to_go_sir           = false;
 public:
   void setup();
   void loop();
@@ -77,6 +78,7 @@ public:
   void controlSystem();
   void showBmsInfo();
   void goodbye(char const *bye_message, int seconds_left_to_quit = 10);
+  void showState() const;
 } myBMS;
 
 void setup()
@@ -126,7 +128,7 @@ void BMS::loop()
   this->checkCellsAttatched();
   if (every_cell_attatched)
   {
-    if (is_operating_now)
+    if (good_to_go_sir)
     {
       this->measureValues();
       this->printValues();
@@ -164,8 +166,7 @@ void BMS::loop()
       }
       else
       {
-        is_operating_now = false;
-        slog << "BREAK";
+        good_to_go_sir = false;
       }
     }
     else
@@ -179,6 +180,7 @@ void BMS::loop()
         case 5:
           this->goodbye("NO POWER SUPPLY", 5);
         default:
+          slog << "Rebooting count = " << rebooting_cnt;
           this->checkCellsAttatched();
           if (every_cell_attatched)
           {
@@ -231,22 +233,31 @@ void BMS::loop()
             delay(2000);
             this->measureValues();
           }
+          else
+          {
+            good_to_go_sir = false;
+            break;
+          }
+          good_to_go_sir = true;
         }
       } while (not power_connected);
-      this->findQs_0();
-      for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+      if (good_to_go_sir)
       {
-        this->startCharging(cell_no);
+        this->findQs_0();
+        for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+        {
+          this->startCharging(cell_no);
+        }
+        slog << "OPERATING NOW!";
+        is_operating_now = true;
+        this->showBmsInfo();
+        hourglass.delay(3000);
       }
-      slog << "OPERATING NOW!";
-      is_operating_now = true;
-      this->showBmsInfo();
-      hourglass.delay(3000);
     }
   }
   else
   {
-    if (not is_operating_now)
+    if (not good_to_go_sir)
     {
       slog << "BREAK";
     }
@@ -268,6 +279,7 @@ void BMS::loop()
     hourglass.delay(3000);
     Qs_lastUpdatedTime.reset();
   }
+  this->showState();
 }
 void BMS::checkCellsAttatched()
 {
@@ -500,4 +512,11 @@ void BMS::goodbye(char const *const msg, int const countDown)
   }
   powerIn_pin.turnOff();
   abort();
+}
+void BMS::showState() const
+{
+  slog << "every_cell_attatched = " << every_cell_attatched;
+  slog << "is_operating_now = " << is_operating_now;
+  slog << "power_connected = " << power_connected;
+  slog << "good_to_go_sir = " << good_to_go_sir;
 }
