@@ -123,6 +123,7 @@ void BMS::setup()
   {
     serr << "LCD not connected.";
   }
+  bms_state.set(jobs_finished, false);
   hourglass.delay(3000);
 }
 void BMS::loop()
@@ -189,7 +190,6 @@ void BMS::loop()
       this->revive();
     }
     sout << "Restart BMS.";
-    bms_state.set(jobs_finished, false);
     bms_state.set(bms_being_operating, false);
     if (not bms_state.get(cells_locked))
     {
@@ -205,6 +205,7 @@ void BMS::loop()
       Qs[i] = 0.0;
     }
     not_dormant = true;
+    bms_state.set(jobs_finished, false);
   }
   hourglass.delay(3000);
 }
@@ -219,10 +220,6 @@ bool BMS::routine()
     serr << "`Iin`" << " too LOW.";
     isGood = false;
     not_dormant = false;
-  }
-  else
-  {
-    not_dormant = true;
   }
   if (Iin > allowedA_max)
   {
