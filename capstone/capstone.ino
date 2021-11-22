@@ -221,47 +221,37 @@ bool BMS::routine()
   }
   if (Iin > allowedA_max)
   {
-    isGood = false;
+    this->lockPower();
     serr << "`Iin`" << " too HIGH.";
+    isGood = false;
   }
   // Check voltages
-  for (int i = 0; i < LENGTH(cellVs); i++)
+  for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
   {
-    if (cellVs[i] > allowedV_max)
+    if (cellVs[cell_no] > allowedV_max)
     {
+      serr << "`cellVs[" << cell_no << "]`" << " too HIGH.";
+      cells[cell_no].BalanceCircuit_pin.turnOn();
       isGood = false;
-      serr << "`cellVs[" << i << "]`" << " too HIGH.";
+    }
+  }
+  for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
+  {
+    bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
+    bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? wantedV_overloaded : wantedV);
+    jobsDone &= is_this_cell_fully_charged_now;
+    if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
+    {
+      cells[cell_no].BalanceCircuit_pin.turnOff();
+    }
+    if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
+    {
+      cells[cell_no].BalanceCircuit_pin.turnOn();
     }
   }
   if (isGood)
   {
-    for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
-    {
-      bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
-      bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? wantedV_overloaded : wantedV);
-      jobsDone &= is_this_cell_fully_charged_now;
-      if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
-      {
-        cells[cell_no].BalanceCircuit_pin.turnOff();
-      }
-      if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
-      {
-        cells[cell_no].BalanceCircuit_pin.turnOn();
-      }
-    }
     bms_state.set(jobs_finished, jobsDone);
-  }
-  else
-  {
-    this->lockCells();
-    this->lockPower();
-    if (lcd_handle)
-    {
-      lcd_handle->clear();
-      lcd_handle->setCursor(0, 0);
-      lcd_handle->print("EMERGENCY");
-    }
-    bms_state.set(bms_life, false);
   }
   return true;
 }
