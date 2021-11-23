@@ -474,6 +474,6 @@ void BMS::revive()
   }
   if (lcd_handle == nullptr)
   {
-    serr << "Lcd not connected.";
+    serr << "LCD not connected.";
   }
 }
