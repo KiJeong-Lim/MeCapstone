@@ -19,7 +19,7 @@
 
 // version information
 #define MAJOR_VERSION     1
-#define MINOR_VERSION     0
+#define MINOR_VERSION     1
 #define REVISION_NUMBER   0
 #include "version.h"
 
@@ -79,42 +79,32 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 void invokingSerial();
 void drawlineSerial();
 BigInt_t POW(BigInt_t base, int expn);
-template <typename UnsignedIntegers = uint8_t>
-class Bits {
-  UnsignedIntegers volatile my_bits;
+template <typename UnsignedIntegers = byte>
+class BitArray {
+  UnsignedIntegers my_bits;
+  int8_t buf_idx;
+  bool buf_mem;
 public:
-  Bits(UnsignedIntegers const _my_bits)
+  BitArray(UnsignedIntegers const _my_bits)
     : my_bits{ _my_bits }
+    , buf_idx{ -1 }
+    , buf_mem{ false }
   {
   }
-  Bits(Bits const &other)
+  BitArray(BitArray const &other)
     : my_bits{ other.my_bits }
+    , buf_idx{ other.buf_idx }
+    , buf_mem{ other.buf_mem }
   {
   }
-  Bits &operator=(Bits &&rhs)
-  {
-    this->my_bits = rhs.my_bits;
-  }
-  ~Bits()
+  ~BitArray()
   {
   }
-  bool operator==(UnsignedIntegers const &rhs) const
+  bool get(int8_t const n) const
   {
-    return my_bits == rhs;
+    return (my_bits & (1u << n)) != 0;
   }
-  bool operator!=(UnsignedIntegers const &rhs) const
-  {
-    return my_bits != rhs;
-  }
-  operator UnsignedIntegers()
-  {
-    return my_bits;
-  }
-  bool get(int const n) const
-  {
-    return (n > 0 ? (my_bits & (1u << n)) != 0 : false);
-  }
-  Bits &set(int const n, bool const to_be)
+  BitArray &set(int8_t const n, bool const to_be)
   {
     if (to_be)
     {
@@ -125,6 +115,35 @@ public:
       my_bits &= (~ 1u << n);
     }
     return *this;
+  }
+  void syncBits()
+  {
+    if (buf_idx >= 0)
+    {
+      this->set(buf_idx, buf_mem);
+      buf_idx = -1;
+    }
+  }
+  bool operator==(UnsignedIntegers const &rhs)
+  {
+    this->syncBits();
+    return my_bits == rhs;
+  }
+  bool operator!=(UnsignedIntegers const &rhs)
+  {
+    return !(*this == rhs);
+  }
+  operator UnsignedIntegers()
+  {
+    this->syncBits();
+    return my_bits;
+  }
+  bool &operator[](int const idx)
+  {
+    this->syncBits();
+    buf_idx = idx % (8u * sizeof(UnsignedIntegers));
+    buf_mem = this->get(buf_idx);
+    return buf_mem;
   }
 };
 class Timer {

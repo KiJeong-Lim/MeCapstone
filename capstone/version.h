@@ -126,9 +126,11 @@
 **        -- Serial port has been connected.
 ** [2021-11-22]
 ** 1. The class `Map2d` added.
-** 2. `VERSION` updated to `1.00`.
+** 2. `VERSION` updated to `1.10`.
 ** 3. File moved `capstone/capstone.ino` -> `capstone/capstone-stable.ino`.
 ** 4. The class `BMS` fixed.
+** [2021-11-23]
+** 1. `VERSION` updated to `1.10`.
 */
 
 /* Circuit Archive
