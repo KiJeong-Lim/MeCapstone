@@ -14,7 +14,7 @@ enum bms_state_mask_t : int {
   bms_life                = 0,
   jobs_finished           = 1,
   every_cells_connected   = 2,
-  Iin_recongnized         = 3,
+  power_connected         = 3,
   cells_locked            = 4,
   power_locked            = 5,
   bms_being_operating     = 6,
@@ -67,7 +67,7 @@ class BMS {
   Amp_t Iin_calibration         = 0.00;
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
-  BitArray<uint8_t> bms_state   = 0u;
+  BitArray<uint16_t> bms_state  = 0u;
 public:
   void setup();
   void loop();
@@ -104,7 +104,7 @@ void BMS::setup()
 {
   Timer hourglass = { };
   invokingSerial();
-  sout << "Starting BMS.";
+  sout << "Runtime begin.";
   bms_state[bms_life] = true;
   Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
@@ -125,15 +125,15 @@ void BMS::setup()
     serr << "LCD not connected.";
   }
   bms_state[not_dormant] = true;
-  hourglass.delay(3000);
+  hourglass.delay(ONE_TURN);
 }
 void BMS::loop()
 {
   Timer hourglass = { };
-  this->report();
   switch (bms_state[bms_life])
   {
   default:
+    this->report();
     if (bms_state[jobs_finished])
     {
       sout << "CHARGING COMPLETED.";
@@ -145,13 +145,13 @@ void BMS::loop()
     {
       if (bms_state[bms_being_operating])
       {
-        sout << "Executing routine.";
+        sout << "Running.";
         this->routine();
         break;
       }
       if (bms_state[power_locked])
       {
-        sout << "Booting BMS.";
+        sout << "Booting.";
         if (lcd_handle)
         {
           LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
@@ -165,9 +165,9 @@ void BMS::loop()
         break;
       }
       this->checkPowerConnected();
-      if (bms_state[Iin_recongnized])
+      this->lockCells();
+      if (bms_state[power_connected])
       {
-        this->lockCells();
         delay(2000);
         this->measureValues();
         this->findQs_0();
@@ -176,8 +176,7 @@ void BMS::loop()
         sout << "NOW BMS OPERATING.";
         break;
       }
-      sout << "Waiting for the power supply to turn on."; 
-      this->lockCells();
+      sout << "Waiting."; 
       if (lcd_handle)
       {
         LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
@@ -188,13 +187,12 @@ void BMS::loop()
       }
       break;
   case false:
-      sout << "Reinitializing BMS.";
+      sout << "Runtime begin.";
       this->revive();
     }
     else
     {
-      sout << "Restarting BMS.";
-      bms_state[not_dormant] = true;
+      sout << "Restarting.";
     }
     bms_state[bms_being_operating] = false;
     this->lockCells();
@@ -203,9 +201,11 @@ void BMS::loop()
     {
       Qs[i] = 0.0;
     }
+    Iin_calibration = 0.0;
     this->greeting();
+    bms_state[not_dormant] = true;
   }
-  hourglass.delay(3000);
+  hourglass.delay(ONE_TURN);
 }
 bool BMS::routine()
 {
@@ -235,7 +235,7 @@ bool BMS::routine()
   }
   if (pin_state_modified)
   {
-    delay(3000);
+    delay(ONE_TURN);
     this->measureValues();
     for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
     {
@@ -270,8 +270,8 @@ bool BMS::checkPowerConnected()
   Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(20) / refOf.analogSignalMax;
   Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
   Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
-  bms_state[Iin_recongnized] = ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor) >= allowedA_min;
-  return bms_state[Iin_recongnized];
+  bms_state[power_connected] = ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor) >= allowedA_min;
+  return bms_state[power_connected];
 }
 bool BMS::checkCellsAttatched()
 {
@@ -298,6 +298,7 @@ Amp_t BMS::getCalibrationOfIin()
   Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
   Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
   Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
+  sout << "Iin_calibration = " << Iin_calibration << "[A].";
   return Iin_calibration;
 }
 void BMS::measureValues()
@@ -444,6 +445,8 @@ void BMS::goodbye(char const *const msg, int const countDown)
     delete lcd_handle;
     lcd_handle = nullptr;
   }
+  Wire.end();
+  Serial.end();
   this->lockPower();
   bms_state[bms_life] = false;
   abort();
@@ -464,7 +467,7 @@ void BMS::report() const
 }
 void BMS::revive()
 {
-  bms_state.set(bms_life, true);
+  bms_state[bms_life] = true;
   if (lcd_handle == nullptr)
   {
     lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
