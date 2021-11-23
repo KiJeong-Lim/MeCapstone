@@ -25,7 +25,6 @@
 #define LCD_WIDTH         16
 #define LCD_HEIGHT        2
 #define LCD_SECTION_EA    2
-#define ONE_TURN          3000
 
 /* Dependencies
 ** [LiquidCrystal_I2C]

@@ -11,14 +11,14 @@
 #include "capstone.hpp"
 
 enum bms_state_mask_t : int {
-  bms_life                = 0,
+  not_dormant             = 0,
   jobs_finished           = 1,
   every_cells_connected   = 2,
   power_connected         = 3,
   cells_locked            = 4,
   power_locked            = 5,
   bms_being_operating     = 6,
-  not_dormant             = 7,
+  bms_life                = 7,
 };
 
 static constexpr
@@ -125,7 +125,7 @@ void BMS::setup()
     serr << "LCD not connected.";
   }
   bms_state[not_dormant] = true;
-  hourglass.delay(ONE_TURN);
+  hourglass.delay(3000);
 }
 void BMS::loop()
 {
@@ -205,11 +205,11 @@ void BMS::loop()
     this->greeting();
     bms_state[not_dormant] = true;
   }
-  hourglass.delay(ONE_TURN);
+  hourglass.delay(3000);
 }
 bool BMS::routine()
 {
-  bool pin_state_modified = false, every_cells_fully_charged = true;
+  bool pin_state_modified = false, all_cells_are_fully_charged = true;
   this->measureValues();
   this->updateQs();
   this->printValues();
@@ -235,13 +235,13 @@ bool BMS::routine()
   }
   if (pin_state_modified)
   {
-    delay(ONE_TURN);
+    delay(3000);
     this->measureValues();
     for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
     {
       bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
       bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? wantedV_overloaded : wantedV);
-      every_cells_fully_charged &= is_this_cell_fully_charged_now;
+      all_cells_are_fully_charged &= is_this_cell_fully_charged_now;
     }
   }
   else
@@ -250,7 +250,7 @@ bool BMS::routine()
     {
       bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
       bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? wantedV_overloaded : wantedV);
-      every_cells_fully_charged &= is_this_cell_fully_charged_now;      
+      all_cells_are_fully_charged &= is_this_cell_fully_charged_now;      
       if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
       {
         cells[cell_no].BalanceCircuit_pin.turnOff();
@@ -261,7 +261,7 @@ bool BMS::routine()
       }
     }
   }
-  bms_state[jobs_finished] = every_cells_fully_charged;
+  bms_state[jobs_finished] = all_cells_are_fully_charged;
   return bms_state[not_dormant];
 }
 bool BMS::checkPowerConnected()
