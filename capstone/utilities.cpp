@@ -75,7 +75,7 @@ ms_t Timer::time() const
 }
 void Timer::delay(ms_t const duration) const
 {
-  while (this->getDuration() < duration)
+  while (this->time() < duration)
   {
     delay1ms();
   }

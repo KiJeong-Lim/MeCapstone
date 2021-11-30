@@ -11,7 +11,7 @@
 #include "capstone.hpp"
 
 static constexpr
-double const Ocvs[] PROGMEM =
+double const Ocvs[] =
 { 2.58503333333333
 , 2.90561016666667
 , 3.08249133333333
@@ -66,7 +66,7 @@ double const Ocvs[] PROGMEM =
 };
 
 static constexpr
-double const Vcells[] PROGMEM =
+double const Vcells[] =
 { 2.66267511813557
 , 2.97909231310534
 , 3.15181171748037

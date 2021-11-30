@@ -82,19 +82,13 @@ BigInt_t POW(BigInt_t base, int expn);
 template <typename UnsignedIntegers = byte>
 class BitArray {
   UnsignedIntegers my_bits;
-  int8_t buf_idx;
-  bool buf_mem;
 public:
   BitArray(UnsignedIntegers const _my_bits)
     : my_bits{ _my_bits }
-    , buf_idx{ -1 }
-    , buf_mem{ false }
   {
   }
   BitArray(BitArray const &other)
     : my_bits{ other.my_bits }
-    , buf_idx{ other.buf_idx }
-    , buf_mem{ other.buf_mem }
   {
   }
   ~BitArray()
@@ -102,7 +96,7 @@ public:
   }
   bool get(int8_t const n) const
   {
-    return (my_bits & (1u << n)) != 0;
+    return (my_bits & (1u << n));
   }
   BitArray &set(int8_t const n, bool const to_be)
   {
@@ -112,38 +106,9 @@ public:
     }
     else
     {
-      my_bits &= (~ 1u << n);
+      my_bits &= ~(1u << n);
     }
     return *this;
-  }
-  void syncBits()
-  {
-    if (buf_idx >= 0)
-    {
-      this->set(buf_idx, buf_mem);
-      buf_idx = -1;
-    }
-  }
-  bool operator==(UnsignedIntegers const &rhs)
-  {
-    this->syncBits();
-    return my_bits == rhs;
-  }
-  bool operator!=(UnsignedIntegers const &rhs)
-  {
-    return !(*this == rhs);
-  }
-  operator UnsignedIntegers()
-  {
-    this->syncBits();
-    return my_bits;
-  }
-  bool &operator[](int const idx)
-  {
-    this->syncBits();
-    buf_idx = idx % (8u * sizeof(UnsignedIntegers));
-    buf_mem = this->get(buf_idx);
-    return buf_mem;
   }
 };
 class Timer {
