@@ -10,10 +10,6 @@
 
 #include "capstone.hpp"
 
-/* Q. What does the keyword `PROGMEM` do?
-** A. See https://www.arduino.cc/reference/ko/language/variables/utilities/progmem/
-*/
-
 static constexpr
 double const Ocvs[] PROGMEM =
 { 2.58503333333333

@@ -129,6 +129,9 @@
 ** 2. `VERSION` updated to `1.10`.
 ** 3. File moved `capstone/capstone.ino` -> `capstone/capstone-stable.ino`.
 ** 4. The class `BMS` fixed.
+** 5. Introduce the keyword `PROGMEM`.
+**    -- What does the keyword `PROGMEM` do?
+**    -- See https://www.arduino.cc/reference/ko/language/variables/utilities/progmem/
 ** [2021-11-23]
 ** 1. `VERSION` updated to `1.10`.
 */
