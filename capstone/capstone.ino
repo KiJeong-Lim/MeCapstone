@@ -2,42 +2,31 @@
 ** ===============================================================================
 ** MEMBER        | AFFILIATION                                                   |
 ** ===============================================================================
-** Hwan-hee Jeon | School of Mechanical Engineering, Chonnam National University |
-** Hak-jung Im   | School of Mechanical Engineering, Chonnam National University |
-** Ki-jeong Lim  | School of Mechanical Engineering, Chonnam National University |
+** Hwan-hee Jeon | School of Meslogical Engineering, Chonnam National University |
+** Hak-jung Im   | School of Meslogical Engineering, Chonnam National University |
+** Ki-jeong Lim  | School of Meslogical Engineering, Chonnam National University |
 ** ===============================================================================
 */
 
 #include "capstone.hpp"
 
-enum bms_state_mask_t : int {
-  not_dormant             = 0,
-  jobs_finished           = 1,
-  every_cells_connected   = 2,
-  power_connected         = 3,
-  cells_locked            = 4,
-  power_locked            = 5,
-  bms_being_operating     = 6,
-  bms_life                = 7,
-};
-
 static constexpr
-Vol_t wantedV = 4.00, wantedV_overloaded = 4.00;
+Vol_t V_wanted = 4.190, overV_wanted = 4.195; // FIX ME!
 
 static constexpr
 ReferenceCollection const refOf =
 { .analogSignalMax              = 1024
 , .arduinoRegularV              = 5.00
 , .batteryCapacity              = 3317
-, .sensitivityOfCurrentSensor   = .100
-, .zenerdiodeVfromRtoA          = 2.48
+, .sensitivityOfCurrentSensor   = .100 // is the sensitivity of the current sensor `ACS712ELCTR-20A-T`.
+, .zenerdiodeVfromRtoA          = 2.48 // is `Vref` of the zener-diode `TL431BVLPRAGOSCT-ND`.
 };
 
 static constexpr
-Vol_t allowedV_max = 4.20, allowedV_min = 2.70;
+Vol_t allowedV_max = +4.20, allowedV_min = +2.70; // FIX ME!
 
 static constexpr
-Amp_t allowedA_max = 2.00, allowedA_min = 0.10;
+Amp_t allowedA_max = +2.00, allowedA_min = -0.10; // FIX ME!
 
 static
 PinsOfCell const cells[] =
@@ -60,6 +49,8 @@ class BMS {
   PinReader const Iin_pin       = { .pinId = Apin(6) };
   PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
 #endif
+  bool jobsDone                 = false;
+  bool measuredValuesAreFresh   = false;
   Timer Qs_lastUpdatedTime      = { .init_time = 0 };
   LcdHandle_t lcd_handle        = nullptr;
   Vol_t arduino5V               = refOf.arduinoRegularV;
@@ -67,215 +58,183 @@ class BMS {
   Amp_t Iin_calibration         = 0.00;
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
-  BitArray<uint16_t> bms_state  = 0u;
+  bool every_cell_attatched     = false;
+  bool is_operating_now         = false;
 public:
-  void setup();
-  void loop();
-  bool routine();
-  bool checkCellsAttatched();
-  bool checkPowerConnected();
-  Amp_t getCalibrationOfIin();
+  void initialize(ms_t time_limit);
+  void progress(ms_t time_limit);
+  void checkCellsAttatched();
+  void getCalibrationOfIin();
   void measureValues();
+  void checkOperatingNow();
   void findQs_0();
   void updateQs();
   double getSocOf(int cell_no) const;
   void printValues() const;
-  void lockCells();
-  void lockPower();
-  void unlockCells();
-  void unlockPower();
-  void greeting();
+  void startCharging(int cell_no);
+  void breakCharging(int cell_no);
+  bool checkSafety(bool reports_to_serial);
+  void controlSystem();
+  void showBmsInfo();
   void goodbye(char const *bye_message, int seconds_left_to_quit = 10);
-  void report() const;
-  void revive();
 } myBMS;
 
 void setup()
 {
-  myBMS.setup();
+  myBMS.initialize(3000);
 }
 
 void loop()
 {
-  myBMS.loop();
+  myBMS.progress(3000);
 }
 
-void BMS::setup()
+void BMS::initialize(ms_t const given_time)
 {
   Timer hourglass = { };
+
   invokingSerial();
-  sout << "Runtime begin.";
-  bms_state[bms_life] = true;
+  sout << "Run time started.";
   Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
   {
     cells[i].BalanceCircuit_pin.initWith(true);
-    Qs[i] = 0.0;
   }
-  bms_state[cells_locked] = true;
   powerIn_pin.initWith(false);  
-  bms_state[power_locked] = true;
   lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
   if (lcd_handle)
   {
-    this->greeting();
+    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+
+    lcd.println("> SYSTEM");
+    lcd.println(" ONLINE");
+    lcd.println("VERSION");
+    lcd.print("= ");
+    lcd.println(VERSION);
   }
   else
   {
     serr << "LCD not connected.";
   }
-  bms_state[not_dormant] = true;
-  hourglass.delay(3000);
+  hourglass.delay(given_time);
 }
-void BMS::loop()
+void BMS::progress(ms_t const given_time)
 {
   Timer hourglass = { };
-  switch (bms_state[bms_life])
+
+  checkCellsAttatched();
+  switch (every_cell_attatched)
   {
-  default:
-    this->report();
-    if (bms_state[jobs_finished])
+  case true:
+    if (is_operating_now)
     {
-      sout << "CHARGING COMPLETED.";
-      this->goodbye("JOBS FINISHED");
-      break;
-    }
-    bms_state[not_dormant] &= this->checkCellsAttatched();
-    if (bms_state[not_dormant])
-    {
-      if (bms_state[bms_being_operating])
+      drawlineSerial();
+      measureValues();
+      printValues();
+      showBmsInfo();
       {
-        sout << "Running.";
-        this->routine();
-        break;
-      }
-      if (bms_state[power_locked])
-      {
-        sout << "Booting.";
-        if (lcd_handle)
+        bool system_is_okay = checkSafety(true);
+
+        controlSystem();
+        if (system_is_okay and jobsDone)
         {
-          LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-          lcd.println("BOOTING ");
-          lcd.println("BMS...");
+          sout << "CHARGING COMPLETED.";
+          goodbye("JOBS FINISHED");
         }
-        this->unlockCells();
-        delay(2000);
-        this->getCalibrationOfIin();
-        this->unlockPower();
-        break;
+        else
+        {
+          while (hourglass.time() < given_time)
+          {
+            if (not system_is_okay)
+            {
+              for (int i = 0; i < LENGTH(cells); i++)
+              {
+                if (cellVs[i] > allowedV_max)
+                {
+                  breakCharging(i);
+                }
+              }
+              delay(100);
+            }
+            system_is_okay = checkSafety(false);
+          }
+        }
       }
-      this->checkPowerConnected();
-      this->lockCells();
-      if (bms_state[power_connected])
-      {
-        delay(2000);
-        this->measureValues();
-        this->findQs_0();
-        this->unlockCells();
-        bms_state[bms_being_operating] = true;
-        sout << "NOW BMS OPERATING.";
-        break;
-      }
-      sout << "Waiting."; 
-      if (lcd_handle)
-      {
-        LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-        lcd.println("PLZ CONN");
-        lcd.println("ECT YOUR");
-        lcd.println("POWER SU");
-        lcd.println("PPLY...");
-      }
-      break;
-  case false:
-      sout << "Runtime begin.";
-      this->revive();
+      updateQs();
     }
     else
     {
-      sout << "Restarting.";
-    }
-    bms_state[bms_being_operating] = false;
-    this->lockCells();
-    this->lockPower();
-    for (int i = 0; i < LENGTH(Qs); i++)
-    {
-      Qs[i] = 0.0;
-    }
-    Iin_calibration = 0.0;
-    this->greeting();
-    bms_state[not_dormant] = true;
-  }
-  hourglass.delay(3000);
-}
-bool BMS::routine()
-{
-  bool pin_state_modified = false, all_cells_are_fully_charged = true;
-  this->measureValues();
-  this->updateQs();
-  this->printValues();
-  if (Iin < allowedA_min)
-  {
-    serr << "`Iin`" << " too LOW.";
-    bms_state[not_dormant] = false;
-  }
-  if (Iin > allowedA_max)
-  {
-    serr << "`Iin`" << " too HIGH.";
-    pin_state_modified |= powerIn_pin.isHigh();
-    this->lockPower();
-  }
-  for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
-  {
-    if (cellVs[cell_no] > allowedV_max)
-    {
-      serr << "`cellVs[" << cell_no << "]`" << " too HIGH.";
-      pin_state_modified |= not cells[cell_no].BalanceCircuit_pin.isHigh();
-      cells[cell_no].BalanceCircuit_pin.turnOn();
-    }
-  }
-  if (pin_state_modified)
-  {
-    delay(3000);
-    this->measureValues();
-    for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
-    {
-      bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
-      bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? wantedV_overloaded : wantedV);
-      all_cells_are_fully_charged &= is_this_cell_fully_charged_now;
-    }
-  }
-  else
-  {
-    for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
-    {
-      bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
-      bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? wantedV_overloaded : wantedV);
-      all_cells_are_fully_charged &= is_this_cell_fully_charged_now;      
-      if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
+      if (lcd_handle)
       {
-        cells[cell_no].BalanceCircuit_pin.turnOff();
+        LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+        lcd.println("CELLS AR");
+        lcd.println("E");
+        lcd.println("RECOGNIZ");
+        lcd.println("ED.");
       }
-      if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
+      powerIn_pin.turnOff();
+      delay(2000);
+      getCalibrationOfIin();
+      sout << "Iin_calibration = " << Iin_calibration << "[A].";
+      if (lcd_handle)
       {
-        cells[cell_no].BalanceCircuit_pin.turnOn();
+        LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+        lcd.println("WAIT FOR");
+        lcd.println(" CIRCUIT");
+        lcd.println("BEING ST");
+        lcd.println("ABLIZED.");
       }
+      delay(3000);
+#if 1
+      powerIn_pin.turnOn();
+      delay(2000);
+      measureValues();
+      findQs_0();
+      for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+      {
+        startCharging(cell_no);
+      }
+#else
+      measureValues();
+      findQs_0();
+      for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+      {
+        startCharging(cell_no);
+      }
+      powerIn_pin.turnOn();
+#endif
+      slog << "OPERATING NOW!";
+      is_operating_now = true;
+      hourglass.delay(given_time);
     }
+    break;
+  case false:
+    if (not is_operating_now)
+    {
+      sout << "Arduino sleep!";
+    }
+    is_operating_now = false;
+    for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+    {
+      breakCharging(cell_no);
+    }
+    powerIn_pin.turnOff();
+    if (lcd_handle)
+    {
+      LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+
+      lcd.println("> SYSTEM");
+      lcd.println(" ONLINE");
+      lcd.println("VERSION");
+      lcd.print("= ");
+      lcd.println(VERSION);
+    }
+    hourglass.delay(given_time);
+    break;
   }
-  bms_state[jobs_finished] = all_cells_are_fully_charged;
-  return bms_state[not_dormant];
 }
-bool BMS::checkPowerConnected()
+void BMS::checkCellsAttatched()
 {
-  Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
-  Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(20) / refOf.analogSignalMax;
-  Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
-  Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
-  bms_state[power_connected] = ((Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor) >= allowedA_min;
-  return bms_state[power_connected];
-}
-bool BMS::checkCellsAttatched()
-{
-  bool every_cell_being_attatched = true;
   Vol_t sensorV = 0.0, accumV = 0.00;
   for (int i = 0; i < LENGTH(cells); i++)
   {
@@ -284,22 +243,20 @@ bool BMS::checkCellsAttatched()
     cellVs[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
     accumV += cellVs[i];
   }
+  every_cell_attatched = true;
   for (int i = 0; i < LENGTH(cellVs); i++)
   {
-    every_cell_being_attatched &= cellVs[i] >= allowedV_min;
+    every_cell_attatched &= cellVs[i] >= allowedV_min;
   }
-  bms_state[every_cells_connected] = every_cell_being_attatched;
-  return every_cell_being_attatched;
 }
-Amp_t BMS::getCalibrationOfIin()
+void BMS::getCalibrationOfIin()
 {
   Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
+
   Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(20) / refOf.analogSignalMax;
   Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
   Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
   Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
-  sout << "Iin_calibration = " << Iin_calibration << "[A].";
-  return Iin_calibration;
 }
 void BMS::measureValues()
 {
@@ -319,44 +276,49 @@ void BMS::measureValues()
   // Calculate the main current
   sensorV = arduino5V * Iin_pin.readSignal(measuring_time) / refOf.analogSignalMax;
   Iin = ((sensorV - 0.5 * arduino5V) / refOf.sensitivityOfCurrentSensor) - Iin_calibration;
+  // Guarantee that the above values are fresh
+  measuredValuesAreFresh = true;
 }
 void BMS::findQs_0()
 {
-  for (int cell_no = 0; cell_no < LENGTH(Qs); cell_no++)
+  for (int i = 0; i < LENGTH(Qs); i++)
   {
-    Qs[cell_no] = refOf.batteryCapacity * mySocOcvTable.get_x_by_y(cellVs[cell_no]) / 100.0;
+    Qs[i] = refOf.batteryCapacity * mySocOcvTable.get_x_by_y(cellVs[i]) / 100.0;
   }
   Qs_lastUpdatedTime.reset();
 }
 void BMS::updateQs()
 {
-  for (int cell_no = 0; cell_no < LENGTH(cells); cell_no++)
+  for (int i = 0; i < LENGTH(cells); i++)
   {
-    if (not cells[cell_no].BalanceCircuit_pin.isHigh())
-    {
-      Qs[cell_no] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
-    }
+    Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
   }
   Qs_lastUpdatedTime.reset();
 }
 double BMS::getSocOf(int const cell_no) const
 {
-  return 100.0 * Qs[cell_no] / refOf.batteryCapacity;
+#if( 0 )
+  return mySocVcellTable.get_x_by_y(cellVs[cell_no]);
+#else
+  return Qs[cell_no] / refOf.batteryCapacity * 100.0;
+#endif
 }
 void BMS::printValues() const
 {
-  sout << "arduino5V = " << arduino5V << "[V].";
-  sout << "Iin = " << Iin << "[A].";
+  slog << "arduino5V = " << arduino5V << "[V].";
+  slog << "Iin = " << Iin << "[A].";
   for (int i = 0; i < LENGTH(cellVs); i++)
   {
-    sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
+    slog << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
   }
   if (lcd_handle)
   {
     LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
+
     for (int i = 0; i < LENGTH(cellVs); i++)
     {
       double const soc = getSocOf(i);
+
       lcd.print("B");
       lcd.print(i + 1);
       lcd.print("=");
@@ -370,55 +332,109 @@ void BMS::printValues() const
     lcd.println(Iin);
   }
 }
-void BMS::lockCells()
+void BMS::startCharging(int const cell_no)
 {
-  if (not bms_state[cells_locked])
-  {
-    for (int i = 0; i < LENGTH(cells); i++)
-    {
-      cells[i].BalanceCircuit_pin.turnOn();
-    }
-    bms_state[cells_locked] = true;
-  }
+  updateQs();
+  cells[cell_no].BalanceCircuit_pin.turnOff();
 }
-void BMS::unlockCells()
+void BMS::breakCharging(int const cell_no)
 {
+  updateQs();
+  cells[cell_no].BalanceCircuit_pin.turnOn();
+}
+bool BMS::checkSafety(bool const reportsToSerial)
+{
+  bool isBad = false;
+
+  if (not measuredValuesAreFresh)
+  {
+    measureValues();
+  }
+  // Check current
+  if (Iin > allowedA_max)
+  {
+    isBad = true;
+    if (reportsToSerial)
+    {
+      serr << "`Iin`" << " too HIGH.";
+    }
+  }
+  if (Iin < allowedA_min)
+  {
+    isBad = true;
+    if (reportsToSerial)
+    {
+      serr << "`Iin`" << " too LOW.";
+    }
+  }
+  // Check voltages
+  for (int i = 0; i < LENGTH(cellVs); i++)
+  {
+    if (cellVs[i] > allowedV_max)
+    {
+      isBad = true;
+      if (reportsToSerial)
+      {
+        serr << "`cellVs[" << i << "]`" << " too HIGH.";
+      }
+    }
+    if (cellVs[i] < allowedV_min)
+    {
+      isBad = true;
+      if (reportsToSerial)
+      {
+        serr << "`cellVs[" << i << "]`" << " too LOW.";
+      }
+    }
+  }
+  measuredValuesAreFresh = false;
+  return isBad;
+}
+void BMS::controlSystem()
+{
+  if (not measuredValuesAreFresh)
+  {
+    measureValues();
+  }
+  jobsDone = true;
+  for (int cell_no = 0; cell_no < LENGTH(cellVs); cell_no++)
+  {
+    bool const is_this_cell_being_charged_now = not cells[cell_no].BalanceCircuit_pin.isHigh();
+    bool const is_this_cell_fully_charged_now = cellVs[cell_no] >= (is_this_cell_being_charged_now ? overV_wanted : V_wanted);
+
+    jobsDone &= is_this_cell_fully_charged_now;
+    if ((not is_this_cell_fully_charged_now) and (not is_this_cell_being_charged_now))
+    {
+      startCharging(cell_no);
+    }
+    if ((is_this_cell_fully_charged_now) and (is_this_cell_being_charged_now))
+    {
+      breakCharging(cell_no);
+    }
+  }
+  measuredValuesAreFresh = false;
+}
+void BMS::showBmsInfo()
+{
+  sout << "powerIn_pin.is_high = " << powerIn_pin.isHigh() << ".";
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    cells[i].BalanceCircuit_pin.turnOff();
+    sout << "cells[" << i << "].BalanceCircuit_pin.is_high = " << cells[i].BalanceCircuit_pin.isHigh() << ".";
   }
-  bms_state[cells_locked] = false;
-}
-void BMS::lockPower()
-{
-  if (not bms_state[power_locked])
+  slog << "Iin_calibration = " << Iin_calibration << "[A].";
+  for (int i = 0; i < LENGTH(Qs); i++)
   {
-    powerIn_pin.turnOff();
-    bms_state[power_locked] = true;
-  }
-}
-void BMS::unlockPower()
-{
-  powerIn_pin.turnOn();
-  bms_state[power_locked] = false;
-}
-void BMS::greeting()
-{
-  if (lcd_handle)
-  {
-    LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-    lcd.println("> SYSTEM");
-    lcd.println(" ONLINE");
-    lcd.println("VERSION");
-    lcd.print("= ");
-    lcd.println(VERSION);
+    slog << "Qs[" << i << "] = " << static_cast<double>(Qs[i]) << "[mAh].";
   }
 }
 void BMS::goodbye(char const *const msg, int const countDown)
 {
   Timer hourglass = { };
-  this->lockCells();
-  bms_state[bms_being_operating] = false;
+
+  for (int i = 0; i < LENGTH(cells); i++)
+  {
+    cells[i].BalanceCircuit_pin.turnOn();
+  }
   if (lcd_handle)
   {
     lcd_handle->clear();
@@ -445,35 +461,6 @@ void BMS::goodbye(char const *const msg, int const countDown)
     delete lcd_handle;
     lcd_handle = nullptr;
   }
-  Wire.end();
-  Serial.end();
-  this->lockPower();
-  bms_state[bms_life] = false;
+  powerIn_pin.turnOff();
   abort();
-}
-void BMS::report() const
-{
-  drawlineSerial();
-  slog << "`powerIn_pin.is_high` = " << powerIn_pin.isHigh() << ".";
-  for (int i = 0; i < LENGTH(cells); i++)
-  {
-    slog << "`cells[" << i << "].BalanceCircuit_pin.is_high` = " << cells[i].BalanceCircuit_pin.isHigh() << ".";
-  }
-  slog << "`Iin_calibration` = " << Iin_calibration << "[A].";
-  for (int i = 0; i < LENGTH(Qs); i++)
-  {
-    slog << "`Qs[" << i << "]` = " << static_cast<double>(Qs[i]) << "[mAh].";
-  }
-}
-void BMS::revive()
-{
-  bms_state[bms_life] = true;
-  if (lcd_handle == nullptr)
-  {
-    lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
-  }
-  if (lcd_handle == nullptr)
-  {
-    serr << "LCD not connected.";
-  }
 }
