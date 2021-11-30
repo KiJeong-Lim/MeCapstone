@@ -110,6 +110,11 @@ public:
     }
     return *this;
   }
+  BitArray &operator=(UnsignedIntegers bits)
+  {
+    my_bits = bits;
+    return *this;
+  }
 };
 class Timer {
   ms_t volatile begTime;

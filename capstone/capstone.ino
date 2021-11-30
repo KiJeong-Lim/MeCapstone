@@ -68,10 +68,12 @@ class BMS {
   Vol_t cellVs[LENGTH(cells)]   = { };
   mAh_t Qs[LENGTH(cells)]       = { };
   BitArray<byte> bms_state      = 0u;
+  int8_t dormant_cnt            = 0;
 public:
   void setup();
   void loop();
   bool routine();
+  void reboot();
   bool checkCellsAttatched();
   bool checkPowerConnected();
   Amp_t getCalibrationOfIin();
@@ -105,6 +107,7 @@ void BMS::setup()
   Timer hourglass = { };
   invokingSerial();
   sout << "Runtime begin.";
+  bms_state = 0u;
   bms_state.set(bms_life, true);
   Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
@@ -126,12 +129,26 @@ void BMS::setup()
   }
   bms_state.set(not_dormant, true);
   hourglass.delay(3000);
+  dormant_cnt = 0;
 }
 void BMS::loop()
 {
   Timer hourglass = { };
-  bool okay = bms_state.get(bms_life);
+  bool okay = bms_state.get(bms_life) && bms_state.get(not_dormant);
   this->report();
+  if (not bms_state.get(bms_being_operating))
+  {
+    this->updateQs();
+    if (dormant_cnt < 10)
+    {
+      dormant_cnt++;
+    }
+    else
+    {
+      dormant_cnt = 0;
+      this->reboot();
+    }
+  }
   switch (okay)
   {
   default:
@@ -164,6 +181,8 @@ void BMS::loop()
         delay(2000);
         this->getCalibrationOfIin();
         this->checkPowerConnected();
+        this->measureValues();
+        this->findQs_0();
         this->unlockPower();
         break;
       }
@@ -175,18 +194,37 @@ void BMS::loop()
         this->measureValues();
         this->findQs_0();
         this->unlockCells();
+        for (int i = 0; i < LENGTH(cellVs); i++)
+        {
+          double const soc = getSocOf(i);
+          sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
+          sout << "soc[" << i << "] = " << soc << "%.";
+        }
+        this->unlockCells();
         bms_state.set(bms_being_operating, true);
         sout << "NOW BMS OPERATING.";
         break;
       }
-      sout << "Waiting."; 
+      this->unlockPower();
+      sout << "Waiting.";
       if (lcd_handle)
       {
         LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-        lcd.println("PLZ CONN");
-        lcd.println("ECT YOUR");
-        lcd.println("POWER SU");
-        lcd.println("PPLY...");
+        for (int i = 0; i < LENGTH(cellVs); i++)
+        {
+          double const soc = getSocOf(i);
+          sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
+          sout << "soc[" << i << "] = " << soc << "%.";
+          lcd.print("B");
+          lcd.print(i + 1);
+          lcd.print("=");
+          lcd.println(cellVs[i]);
+          lcd.print(" ");
+          lcd.print(soc);
+          lcd.println("%");
+        }
+        lcd.println("NO POWER");
+        lcd.println(" SUPPLY ");
       }
       break;
   case false:
@@ -200,10 +238,6 @@ void BMS::loop()
     bms_state.set(bms_being_operating, false);
     this->lockCells();
     this->lockPower();
-    for (int i = 0; i < LENGTH(Qs); i++)
-    {
-      Qs[i] = 0.0;
-    }
     Iin_calibration = 0.0;
     this->greeting();
     bms_state.set(not_dormant, true);
@@ -216,7 +250,7 @@ bool BMS::routine()
   this->measureValues();
   this->updateQs();
   this->printValues();
-  if (Iin < allowedA_min)
+  if (Iin < Iin_calibration + allowedA_min)
   {
     serr << "`Iin`" << " too LOW.";
     bms_state.set(not_dormant, false);
@@ -267,6 +301,11 @@ bool BMS::routine()
   bms_state.set(jobs_finished, every_cells_fully_charged);
   return bms_state.get(not_dormant);
 }
+void BMS::reboot()
+{
+  this->lockPower();
+  bms_state.set(not_dormant, true);
+}
 bool BMS::checkPowerConnected()
 {
   Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
@@ -297,11 +336,18 @@ bool BMS::checkCellsAttatched()
 Amp_t BMS::getCalibrationOfIin()
 {
   Vol_t Vref_sensorV = refOf.zenerdiodeVfromRtoA, Vref = refOf.arduinoRegularV, Iin_sensorV = 0.5 * Vref;
-  Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(20) / refOf.analogSignalMax;
-  Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
-  Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
-  Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
-  sout << "Iin_calibration = " << Iin_calibration << "[A].";
+  if (bms_state.get(power_locked))
+  {
+    Iin_calibration = 0.0;
+  }
+  else
+  {
+    Vref_sensorV = refOf.arduinoRegularV * arduino5V_pin.readSignal(20) / refOf.analogSignalMax;
+    Vref = refOf.arduinoRegularV * refOf.zenerdiodeVfromRtoA / Vref_sensorV;
+    Iin_sensorV = Vref * Iin_pin.readSignal(20) / refOf.analogSignalMax;
+    Iin_calibration = (Iin_sensorV - 0.5 * Vref) / refOf.sensitivityOfCurrentSensor;
+    sout << "Iin_calibration = " << Iin_calibration << "[A].";
+  }
   return Iin_calibration;
 }
 void BMS::measureValues()
@@ -463,6 +509,7 @@ void BMS::report() const
     slog << "`cells[" << i << "].BalanceCircuit_pin.is_high` = " << cells[i].BalanceCircuit_pin.isHigh() << ".";
   }
   slog << "`Iin_calibration` = " << Iin_calibration << "[A].";
+  slog << "`Iin` = " << Iin << "[A].";
   for (int i = 0; i < LENGTH(Qs); i++)
   {
     slog << "`Qs[" << i << "]` = " << static_cast<double>(Qs[i]) << "[mAh].";
@@ -470,6 +517,7 @@ void BMS::report() const
 }
 void BMS::revive()
 {
+  bms_state = 0u;
   bms_state.set(bms_life, true);
   if (lcd_handle == nullptr)
   {
