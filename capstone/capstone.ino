@@ -11,7 +11,7 @@
 #include "capstone.hpp"
 
 static constexpr
-Vol_t V_wanted = 4.190, overV_wanted = 4.195; // FIX ME!
+Vol_t V_wanted = 3.20, overV_wanted = 3.60; // FIX ME!
 
 static constexpr
 ReferenceCollection const refOf =
@@ -66,7 +66,6 @@ public:
   void checkCellsAttatched();
   void getCalibrationOfIin();
   void measureValues();
-  void checkOperatingNow();
   void findQs_0();
   void updateQs();
   double getSocOf(int cell_no) const;
@@ -291,7 +290,11 @@ void BMS::updateQs()
 {
   for (int i = 0; i < LENGTH(cells); i++)
   {
-    Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
+    bool const balance_circuit_on = cells[i].BalanceCircuit_pin.isHigh();
+    if (not balance_circuit_on)
+    {
+      Qs[i] += Iin * Qs_lastUpdatedTime.getDuration() / 3600.0;
+    }
   }
   Qs_lastUpdatedTime.reset();
 }
