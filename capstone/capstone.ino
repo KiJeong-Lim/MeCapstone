@@ -71,9 +71,9 @@ class BMS {
   int8_t dormant_cnt            = 0;
 public:
   void setup();
+  void init();
   void loop();
   bool routine();
-  void reboot();
   bool checkCellsAttatched();
   bool checkPowerConnected();
   Amp_t getCalibrationOfIin();
@@ -104,10 +104,10 @@ void loop()
 
 void BMS::setup()
 {
-  Timer hourglass = { };
   invokingSerial();
   sout << "Runtime begin.";
   bms_state = 0u;
+  dormant_cnt = 0;
   bms_state.set(bms_life, true);
   Wire.begin();
   for (int i = 0; i < LENGTH(cells); i++)
@@ -119,26 +119,23 @@ void BMS::setup()
   powerIn_pin.initWith(false);  
   bms_state.set(power_locked, true);
   lcd_handle = openLcdI2C(LCD_WIDTH, LCD_HEIGHT);
-  if (lcd_handle)
-  {
-    this->greeting();
-  }
-  else
-  {
-    serr << "LCD not connected.";
-  }
+  this->init();
+}
+void BMS::init()
+{
+  bms_state.set(bms_being_operating, false);
+  this->lockCells();
+  this->lockPower();
+  this->getCalibrationOfIin();
   bms_state.set(not_dormant, true);
-  hourglass.delay(3000);
-  dormant_cnt = 0;
 }
 void BMS::loop()
 {
   Timer hourglass = { };
-  bool okay = bms_state.get(bms_life) && bms_state.get(not_dormant);
+  bool okay = bms_state.get(bms_life);
   this->report();
   if (not bms_state.get(bms_being_operating))
   {
-    this->updateQs();
     if (dormant_cnt < 10)
     {
       dormant_cnt++;
@@ -146,12 +143,13 @@ void BMS::loop()
     else
     {
       dormant_cnt = 0;
-      this->reboot();
+      this->init();
     }
   }
   switch (okay)
   {
   default:
+    okay &= bms_state.get(not_dormant);
     if (bms_state.get(jobs_finished))
     {
       sout << "CHARGING COMPLETED.";
@@ -170,57 +168,47 @@ void BMS::loop()
       }
       if (bms_state.get(power_locked))
       {
-        sout << "Booting.";
         if (lcd_handle)
         {
           LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-          lcd.println("BOOTING ");
-          lcd.println("BMS...");
+          lcd.println("ALL CELL");
+          lcd.println("S ARE RE");
+          lcd.println("COGNIDZE");
+          lcd.println("D");
         }
-        this->unlockCells();
-        delay(2000);
-        this->getCalibrationOfIin();
-        this->checkPowerConnected();
+        sout << "Booting.";
         this->measureValues();
         this->findQs_0();
-        this->unlockPower();
+        for (int i = 0; i < LENGTH(cellVs); i++)
+        {
+          sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
+          sout << "soc[" << i << "] = " << getSocOf(i) << "%.";
+        }
+        this->unlockCells();
         break;
       }
-      this->lockCells();
+      this->getCalibrationOfIin();
+      this->unlockPower();
+      delay(2000);
       this->checkPowerConnected();
       if (bms_state.get(power_connected))
       {
-        delay(2000);
-        this->measureValues();
-        this->findQs_0();
-        this->unlockCells();
-        for (int i = 0; i < LENGTH(cellVs); i++)
-        {
-          double const soc = getSocOf(i);
-          sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
-          sout << "soc[" << i << "] = " << soc << "%.";
-        }
-        this->unlockCells();
         bms_state.set(bms_being_operating, true);
-        sout << "NOW BMS OPERATING.";
+        dormant_cnt = 0;
         break;
       }
-      this->unlockPower();
       sout << "Waiting.";
       if (lcd_handle)
       {
         LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
         for (int i = 0; i < LENGTH(cellVs); i++)
         {
-          double const soc = getSocOf(i);
-          sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
-          sout << "soc[" << i << "] = " << soc << "%.";
           lcd.print("B");
           lcd.print(i + 1);
           lcd.print("=");
           lcd.println(cellVs[i]);
           lcd.print(" ");
-          lcd.print(soc);
+          lcd.print(getSocOf(i));
           lcd.println("%");
         }
         lcd.println("NO POWER");
@@ -235,12 +223,8 @@ void BMS::loop()
     {
       sout << "Restarting.";
     }
-    bms_state.set(bms_being_operating, false);
-    this->lockCells();
-    this->lockPower();
-    Iin_calibration = 0.0;
+    this->init();
     this->greeting();
-    bms_state.set(not_dormant, true);
   }
   hourglass.delay(3000);
 }
@@ -300,11 +284,6 @@ bool BMS::routine()
   }
   bms_state.set(jobs_finished, every_cells_fully_charged);
   return bms_state.get(not_dormant);
-}
-void BMS::reboot()
-{
-  this->lockPower();
-  bms_state.set(not_dormant, true);
 }
 bool BMS::checkPowerConnected()
 {
