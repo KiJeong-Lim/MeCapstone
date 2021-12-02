@@ -20,7 +20,7 @@
 // version information
 #define MAJOR_VERSION     1
 #define MINOR_VERSION     1
-#define REVISION_NUMBER   0
+#define REVISION_NUMBER   1
 #include "version.h"
 
 // macro defns
@@ -152,19 +152,19 @@ public:
   Val_t get_x_by_parameter(Val_t param) const;
   Val_t get_x_by_y(Val_t y) const;
 };
-template <size_t TableWidth, typename TypeOfData = Val_t>
+template <size_t TableWidth, typename Fractional_t = Val_t>
 class Map2d {
-  TypeOfData const left_bound_of_xs;
-  TypeOfData const right_bound_of_xs;
-  TypeOfData const min_of_s;
-  TypeOfData const max_of_s;
+  Fractional_t const left_bound_of_xs;
+  Fractional_t const right_bound_of_xs;
+  Fractional_t const min_of_s;
+  Fractional_t const max_of_s;
   int const number_of_intervals;
   int const number_of_s_levels;
-  TypeOfData const (*table)[TableWidth];
-  TypeOfData ys[TableWidth];
+  Fractional_t const (*table)[TableWidth];
+  Fractional_t ys[TableWidth];
 public:
   template <size_t TableHeight>
-  Map2d(TypeOfData const (*data_sheet_ref)[TableHeight][TableWidth], TypeOfData const left_bound, TypeOfData const right_bound, TypeOfData const s_min, TypeOfData const s_max)
+  Map2d(Fractional_t const (*data_sheet_ref)[TableHeight][TableWidth], Fractional_t const left_bound, Fractional_t const right_bound, Fractional_t const s_min, Fractional_t const s_max)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , min_of_s{ s_min }
@@ -181,11 +181,11 @@ public:
   ~Map2d()
   {
   }
-  TypeOfData get_x_by_parameter(TypeOfData const param) const
+  Fractional_t get_x_by_parameter(Fractional_t const param) const
   {
     return ((param * (right_bound_of_xs - left_bound_of_xs) / number_of_intervals) + left_bound_of_xs);
   }
-  TypeOfData get_x_by_y(TypeOfData const y) const
+  Fractional_t get_x_by_y(Fractional_t const y) const
   {
     int low = 0, high = number_of_intervals;
   
@@ -219,7 +219,7 @@ public:
       return this->get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
     } 
   }
-  TypeOfData with_s_get_x_by_y(TypeOfData const s, TypeOfData const y)
+  Fractional_t with_s_get_x_by_y(Fractional_t const s, Fractional_t const y)
   {
     if (s <= min_of_s)
     {
@@ -237,22 +237,12 @@ public:
     }
     else
     {
-      TypeOfData const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
+      Fractional_t const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
       int const idx = param_s;
       
-      if (static_cast<TypeOfData>(idx) == param_s)
-      {
-        for (int i = 0; i < TableWidth; i++)
-        {        
-          ys[i] = table[idx][i];
-        }
-      }
-      else
-      {
-        for (int i = 0; i < TableWidth; i++)
-        {        
-          ys[i] = ((table[idx + 1][i] - table[idx][i]) * (param_s - idx)) + table[idx][i];
-        }
+      for (int i = 0; i < TableWidth; i++)
+      {        
+        ys[i] = ((table[idx + 1][i] - table[idx][i]) * (param_s - idx)) + table[idx][i];
       }
     }
     return this->get_x_by_y(y);
