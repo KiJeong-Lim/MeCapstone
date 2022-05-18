@@ -75,7 +75,7 @@ ms_t Timer::time() const
 }
 void Timer::delay(ms_t const duration) const
 {
-  while (time() < duration)
+  while (this->time() < duration)
   {
     delay1ms();
   }
@@ -145,19 +145,19 @@ double AscList::get_x_by_y(double const y) const
     }
     else
     {
-      return get_x_by_parameter(mid);
+      return this->get_x_by_parameter(mid);
     }
   }
   if (low > number_of_intervals)
   {
-    return get_x_by_parameter(number_of_intervals);
+    return this->get_x_by_parameter(number_of_intervals);
   }
   else if (high < 0)
   {
-    return get_x_by_parameter(0);
+    return this->get_x_by_parameter(0);
   }
   else
   {
-    return get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
+    return this->get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
   }
 }

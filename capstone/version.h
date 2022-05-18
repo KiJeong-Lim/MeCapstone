@@ -21,7 +21,7 @@
 
 // Please do NOT manipulate any macros other than these:
 #define SERIAL_PORT       9600
-#define OPERATING_MODE    1
+#define OPERATING_MODE    3
 #define LCD_WIDTH         16
 #define LCD_HEIGHT        2
 #define LCD_SECTION_EA    2
@@ -130,7 +130,9 @@
 ** 3. File moved `capstone/capstone.ino` -> `capstone/capstone-stable.ino`.
 ** 4. The class `BMS` fixed.
 ** [2021-11-23]
-** 1. `VERSION` updated to `1.10`.
+** 1. `VERSION` updated to `1.11`.
+** [2022-05-18]
+** 1. `VERSION` updated to `1.20`.
 */
 
 /* Circuit Archive
@@ -206,7 +208,7 @@
 ** >             |   |               |   |                       [ZenerDiode]                         |
 ** >             |   |               |   |                                                            |
 ** >             |   |               |   |   +---------------------< E                                |
-** >             +---|---------------|---|---|--------< 330Ohm >---< B                                |
+** >             +---|---------------|---|---|---< 330Ohm >--------< B                                |
 ** >                 |               |   |   |                 +---< C                                |
 ** >                 |   +-----------+   |   |                 |   [NPN]        +-----------------+   |
 ** >                 |   |               |   |                 |                |                 |   |

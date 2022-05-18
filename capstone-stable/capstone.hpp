@@ -19,7 +19,7 @@
 
 // version information
 #define MAJOR_VERSION     1
-#define MINOR_VERSION     0
+#define MINOR_VERSION     2
 #define REVISION_NUMBER   0
 #include "version.h"
 
@@ -79,6 +79,43 @@ typedef LiquidCrystal_I2C *LcdHandle_t;
 void invokingSerial();
 void drawlineSerial();
 BigInt_t POW(BigInt_t base, int expn);
+template <typename UnsignedIntegers = byte>
+class BitArray {
+  UnsignedIntegers my_bits;
+public:
+  BitArray(UnsignedIntegers const _my_bits)
+    : my_bits{ _my_bits }
+  {
+  }
+  BitArray(BitArray const &other)
+    : my_bits{ other.my_bits }
+  {
+  }
+  ~BitArray()
+  {
+  }
+  bool get(int8_t const n) const
+  {
+    return (my_bits & (1u << n));
+  }
+  BitArray &set(int8_t const n, bool const to_be)
+  {
+    if (to_be)
+    {
+      my_bits |= (1u << n);
+    }
+    else
+    {
+      my_bits &= ~(1u << n);
+    }
+    return *this;
+  }
+  BitArray &operator=(UnsignedIntegers bits)
+  {
+    my_bits = bits;
+    return *this;
+  }
+};
 class Timer {
   ms_t volatile begTime;
 public:
@@ -93,16 +130,16 @@ public:
   void delay(ms_t duration) const;
 };
 class AscList {
-  double const left_bound_of_xs;
-  double const right_bound_of_xs;
-  double const *const ys;
+  Val_t const left_bound_of_xs;
+  Val_t const right_bound_of_xs;
+  Val_t const *const ys;
   int const number_of_intervals;
 public:
   AscList() = delete;
   AscList(AscList const &other) = delete;
   AscList(AscList &&other) = delete;
   template <size_t size_of_data_sheet>
-  AscList(double const (*const data_sheet_ref)[size_of_data_sheet], double const left_bound, double const right_bound)
+  AscList(Val_t const (*const data_sheet_ref)[size_of_data_sheet], Val_t const left_bound, Val_t const right_bound)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , ys{ *data_sheet_ref }
@@ -111,30 +148,30 @@ public:
   }
   ~AscList();
   bool isValid() const;
-  double get_y_by_x(double x) const;
-  double get_x_by_parameter(double param) const;
-  double get_x_by_y(double y) const;
+  Val_t get_y_by_x(Val_t x) const;
+  Val_t get_x_by_parameter(Val_t param) const;
+  Val_t get_x_by_y(Val_t y) const;
 };
-template <size_t TableWidth, typename Val_t = double>
+template <size_t TableWidth, typename Fractional_t = Val_t>
 class Map2d {
-  Val_t const left_bound_of_xs;
-  Val_t const right_bound_of_xs;
-  Val_t const min_of_s;
-  Val_t const max_of_s;
-  int number_of_intervals;
-  int number_of_s_levels;
-  Val_t const (*table)[TableWidth];
-  Val_t ys[TableWidth];
+  Fractional_t const left_bound_of_xs;
+  Fractional_t const right_bound_of_xs;
+  Fractional_t const min_of_s;
+  Fractional_t const max_of_s;
+  int const number_of_intervals;
+  int const number_of_s_levels;
+  Fractional_t const (*table)[TableWidth];
+  Fractional_t ys[TableWidth];
 public:
   template <size_t TableHeight>
-  Map2d(Val_t const (*table_ref)[TableHeight][TableWidth], Val_t const left_bound, Val_t const right_bound, Val_t const s_min, Val_t const s_max)
+  Map2d(Fractional_t const (*data_sheet_ref)[TableHeight][TableWidth], Fractional_t const left_bound, Fractional_t const right_bound, Fractional_t const s_min, Fractional_t const s_max)
     : left_bound_of_xs{ left_bound }
     , right_bound_of_xs{ right_bound }
     , min_of_s{ s_min }
     , max_of_s{ s_max }
     , number_of_intervals{ static_cast<int>(TableWidth) - 1 }
     , number_of_s_levels{ static_cast<int>(TableHeight) - 1 }
-    , table{ *table_ref }
+    , table{ *data_sheet_ref }
     , ys{ }
   {
   }
@@ -144,11 +181,11 @@ public:
   ~Map2d()
   {
   }
-  Val_t get_x_by_parameter(Val_t const param) const
+  Fractional_t get_x_by_parameter(Fractional_t const param) const
   {
     return ((param * (right_bound_of_xs - left_bound_of_xs) / number_of_intervals) + left_bound_of_xs);
   }
-  Val_t get_x_by_y(Val_t const y) const
+  Fractional_t get_x_by_y(Fractional_t const y) const
   {
     int low = 0, high = number_of_intervals;
   
@@ -166,23 +203,23 @@ public:
       }
       else
       {
-        return get_x_by_parameter(mid);
+        return this->get_x_by_parameter(mid);
       }
     }
     if (low > number_of_intervals)
     {
-      return get_x_by_parameter(number_of_intervals);
+      return this->get_x_by_parameter(number_of_intervals);
     }
     else if (high < 0)
     {
-      return get_x_by_parameter(0);
+      return this->get_x_by_parameter(0);
     }
     else
     {
-      return get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
+      return this->get_x_by_parameter(((y - ys[high]) / (ys[low] - ys[high])) * (low - high) + high);
     } 
   }
-  Val_t with_s_get_x_by_y(Val_t const s, Val_t const y)
+  Fractional_t with_s_get_x_by_y(Fractional_t const s, Fractional_t const y)
   {
     if (s <= min_of_s)
     {
@@ -200,25 +237,15 @@ public:
     }
     else
     {
-      Val_t const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
+      Fractional_t const param_s = (s - min_of_s) * (number_of_s_levels / (max_of_s - min_of_s));
       int const idx = param_s;
       
-      if (static_cast<double>(idx) == param_s)
-      {
-        for (int i = 0; i < TableWidth; i++)
-        {        
-          ys[i] = table[idx][i];
-        }
-      }
-      else
-      {
-        for (int i = 0; i < TableWidth; i++)
-        {        
-          ys[i] = ((table[idx + 1][i] - table[idx][i]) * (param_s - idx)) + table[idx][i];
-        }
+      for (int i = 0; i < TableWidth; i++)
+      {        
+        ys[i] = ((table[idx + 1][i] - table[idx][i]) * (param_s - idx)) + table[idx][i];
       }
     }
-    return get_x_by_y(y);
+    return this->get_x_by_y(y);
   }
 };
 /* Comments
@@ -277,7 +304,7 @@ public:
   {
     if (printMe >= 0 && printMe < 16)
     {
-      putChar("0123456789ABCDEF"[printMe]);
+      this->putChar("0123456789ABCDEF"[printMe]);
     }
   }
   void putInt(BigInt_t const printMe, int const base)
@@ -286,7 +313,7 @@ public:
     BigInt_t val = printMe;
     if (val < 0)
     {
-      putChar('-');
+      this->putChar('-');
       val *= -1;
     }
     for (BigInt_t _val = 1; _val <= val; _val *= base)
@@ -295,7 +322,7 @@ public:
     }
     do
     {
-      putDigit(((base * val) / POW(base, cn)) % base);
+      this->putDigit(((base * val) / POW(base, cn)) % base);
     } while (--cn > 0);
   }
   void putDouble(double const printMe, int const afters_dot)
@@ -304,7 +331,7 @@ public:
     double val = printMe;
     if (printMe < 0.0)
     {
-      putChar('-');
+      this->putChar('-');
       val *= -1;
     }
     if (afters_dot > 0)
@@ -314,11 +341,11 @@ public:
       BigInt_t valN = ROUND(val * pow10_afters_dot);
       BigInt_t valF = valN % pow10_afters_dot;
       valN /= pow10_afters_dot;
-      putInt(valN, base);
-      putChar('.');
+      this->putInt(valN, base);
+      this->putChar('.');
       do
       {
-        putDigit(((base * valF) / POW(base, cn)) % base);
+        this->putDigit(((base * valF) / POW(base, cn)) % base);
       } while (--cn > 0);
     }
     else
@@ -326,7 +353,7 @@ public:
       BigInt_t valE = POW(base, - afters_dot);
       BigInt_t valN = ROUND(val / (static_cast<double>(valE)));
       valN *= valE;
-      putInt(valN, base);
+      this->putInt(valN, base);
     }
   }
   void putString(char const *const printMe)
@@ -350,14 +377,18 @@ public:
 class LcdPrinter {
   LcdHandle_t const lcdHandle;
   int section_no;
-  SizedFormatter<LCD_SECTION_LEN> fbuf;
-  char mybuf[LCD_HEIGHT][LCD_WIDTH + 1];
+  SizedFormatter<LCD_SECTION_LEN> auxiliary_buffer;
+  char main_buffer[LCD_HEIGHT][LCD_WIDTH + 1];
 public:
   LcdPrinter() = delete;
   LcdPrinter(LcdPrinter const &other) = delete;
   LcdPrinter(LcdPrinter &&other) = delete;
   LcdPrinter(LcdHandle_t const &lcdHandleRef);
   ~LcdPrinter();
+  void overwrite();
+  void clear();
+  void send();
+  void flush();
   void newline();
   void print(int num, int base = 10);
   void println(int num, int base = 10);
@@ -365,7 +396,6 @@ public:
   void println(double val, int afters_dot = 2);
   void print(char const *str);
   void println(char const *str);
-  void flush();
 };
 class SerialPrinter {
   char const *const prefix_of_message;
@@ -437,8 +467,7 @@ public:
   PinReader(PinReader &&other) = delete;
   PinReader(pinId_t pinId);
   ~PinReader();
-  int read_once() const;
-  Val_t readSignalOnce() const;
+  int readSignalOnce() const;
   Val_t readSignal(ms_t duration) const;
 };
 class PinSetter : public PinHandler {
@@ -500,8 +529,8 @@ extern AscList const mySocOcvTable, mySocVcellTable;
 
 // implemented in "capstone.ino"
 struct PinsOfCell {
-  PinReader const voltage_sensor_pin;
-  PinSetter const BalanceCircuit_pin;
+  PinReader voltage_sensor_pin;
+  PinSetter BalanceCircuit_pin;
 };
 struct ReferenceCollection {
   Val_t const analogSignalMax;

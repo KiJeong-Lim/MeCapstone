@@ -19,8 +19,8 @@
 
 // version information
 #define MAJOR_VERSION     1
-#define MINOR_VERSION     1
-#define REVISION_NUMBER   1
+#define MINOR_VERSION     2
+#define REVISION_NUMBER   0
 #include "version.h"
 
 // macro defns
@@ -529,8 +529,8 @@ extern AscList const mySocOcvTable, mySocVcellTable;
 
 // implemented in "capstone.ino"
 struct PinsOfCell {
-  PinReader const voltage_sensor_pin;
-  PinSetter const BalanceCircuit_pin;
+  PinReader voltage_sensor_pin;
+  PinSetter BalanceCircuit_pin;
 };
 struct ReferenceCollection {
   Val_t const analogSignalMax;

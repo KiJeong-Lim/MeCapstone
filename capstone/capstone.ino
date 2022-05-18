@@ -21,7 +21,7 @@ enum bms_state_mask_t : int {
   not_dormant             = 7,
 };
 
-static constexpr Vol_t V_wanted = 3.20;
+static constexpr Vol_t V_wanted = 3.80;
 
 static constexpr
 ReferenceCollection const refOf =
@@ -39,25 +39,32 @@ static constexpr
 Amp_t allowedA_max = 2.00, allowedA_min = 0.10;
 
 static
-PinsOfCell const cells[] =
-#if( OPERATING_MODE == 1 )
+PinsOfCell cells[] =
+#if  ( OPERATING_MODE == 1 )
 { { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
-#else
+#elif( OPERATING_MODE == 2 )
 { { .voltage_sensor_pin = { .pinId = Apin(0) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
 , { .voltage_sensor_pin = { .pinId = Apin(1) }, .BalanceCircuit_pin = { .pinId = Dpin(3) } } // B2(7V4)
 , { .voltage_sensor_pin = { .pinId = Apin(2) }, .BalanceCircuit_pin = { .pinId = Dpin(4) } } // B3(11V1)
+#elif( OPERATING_MODE == 3 )
+{ { .voltage_sensor_pin = { .pinId = Apin(1) }, .BalanceCircuit_pin = { .pinId = Dpin(2) } } // B1(3V7)
+, { .voltage_sensor_pin = { .pinId = Apin(2) }, .BalanceCircuit_pin = { .pinId = Dpin(3) } } // B2(7V4)
 #endif
 };
 
 class BMS {
-#if( OPERATING_MODE == 1 )
-  PinReader const arduino5V_pin = { .pinId = Apin(1) };
-  PinReader const Iin_pin       = { .pinId = Apin(2) };
-  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
-#else
-  PinReader const arduino5V_pin = { .pinId = Apin(3) };
-  PinReader const Iin_pin       = { .pinId = Apin(6) };
-  PinSetter const powerIn_pin   = { .pinId = Dpin(5) };
+#if  ( OPERATING_MODE == 1 )
+  PinReader arduino5V_pin = { .pinId = Apin(1) };
+  PinReader Iin_pin       = { .pinId = Apin(2) };
+  PinSetter powerIn_pin   = { .pinId = Dpin(5) };
+#elif( OPERATING_MODE == 2 )
+  PinReader arduino5V_pin = { .pinId = Apin(3) };
+  PinReader Iin_pin       = { .pinId = Apin(6) };
+  PinSetter powerIn_pin   = { .pinId = Dpin(5) };
+#elif( OPERATING_MODE == 3 )
+  PinReader arduino5V_pin = { .pinId = Apin(0) };
+  PinReader Iin_pin       = { .pinId = Apin(3) };
+  PinSetter powerIn_pin   = { .pinId = Dpin(13) };
 #endif
   Timer Qs_lastUpdatedTime      = { .init_time = 0 };
   LcdHandle_t lcd_handle        = nullptr;
@@ -240,6 +247,10 @@ void BMS::loop()
     }
     else
     {
+      for (int i = 0; i < LENGTH(cellVs); i++)
+      {
+        sout << "cellVs[" << i << "] = " << cellVs[i] << "[V].";
+      }
       sout << "Restarting.";
     }
     this->init();
@@ -275,10 +286,13 @@ bool BMS::checkCellsAttatched()
 {
   bool every_cell_being_attatched = true;
   Vol_t sensorV = 0.0, accumV = 0.00;
+  double signal = 0.0;
   for (int i = 0; i < LENGTH(cells); i++)
   {
     constexpr Ohm_t R1 = 18000.0, R2 = 2000.0;
-    sensorV = refOf.arduinoRegularV * cells[i].voltage_sensor_pin.readSignal(20) / refOf.analogSignalMax;
+    signal = cells[i].voltage_sensor_pin.readSignal(20);
+    sout << "signal (cell_no = " << i + 1 << ") = " << signal;
+    sensorV = refOf.arduinoRegularV * signal / refOf.analogSignalMax;
     cellVs[i] = (sensorV / (R2 / (R1 + R2))) - accumV;
     accumV += cellVs[i];
   }
