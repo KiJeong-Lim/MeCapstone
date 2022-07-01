@@ -133,6 +133,8 @@
 ** 1. `VERSION` updated to `1.11`.
 ** [2022-05-18]
 ** 1. `VERSION` updated to `1.20`.
+** [2022-05-21]
+** 1. `VERSION` updated to `2.00`.
 */
 
 /* Circuit Archive

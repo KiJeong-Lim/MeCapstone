@@ -18,8 +18,8 @@
 #include "LiquidCrystal_I2C.h"
 
 // version information
-#define MAJOR_VERSION     1
-#define MINOR_VERSION     2
+#define MAJOR_VERSION     2
+#define MINOR_VERSION     0
 #define REVISION_NUMBER   0
 #include "version.h"
 
@@ -528,10 +528,6 @@ extern AscList const mySocOcvTable, mySocVcellTable;
 */
 
 // implemented in "capstone.ino"
-struct PinsOfCell {
-  PinReader voltage_sensor_pin;
-  PinSetter BalanceCircuit_pin;
-};
 struct ReferenceCollection {
   Val_t const analogSignalMax;
   Vol_t const arduinoRegularV;
@@ -540,8 +536,6 @@ struct ReferenceCollection {
   Vol_t const zenerdiodeVfromRtoA;
 };
 /* Comments
-** [PinsOfCell]
-** 1. A class whose instances consist of pins associated with a cell.
 ** [ReferenceCollection]
 ** 1. A class, each instance of which is a collection of value references.
 */
