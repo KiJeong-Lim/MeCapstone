@@ -186,7 +186,7 @@ void SerialPrinter::trick()
   }
 #endif
 }
-SerialPrinter SerialPrinter::operator<<(bool is)
+SerialPrinter SerialPrinter::operator<<(bool const is)
 {
   this->trick();
 #if defined(SERIAL_PORT)
