@@ -164,7 +164,8 @@ SerialPrinter::~SerialPrinter()
 {
 #if defined(SERIAL_PORT)
   if (Serial)
-  { if (newline)
+  {
+    if (newline)
     {
       Serial.println("");
       delay(5);

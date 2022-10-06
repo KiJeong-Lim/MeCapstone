@@ -176,8 +176,7 @@
 **   [PNP]          2N3906 PNP Transistor                  x 1
 **   [PowerSupply]  SMART RDP-305 DC Power Supply          x 1
 **   [RedLED]       microtivity IL011 5mm Diffused Red LED x 1
-**   [Resistor]     5Ohm                                   x 1
-**                  120Ohm                                 x 1
+**   [Resistor]     120Ohm                                 x 1
 **                  220Ohm                                 x 1
 **                  330Ohm                                 x 2
 **                  1kOhm                                  x 3
@@ -228,7 +227,7 @@
 ** >    +---< + [Cell] - >---------------+---< 100kOhm >---+-------< G                  |                 |
 ** >    |                                                      +---< D                  |                 |
 ** >    |                                                      |   [N-MOSFET]           |                 |
-** >    +---< 5Ohm >-------------------------------------------+                        |                 |
+** >    +---< WCR5OhmJ5W >-------------------------------------+                        |                 |
 ** >    |                                                      |                        |                 |
 ** >    +---< + [RedLED] - >---< 220Ohm >----------------------+                        |                 |
 ** >    |                                                                               |                 |
