@@ -584,7 +584,6 @@ namespace BMS {
   {
     Timer hourglass = { };
 
-#if 0
     // MEASURE VALUES
     {
       Vol_t sensorV = 0.00, accumV = 0.00;
@@ -676,29 +675,6 @@ namespace BMS {
         break;
       }
     }
-#else
-
-    if (lcd_handle)
-    {
-      LcdPrinter lcd = { .lcdHandleRef = lcd_handle };
-      mAh_t Q;
-      double soc;
-      lcd.println("B1=3.96");
-      Q = refOf.batteryCapacity * mySocOcvTable.get_x_by_y(3.96) / 100.0;
-      soc = 100.0 * Q / refOf.batteryCapacity;
-      lcd.print(soc);
-      lcd.println("%");
-      lcd.println("B2=4.00");
-      Q = refOf.batteryCapacity * mySocOcvTable.get_x_by_y(4.00) / 100.0;
-      soc = 100.0 * Q / refOf.batteryCapacity;
-      lcd.print(soc);
-      lcd.println("%");
-      lcd.println(VERSION);
-    }
-
-    cells[0].DISCHARGER_pin.turnOff();
-    cells[1].DISCHARGER_pin.turnOff();
-#endif
 
     hourglass.delay(100000);
   }
